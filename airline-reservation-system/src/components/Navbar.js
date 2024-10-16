@@ -6,16 +6,28 @@ const Navbar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        {/* Enlace al home ("/") */}
+        <Typography
+          variant="h6"
+          component={Link}
+          to="/"
+          sx={{
+            flexGrow: 1,
+            textDecoration: "none",
+            color: "inherit",
+            cursor: "pointer",
+          }}
+        >
           AeroTicket
         </Typography>
+
         <Button color="inherit" component={Link} to="/login" sx={{ mx: 1 }}>
           Iniciar Sesión
         </Button>
         <Button color="inherit" sx={{ mx: 1 }}>
           Reservar
         </Button>
-        <Button color="inherit"  component={Link} to="/Editperfil" sx={{ mx: 1 }}>
+        <Button color="inherit" component={Link} to="/perfil" sx={{ mx: 1 }}>
           Perfil
         </Button>
       </Toolbar>
