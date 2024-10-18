@@ -40,7 +40,7 @@ const Login = () => {
       </Button>
 
       <Box mt={2} display="flex" justifyContent="space-between" width="100%">
-        <Link href="#" underline="hover">
+        <Link href="/Registro" underline="hover">
           ¿No tienes cuenta? Registrarse
         </Link>
         <Link href="#" underline="hover">

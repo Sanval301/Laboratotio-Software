@@ -16,6 +16,7 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar"; // Tu Navbar personalizado
 import Perfil from "./components/Perfil"; // Importa tu componente de perfil
 import Login from "./components/Login"; // Importa tu componente de login
+import Registro from "./components/Registro"; //Importa componente de registro
 import { useMediaQuery } from "@mui/material";
 
 const theme = createTheme({
@@ -147,6 +148,8 @@ function App() {
           <Route path="/" element={<PaginaPrincipal />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/Registro" element={<Registro />} />
+
         </Routes>
         <Box
           component="footer"
