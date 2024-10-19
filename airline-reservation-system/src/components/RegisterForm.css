@@ -1,0 +1,83 @@
+/* RegisterForm.css */
+.register-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    margin: 50px auto;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .register-title {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+  }
+  
+  .register-field {
+    margin-bottom: 20px;
+  }
+  
+  .register-field input,
+  .register-field select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+  }
+  
+  .register-field input:focus,
+  .register-field select:focus {
+    border-color: #1976d2;
+    outline: none;
+  }
+  
+  .register-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .register-button button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .register-button button:hover {
+    background-color: #1565c0;
+  }
+  
+  .register-button button:active {
+    background-color: #0d47a1;
+  }
+  
+  .register-links {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .register-links a {
+    color: #1976d2;
+    text-decoration: none;
+    margin: 0 10px;
+  }
+  
+  .register-links a:hover {
+    text-decoration: underline;
+  }
+  
