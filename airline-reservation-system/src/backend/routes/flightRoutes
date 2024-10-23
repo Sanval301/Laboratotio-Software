@@ -1,0 +1,9 @@
+const express = require("express");
+const router = express.Router();
+const flightController = require("../controllers/flightController");
+
+// Definir las rutas
+router.get("/", flightController.getAllFlights); // Obtener todos los vuelos
+router.post("/", flightController.createFlight); // Crear un vuelo nuevo
+
+module.exports = router;

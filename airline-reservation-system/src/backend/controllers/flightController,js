@@ -1,0 +1,27 @@
+const flightService = require("../services/flightService");
+
+// Obtener todos los vuelos
+const getAllFlights = async (req, res) => {
+  try {
+    const flights = await flightService.getAllFlights();
+    res.status(200).json(flights);
+  } catch (error) {
+    res.status(500).json({ error: "Error al obtener los vuelos" });
+  }
+};
+
+// Crear una nueva reserva de vuelo
+const createFlight = async (req, res) => {
+  const { flightDetails } = req.body;
+  try {
+    const newFlight = await flightService.createFlight(flightDetails);
+    res.status(201).json(newFlight);
+  } catch (error) {
+    res.status(500).json({ error: "Error al crear el vuelo" });
+  }
+};
+
+module.exports = {
+  getAllFlights,
+  createFlight,
+};
