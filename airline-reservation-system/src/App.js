@@ -17,6 +17,7 @@ import Navbar from "./components/Navbar"; // Tu Navbar personalizado
 import Perfil from "./components/Perfil"; // Importa tu componente de perfil
 import Login from "./components/Login"; // Importa tu componente de login
 import Registro from "./components/Registro"; //Importa componente de registro
+import EditarVuelos from "./components/EditarVuelos"; //Importa componente de Edicion de vuelos
 import { useMediaQuery } from "@mui/material";
 
 const theme = createTheme({

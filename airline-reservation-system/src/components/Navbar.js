@@ -30,6 +30,9 @@ const Navbar = () => {
         <Button color="inherit" component={Link} to="/perfil" sx={{ mx: 1 }}>
           Perfil
         </Button>
+        <Button color="inherit" component={Link} to="/EditarVuelos" sx={{ mx: 1 }}>
+          Edicion Vuelos
+        </Button>
       </Toolbar>
     </AppBar>
   );
