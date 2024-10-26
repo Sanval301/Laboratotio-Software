@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",

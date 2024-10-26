@@ -2,6 +2,12 @@ const express = require("express");
 const router = express.Router();
 const flightController = require("../controllers/flightController");
 
+// Ruta para registrar un nuevo usuario
+router.post("/register", flightController.register);
+
+// Ruta para iniciar sesión
+router.post("/login", flightController.login);
+
 // Definir las rutas
 router.get("/", flightController.getAllFlights); // Obtener todos los vuelos
 router.post("/", flightController.createFlight); // Crear un vuelo nuevo

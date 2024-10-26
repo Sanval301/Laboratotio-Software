@@ -3,7 +3,7 @@ const flightService = require("../services/flightService");
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const token = await authService.login(email, password);
+    const token = await flightService.login(email, password);
     res.status(200).json({ token });
   } catch (error) {
     res.status(401).json({ error: "Credenciales inválidas" });
@@ -14,7 +14,7 @@ const login = async (req, res) => {
 const register = async (req, res) => {
   const { email, password } = req.body;
   try {
-    const newUser = await authService.register(email, password);
+    const newUser = await flightService.register(email, password);
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ error: "Error al registrar el usuario" });

@@ -1,7 +1,31 @@
-import React from "react";
-import { TextField, Button, Box, Typography, Link } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Typography, TextField, Button, Link } from "@mui/material";
+import axios from "axios";
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleLogin = async () => {
+    try {
+      // Enviar los datos al backend
+      const response = await axios.post("http://localhost:3000/login", {
+        username: email,
+        password: password,
+      });
+
+      // Guardar el token en el localStorage o manejarlo según lo necesites
+      localStorage.setItem("token", response.data.token);
+      setError(""); // Limpiar cualquier error previo
+
+      // Redirigir o actualizar el estado según sea necesario
+      alert("Inicio de sesión exitoso");
+    } catch (err) {
+      setError(err.response?.data?.message || "Error en el inicio de sesión");
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -25,6 +49,8 @@ const Login = () => {
         margin="normal"
         type="email"
         required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
       />
 
       <TextField
@@ -33,9 +59,23 @@ const Login = () => {
         margin="normal"
         type="password"
         required
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
       />
 
-      <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+      {error && (
+        <Typography color="error" variant="body2" gutterBottom>
+          {error}
+        </Typography>
+      )}
+
+      <Button
+        variant="contained"
+        color="primary"
+        fullWidth
+        sx={{ mt: 2 }}
+        onClick={handleLogin}
+      >
         Iniciar Sesión
       </Button>
 

@@ -4,8 +4,8 @@ const mysql = require("mysql2");
 const db = mysql.createConnection({
   host: "localhost", // Cambiar por la dirección de tu servidor MySQL si no es local
   user: "root", // Tu usuario de MySQL
-  password: "password", // Tu contraseña de MySQL
-  database: "airline_reservation", // Nombre de tu base de datos
+  password: "1234", // Tu contraseña de MySQL
+  database: "mibasededatos", // Nombre de tu base de datos
 });
 
 // Conectar a la base de datos

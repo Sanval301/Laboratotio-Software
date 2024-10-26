@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios"; // Asegúrate de importar axios
 import {
   Button,
   TextField,
@@ -13,10 +14,10 @@ import {
 
 function Registro() {
   const [formData, setFormData] = useState({
-    nombreUsuario: "",
+    username: "",
     nombreCompleto: "",
     email: "",
-    contrasena: "",
+    password: "", // Cambia a 'password' para que coincida con el backend
     genero: "",
     cedula: "",
   });
@@ -29,10 +30,20 @@ function Registro() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos del formulario:", formData);
-    // Aquí puedes agregar la lógica para enviar los datos al servidor
+    try {
+      const response = await axios.post("http://localhost:3000/register", {
+        username: formData.username,
+        password: formData.password,
+        email: formData.email,
+      });
+      console.log("Usuario registrado:", response.data);
+      alert("Usuario registrado con éxito");
+    } catch (error) {
+      console.error("Error al registrar usuario:", error);
+      alert("Error al registrar usuario");
+    }
   };
 
   return (
@@ -62,8 +73,8 @@ function Registro() {
             margin="normal"
             fullWidth
             label="Nombre de Usuario"
-            name="nombreUsuario"
-            value={formData.nombreUsuario}
+            name="username"
+            value={formData.username}
             onChange={handleChange}
             required
           />
@@ -90,8 +101,8 @@ function Registro() {
             margin="normal"
             fullWidth
             label="Contraseña"
-            name="contrasena"
-            value={formData.contrasena}
+            name="password" // Cambia a 'password'
+            value={formData.password}
             onChange={handleChange}
             type="password"
             required
