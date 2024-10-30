@@ -11,13 +11,13 @@ const login = async (req, res) => {
 };
 
 // Registrar un nuevo usuario (opcional si decides tener registro)
-const register = require("../services/userService");
+const register = require("../services/flightService");
 
 const register = async (req, res) => {
   const { username, nombreCompleto, email, password, genero, cedula } = req.body;
   
   try {
-    const newUser = await userService.registerUser(username, nombreCompleto, email, password, genero, cedula);
+    const newUser = await flightService.register(username, nombreCompleto, email, password, genero, cedula);
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ error: "Error al registrar el usuario" });

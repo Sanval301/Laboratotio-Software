@@ -12,6 +12,6 @@ router.post("/login", flightController.login);
 router.get("/", flightController.getAllFlights); // Obtener todos los vuelos
 router.post("/", flightController.createFlight); // Crear un vuelo nuevo
 
-router.post("/", flightController.register);
+router.post("/", flightController.register); //Crea el registro
 
 module.exports = router;
