@@ -2,23 +2,26 @@ const db = require("../config/db.config");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const register = (userDetails) => {
-  return new Promise((resolve, reject) => {
-    const { username, password, email } = userDetails;
+const register = async (username, nombreCompleto, email, password, genero, cedula) => {
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Hashear la contraseña
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) return reject(err);
-
-      const query = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-      db.query(query, [username, hashedPassword, email], (err, result) => {
-        if (err) return reject(err);
-        resolve(result);
+    return new Promise((resolve, reject) => {
+      const query = `INSERT INTO users (username, nombreCompleto, email, password, genero, cedula) VALUES (?, ?, ?, ?, ?, ?)`;
+      const values = [username, nombreCompleto, email, hashedPassword, genero, cedula];
+      
+      db.query(query, values, (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ id: results.insertId, username, email });
+        }
       });
     });
-  });
+  } catch (error) {
+    throw new Error("Error al registrar el usuario");
+  }
 };
-
 // Inicio de sesión de usuario
 const login = (username, password) => {
   return new Promise((resolve, reject) => {
@@ -68,6 +71,8 @@ const createFlight = (flightDetails) => {
     });
   });
 };
+
+
 
 module.exports = {
   register,
