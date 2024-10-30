@@ -1,3 +1,5 @@
+const db = require("../config/db.config");
+const bcrypt = require("bcryptjs");
 const flightService = require("../services/flightService");
 
 const login = async (req, res) => {
@@ -11,38 +13,24 @@ const login = async (req, res) => {
 };
 
 // Registrar un nuevo usuario (opcional si decides tener registro)
-const registro = async (req, res) => {
-  const { username, nombreCompleto, email, password, genero, cedula } = req.body;
-
-  // Validación de datos
-  if (!username || !nombreCompleto || !email || !password || !genero || !cedula) {
-    return res.status(400).json({ error: "Todos los campos son obligatorios" });
-  }
-
+const registro = async (username, nombreCompleto, email, password, genero, cedula) => {
   try {
-    // Verificar si el usuario ya existe
-    const existingUser = await flightService.findUserByEmail(email);
-    if (existingUser) {
-      return res.status(409).json({ error: "El correo ya está en uso" });
-    }
-
-    // Hash de la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Registrar al usuario
-    const newUser = await flightService.registro({
-      username,
-      nombreCompleto,
-      email,
-      password: hashedPassword,
-      genero,
-      cedula,
+    return new Promise((resolve, reject) => {
+      const query = `INSERT INTO users (username, nombreCompleto, email, password, genero, cedula) VALUES (?, ?, ?, ?, ?, ?)`;
+      const values = [username, nombreCompleto, email, hashedPassword, genero, cedula];
+      
+      db.query(query, values, (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ id: results.insertId, username, email });
+        }
+      });
     });
-
-    res.status(201).json({ message: "Usuario registrado con éxito", user: newUser });
   } catch (error) {
-    console.error("Error al registrar el usuario:", error);
-    res.status(500).json({ error: "Error al registrar el usuario" });
+    throw new Error("Error al registrar el usuario");
   }
 };
 
@@ -70,7 +58,7 @@ const createFlight = async (req, res) => {
 
 module.exports = {
   login,
-  register,
+  registro,
   getAllFlights,
   createFlight,
 };
