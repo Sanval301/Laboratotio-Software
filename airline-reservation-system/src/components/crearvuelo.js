@@ -8,7 +8,7 @@ import { format, addMinutes, parse } from 'date-fns';
 // Función para enviar la información de un vuelo al backend
 const createFlight = async (flightData) => {
   try {
-    const response = await axios.post("http://localhost:5000/flights", flightData);
+    const response = await axios.post("http://localhost:3000/crearvuelo", flightData);
     console.log(response.data.message);
     alert(response.data.message); // Muestra un mensaje de éxito
   } catch (error) {
@@ -39,10 +39,8 @@ export default function Dashboard() {
           <Button variant={activeTab === 'create-flight' ? 'contained' : 'text'} fullWidth onClick={() => setActiveTab('create-flight')}>
             Crear Vuelo
           </Button>
-          {/* Aquí puedes agregar más opciones del menú */}
         </nav>
       </div>
-
       <div style={{ flex: 1, padding: 16, overflowY: 'auto' }}>
         {renderContent()}
       </div>
@@ -97,6 +95,7 @@ function CreateFlightForm() {
       DuracionVuelo: duration,
       CostoPorPersona: parseFloat(costPerPerson),
       EsInternacional: isInternational ? 1 : 0,
+      HoraLlegadaLocal: estimatedArrival,
     };
 
     await createFlight(flightData);
