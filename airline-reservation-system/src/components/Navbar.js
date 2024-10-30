@@ -29,7 +29,7 @@ const Navbar = () => {
           <Button
             color="inherit"
             component={Link}
-            to="/reservar"
+            to="/crearvuelo"
             sx={{ mx: 1 }}
           >
             Reservar

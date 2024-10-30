@@ -10,6 +10,6 @@ router.post("/login", flightController.login);
 
 // Definir las rutas
 router.get("/", flightController.getAllFlights); // Obtener todos los vuelos
-router.post("/", flightController.createFlight); // Crear un vuelo nuevo
+router.post("/crearvuelo", flightController.createFlight); // Crear un vuelo nuevo
 
 module.exports = router;
