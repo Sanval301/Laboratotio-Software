@@ -1,6 +1,5 @@
 import React from "react";
 import {
-
   Typography,
   Button,
   Select,
@@ -9,9 +8,7 @@ import {
   Grid,
   Card,
   CardContent,
-
   InputBase,
-
   Box,
   CardMedia,
 } from "@mui/material";
@@ -22,13 +19,12 @@ import Navbar from "./components/Navbar"; // Tu Navbar personalizado
 import Footer from "./components/Footer"; // Pie de pagina
 import Perfil from "./components/Perfil";
 import Login from "./components/Login";
-import Registro from "./components/Registro";
+import Register from "./components/Register";
 import Recovery from "./components/Recovery";
 import EditarVuelos from "./components/EditarVuelos";
-<<<<<<< HEAD
-import Dashboard from "./components/crearvuelo";
-=======
 import AdminVuelos from "./components/AdminVuelos";
+import CancelarVuelos from "./components/CancelarVuelos";
+import Dashboard from "./components/crearvuelo";
 
 const theme = createTheme({
   palette: {
@@ -190,9 +186,9 @@ function App() {
         <Routes>
           <Route path="/" element={<PaginaPrincipal />} />
           <Route path="/perfil" element={<Perfil />} />
-          <Route path="/crearvuelo" element={<Dashboard/>} />
+          <Route path="/crearvuelo" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Registro />} />
+          <Route path="/registro" element={<Register />} />
           <Route path="/editarvuelos" element={<EditarVuelos />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />
