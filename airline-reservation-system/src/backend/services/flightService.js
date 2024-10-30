@@ -2,22 +2,26 @@ const db = require("../config/db.config");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const register = (userDetails) => {
+const register = (email, password) => {
   return new Promise((resolve, reject) => {
-    const { username, password, email } = userDetails;
-
-    // Hashear la contraseña
     bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) return reject(err);
+      if (err) return reject(new Error("Error al encriptar la contraseña"));
 
-      const query = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-      db.query(query, [username, hashedPassword, email], (err, result) => {
-        if (err) return reject(err);
+      const query = "INSERT INTO Usuarios (Email, Contraseña) VALUES (?, ?)";
+      db.query(query, [email, hashedPassword], (err, result) => {
+        if (err) {
+          if (err.code === 'ER_DUP_ENTRY') {
+            return reject(new Error("El email ya está registrado"));
+          }
+          return reject(err);
+        }
         resolve(result);
       });
     });
   });
 };
+
+
 
 // Inicio de sesión de usuario
 const login = (username, password) => {
@@ -59,8 +63,26 @@ const getAllFlights = () => {
 // Crear un nuevo vuelo en la base de datos
 const createFlight = (flightDetails) => {
   return new Promise((resolve, reject) => {
-    const query = "INSERT INTO flights SET ?";
-    db.query(query, flightDetails, (err, result) => {
+    const query = `
+      INSERT INTO vuelos
+      (CodigoVuelo, FechaVuelo, HoraSalida, Origen, Destino, DuracionVuelo, HoraLlegadaLocal, CostoPorPersona, EsInternacional, Estado, CreadoPor)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [
+      flightDetails.CodigoVuelo,
+      flightDetails.FechaVuelo,
+      flightDetails.HoraSalida,
+      flightDetails.Origen,
+      flightDetails.Destino,
+      flightDetails.DuracionVuelo,
+      flightDetails.HoraLlegadaLocal,
+      flightDetails.CostoPorPersona,
+      flightDetails.EsInternacional,
+      flightDetails.Estado,
+      flightDetails.CreadoPor
+    ];
+
+    db.query(query, values, (err, result) => {
       if (err) {
         return reject(err);
       }
@@ -68,6 +90,7 @@ const createFlight = (flightDetails) => {
     });
   });
 };
+
 
 module.exports = {
   register,

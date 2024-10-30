@@ -7,10 +7,10 @@ const db = require("./config/db.config"); // Importar la conexión a la DB
 app.use(express.json());
 
 // Rutas de vuelos
-app.use("/api/vuelos", flightRoutes);
+app.use("/airline-reservation-system/src/backend/routes", flightRoutes);
 
 // Puerto y arranque del servidor
-const PORT = process.env.PORT || 5000;
+const PORT =  3000;
 app.listen(PORT, () => {
   console.log("Servidor corriendo en el puerto ${3000}");
 });
