@@ -1,12 +1,6 @@
 import React, { useState } from "react";
-import {
-  Button,
-  TextField,
-  Box,
-  Typography,
-  Container,
-} from "@mui/material";
-import DatePicker from "@mui/lab/DatePicker"; 
+import { Button, TextField, Box, Typography, Container } from "@mui/material";
+import DatePicker from "@mui/lab/DatePicker";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 
@@ -57,12 +51,7 @@ function EditarVuelos() {
         <Typography component="h1" variant="h5" sx={{ fontWeight: "bold" }}>
           Editar Vuelo
         </Typography>
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ mt: 3 }}
-          noValidate
-        >
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }} noValidate>
           <TextField
             margin="normal"
             fullWidth
@@ -95,7 +84,9 @@ function EditarVuelos() {
               label="Hora"
               value={formData.hora}
               onChange={handleDateChange}
-              renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
+              renderInput={(params) => (
+                <TextField {...params} fullWidth margin="normal" />
+              )}
             />
           </LocalizationProvider>
           <TextField
@@ -115,9 +106,9 @@ function EditarVuelos() {
             sx={{
               mt: 3,
               mb: 2,
-              backgroundColor: "#1976d2",
+              backgroundColor: "#6a1b9a",
               "&:hover": {
-                backgroundColor: "#1565c0",
+                backgroundColor: "#9A40BD",
               },
               fontWeight: "bold",
             }}
