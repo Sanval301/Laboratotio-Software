@@ -40,12 +40,12 @@ const Navbar = () => {
           <Button
             color="inherit"
             component={Link}
-            to="/EditarVuelos"
+            to="/AdminVuelos"
             sx={{ mx: 1 }}
           >
-            Edicion Vuelos
+            Administración de Vuelos
           </Button>{" "}
-          {/* Esto no va aca se supone que se puede hacer unicamente desde la vista de administrador */}
+          {/* Esto no va aca se supone que se puede hacer unicamente desde la vista de administrador, se deja aca momentaneamente para uso de vista */}
         </Box>
 
         {/* Opciones adicionales */}

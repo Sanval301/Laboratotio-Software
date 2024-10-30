@@ -25,7 +25,11 @@ import Login from "./components/Login";
 import Registro from "./components/Registro";
 import Recovery from "./components/Recovery";
 import EditarVuelos from "./components/EditarVuelos";
+<<<<<<< HEAD
 import Dashboard from "./components/crearvuelo";
+=======
+import AdminVuelos from "./components/AdminVuelos";
+>>>>>>> a9ceae1ba1917f9a4971cdfa7bd738a5c85c5e44
 
 const theme = createTheme({
   palette: {
@@ -192,6 +196,7 @@ function App() {
           <Route path="/registro" element={<Registro />} />
           <Route path="/editarvuelos" element={<EditarVuelos />} />
           <Route path="/recovery" element={<Recovery />} />
+          <Route path="/adminvuelos" element={<AdminVuelos />} />
         </Routes>
       </Router>
     </ThemeProvider>
