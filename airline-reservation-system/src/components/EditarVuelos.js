@@ -3,6 +3,7 @@ import { Button, TextField, Box, Typography, Container } from "@mui/material";
 import DatePicker from "@mui/lab/DatePicker";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import { Link } from "react-router-dom";
 
 function EditarVuelos() {
   const [formData, setFormData] = useState({
@@ -116,6 +117,15 @@ function EditarVuelos() {
             Guardar Cambios
           </Button>
         </Box>
+        <Button
+          component={Link}
+          to="/adminvuelos"
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2 }}
+        >
+          Regresar a Administración de Vuelos
+        </Button>
       </Box>
     </Container>
   );
