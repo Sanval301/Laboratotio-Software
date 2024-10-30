@@ -2,21 +2,27 @@ const db = require("../config/db.config");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const register = (email, password) => {
+const register = (userDetails) => {
   return new Promise((resolve, reject) => {
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) return reject(new Error("Error al encriptar la contraseña"));
+    const query = `
+      INSERT INTO users
+      (NombreUsuario, NombreCompleto, CorreoElectronico, Contrasena, Genero, Cedula)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
+    const values = [
+      userDetails.username,
+      userDetails.fullName,
+      userDetails.email,
+      userDetails.password, // Recuerda encriptar la contraseña antes de guardarla
+      userDetails.gender,
+      userDetails.idCard
+    ];
 
-      const query = "INSERT INTO Usuarios (Email, Contraseña) VALUES (?, ?)";
-      db.query(query, [email, hashedPassword], (err, result) => {
-        if (err) {
-          if (err.code === 'ER_DUP_ENTRY') {
-            return reject(new Error("El email ya está registrado"));
-          }
-          return reject(err);
-        }
-        resolve(result);
-      });
+    db.query(query, values, (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(result);
     });
   });
 };

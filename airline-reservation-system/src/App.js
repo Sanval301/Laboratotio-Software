@@ -22,15 +22,11 @@ import Navbar from "./components/Navbar"; // Tu Navbar personalizado
 import Footer from "./components/Footer"; // Pie de pagina
 import Perfil from "./components/Perfil";
 import Login from "./components/Login";
-import Registro from "./components/Registro";
 import Recovery from "./components/Recovery";
+import Registro from "./components/Register";
 import EditarVuelos from "./components/EditarVuelos";
-<<<<<<< HEAD
-import Dashboard from "./components/crearvuelo";
-=======
 import AdminVuelos from "./components/AdminVuelos";
->>>>>>> a9ceae1ba1917f9a4971cdfa7bd738a5c85c5e44
-
+import Dashboard from "./components/crearvuelo";
 const theme = createTheme({
   palette: {
     primary: {
@@ -193,7 +189,7 @@ function App() {
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/crearvuelo" element={<Dashboard/>} />
           <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Registro />} />
+          <Route path="/register" element={<Registro />} />
           <Route path="/editarvuelos" element={<EditarVuelos />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />
