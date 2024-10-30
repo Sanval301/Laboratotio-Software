@@ -11,15 +11,41 @@ const login = async (req, res) => {
 };
 
 // Registrar un nuevo usuario (opcional si decides tener registro)
-const register = async (req, res) => {
-  const { email, password } = req.body;
+const registro = async (req, res) => {
+  const { username, nombreCompleto, email, password, genero, cedula } = req.body;
+
+  // Validación de datos
+  if (!username || !nombreCompleto || !email || !password || !genero || !cedula) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios" });
+  }
+
   try {
-    const newUser = await flightService.register(email, password);
-    res.status(201).json(newUser);
+    // Verificar si el usuario ya existe
+    const existingUser = await flightService.findUserByEmail(email);
+    if (existingUser) {
+      return res.status(409).json({ error: "El correo ya está en uso" });
+    }
+
+    // Hash de la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Registrar al usuario
+    const newUser = await flightService.registro({
+      username,
+      nombreCompleto,
+      email,
+      password: hashedPassword,
+      genero,
+      cedula,
+    });
+
+    res.status(201).json({ message: "Usuario registrado con éxito", user: newUser });
   } catch (error) {
+    console.error("Error al registrar el usuario:", error);
     res.status(500).json({ error: "Error al registrar el usuario" });
   }
 };
+
 
 // Obtener todos los vuelos
 const getAllFlights = async (req, res) => {
