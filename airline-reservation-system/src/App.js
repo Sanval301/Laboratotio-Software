@@ -19,12 +19,12 @@ import Navbar from "./components/Navbar"; // Tu Navbar personalizado
 import Footer from "./components/Footer"; // Pie de pagina
 import Perfil from "./components/Perfil";
 import Login from "./components/Login";
-import Registro from "./components/Registro";
 import Recovery from "./components/Recovery";
 import Registro from "./components/Register";
 import EditarVuelos from "./components/EditarVuelos";
 import AdminVuelos from "./components/AdminVuelos";
->>>>>>> a9ceae1ba1917f9a4971cdfa7bd738a5c85c5e44
+import Crearvuelo from "./components/Crearvuelo";
+import CancelarVuelos from "./components/CancelarVuelos";
 
 const theme = createTheme({
   palette: {
@@ -186,13 +186,13 @@ function App() {
         <Routes>
           <Route path="/" element={<PaginaPrincipal />} />
           <Route path="/perfil" element={<Perfil />} />
-          <Route path="/crearvuelo" element={<Dashboard />} />
+          <Route path="/Crearvuelo" element={<Crearvuelo />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/editarvuelos" element={<EditarVuelos />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />
-          <Route path="/cancelarvuelos" element={<CancelarVuelos />} />
+          <Route path="/CancelarVuelos" element={<CancelarVuelos />} />
         </Routes>
       </Router>
     </ThemeProvider>
