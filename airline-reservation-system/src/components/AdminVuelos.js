@@ -16,6 +16,7 @@ import {
   Flight,
   CheckCircle,
   Error,
+  History,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar"; // Asegúrate de que esta ruta sea correcta
@@ -46,7 +47,9 @@ export default function AdminVuelos() {
         </Box>
         {/* Botones de acciones principales */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
+            {" "}
+            {/* Cambiar md={4} a md={3} */}
             <Button
               fullWidth
               variant="contained"
@@ -58,7 +61,7 @@ export default function AdminVuelos() {
               Crear Vuelo
             </Button>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Button
               fullWidth
               variant="contained"
@@ -70,7 +73,7 @@ export default function AdminVuelos() {
               Editar Vuelo
             </Button>
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <Button
               fullWidth
               variant="contained"
@@ -80,6 +83,18 @@ export default function AdminVuelos() {
               sx={{ height: "60px", fontSize: "1.2rem" }}
             >
               Cancelar Vuelo
+            </Button>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Button
+              fullWidth
+              variant="contained"
+              color="error"
+              startIcon={<History />}
+              onClick={() => navigate("/VuelosRealizados")}
+              sx={{ height: "60px", fontSize: "1rem" }}
+            >
+              Vuelos Realizados
             </Button>
           </Grid>
         </Grid>

@@ -25,6 +25,7 @@ import EditarVuelos from "./components/EditarVuelos";
 import AdminVuelos from "./components/AdminVuelos";
 import Crearvuelo from "./components/crearvuelo";
 import CancelarVuelos from "./components/CancelarVuelos";
+import VuelosRealizados from "./components/VuelosRealizados";
 
 const theme = createTheme({
   palette: {
@@ -193,6 +194,7 @@ function App() {
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />
           <Route path="/CancelarVuelos" element={<CancelarVuelos />} />
+          <Route path="/VuelosRealizados" element={<VuelosRealizados />} />
         </Routes>
       </Router>
     </ThemeProvider>
