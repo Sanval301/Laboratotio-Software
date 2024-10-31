@@ -23,7 +23,7 @@ import Recovery from "./components/Recovery";
 import Registro from "./components/Register";
 import EditarVuelos from "./components/EditarVuelos";
 import AdminVuelos from "./components/AdminVuelos";
-import Crearvuelo from "./components/Crearvuelo";
+import Crearvuelo from "./components/crearvuelo";
 import CancelarVuelos from "./components/CancelarVuelos";
 
 const theme = createTheme({
@@ -188,7 +188,7 @@ function App() {
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/Crearvuelo" element={<Crearvuelo />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/registro" element={<Registro />} />
+          <Route path="/register" element={<Registro />} />
           <Route path="/editarvuelos" element={<EditarVuelos />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />

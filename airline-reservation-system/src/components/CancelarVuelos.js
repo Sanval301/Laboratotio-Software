@@ -63,9 +63,9 @@ const vuelosActuales = [
   {
     id: 1,
     numero: "AA123",
-    origen: "Madrid",
-    destino: "Barcelona",
-    fecha: "2024-03-15",
+    origen: "Pereira",
+    destino: "Madrid",
+    fecha: "2024-05-11",
     hora: "10:00",
     estado: "Programado",
     pasajeros: 120,
@@ -73,9 +73,9 @@ const vuelosActuales = [
   {
     id: 2,
     numero: "IB456",
-    origen: "Sevilla",
-    destino: "Valencia",
-    fecha: "2024-03-16",
+    origen: "Bogota",
+    destino: "Miami",
+    fecha: "2024-11-11",
     hora: "14:30",
     estado: "En Espera",
     pasajeros: 80,
@@ -83,9 +83,9 @@ const vuelosActuales = [
   {
     id: 3,
     numero: "VY789",
-    origen: "Bilbao",
-    destino: "Málaga",
-    fecha: "2024-03-17",
+    origen: "Medellin",
+    destino: "Londres",
+    fecha: "2024-31-10",
     hora: "08:45",
     estado: "Embarcando",
     pasajeros: 150,
@@ -93,9 +93,9 @@ const vuelosActuales = [
   {
     id: 4,
     numero: "FR101",
-    origen: "Alicante",
-    destino: "Madrid",
-    fecha: "2024-03-18",
+    origen: "Cali",
+    destino: "Cartagena",
+    fecha: "2024-15-12",
     hora: "12:15",
     estado: "Programado",
     pasajeros: 95,
@@ -103,8 +103,8 @@ const vuelosActuales = [
   {
     id: 5,
     numero: "UX202",
-    origen: "Barcelona",
-    destino: "Ibiza",
+    origen: "Cartagena",
+    destino: "New York,",
     fecha: "2024-03-19",
     hora: "16:00",
     estado: "En Espera",
@@ -316,7 +316,7 @@ export default function CancelacionVuelosMejorada() {
                   <ListItemIcon>
                     <EventBusy color="secondary" />
                   </ListItemIcon>
-                  <ListItemText primary="Considere las implicaciones en vuelos conectados." />
+                  <ListItemText primary="Considere las implicaciones en vuelos Cancelados." />
                 </ListItem>
               </List>
             </Paper>
