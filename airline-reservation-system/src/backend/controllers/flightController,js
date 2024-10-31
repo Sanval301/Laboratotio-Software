@@ -37,14 +37,39 @@ const getAllFlights = async (req, res) => {
 
 // Crear una nueva reserva de vuelo
 const createFlight = async (req, res) => {
-  const { flightDetails } = req.body;
+  const { flightCode, date, time, origin, destination, duration, isInternational, localTimeAdjustment, estimatedArrival, costPerPerson } = req.body;
+
+  // Verificar que todos los datos requeridos estén presentes
+  if (!flightCode || !date || !time || !origin || !destination || !duration || !costPerPerson) {
+    return res.status(400).json({ message: "Datos incompletos" });
+  }
+
+  // Validación adicional (ejemplo)
+  if (isNaN(costPerPerson)) {
+    return res.status(400).json({ message: "El costo por persona debe ser un número válido" });
+  }
+
   try {
-    const newFlight = await flightService.createFlight(flightDetails);
-    res.status(201).json(newFlight);
-  } catch (error) {
-    res.status(500).json({ error: "Error al crear el vuelo" });
+    // Código para crear el vuelo en la base de datos
+    const result = await db.query("INSERT INTO flights SET ?", {
+      CodigoVuelo: flightCode,
+      FechaVuelo: date,
+      HoraSalida: time,
+      Origen: origin,
+      Destino: destination,
+      DuracionVuelo: duration,
+      EsInternacional: isInternational ? 1 : 0,
+      CostoPorPersona: costPerPerson,
+      HoraLlegadaLocal: estimatedArrival,
+    });
+
+    res.status(201).json({ message: "Vuelo creado exitosamente", flightId: result.insertId });
+  } catch (err) {
+    console.error("Error al crear el vuelo:", err);
+    res.status(500).json({ message: "Error al crear el vuelo" });
   }
 };
+
 
 module.exports = {
   login,

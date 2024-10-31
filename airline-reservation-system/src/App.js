@@ -1,7 +1,6 @@
 import React from "react";
 import {
-  AppBar,
-  Toolbar,
+
   Typography,
   Button,
   Select,
@@ -10,13 +9,13 @@ import {
   Grid,
   Card,
   CardContent,
-  InputLabel,
+
   InputBase,
-  IconButton,
+
   Box,
   CardMedia,
 } from "@mui/material";
-import { Facebook, Twitter, Instagram, YouTube } from "@mui/icons-material";
+
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import Navbar from "./components/Navbar"; // Tu Navbar personalizado
@@ -26,7 +25,11 @@ import Login from "./components/Login";
 import Registro from "./components/Registro";
 import Recovery from "./components/Recovery";
 import EditarVuelos from "./components/EditarVuelos";
+<<<<<<< HEAD
+import Dashboard from "./components/crearvuelo";
+=======
 import AdminVuelos from "./components/AdminVuelos";
+>>>>>>> a9ceae1ba1917f9a4971cdfa7bd738a5c85c5e44
 
 const theme = createTheme({
   palette: {
@@ -188,6 +191,7 @@ function App() {
         <Routes>
           <Route path="/" element={<PaginaPrincipal />} />
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="/crearvuelo" element={<Dashboard/>} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/editarvuelos" element={<EditarVuelos />} />
