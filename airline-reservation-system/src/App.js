@@ -1,6 +1,5 @@
 import React from "react";
 import {
-
   Typography,
   Button,
   Select,
@@ -9,9 +8,7 @@ import {
   Grid,
   Card,
   CardContent,
-
   InputBase,
-
   Box,
   CardMedia,
 } from "@mui/material";
@@ -24,10 +21,8 @@ import Perfil from "./components/Perfil";
 import Login from "./components/Login";
 import Registro from "./components/Registro";
 import Recovery from "./components/Recovery";
+import Registro from "./components/Register";
 import EditarVuelos from "./components/EditarVuelos";
-<<<<<<< HEAD
-import Dashboard from "./components/crearvuelo";
-=======
 import AdminVuelos from "./components/AdminVuelos";
 >>>>>>> a9ceae1ba1917f9a4971cdfa7bd738a5c85c5e44
 
@@ -191,12 +186,13 @@ function App() {
         <Routes>
           <Route path="/" element={<PaginaPrincipal />} />
           <Route path="/perfil" element={<Perfil />} />
-          <Route path="/crearvuelo" element={<Dashboard/>} />
+          <Route path="/crearvuelo" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/editarvuelos" element={<EditarVuelos />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />
+          <Route path="/cancelarvuelos" element={<CancelarVuelos />} />
         </Routes>
       </Router>
     </ThemeProvider>

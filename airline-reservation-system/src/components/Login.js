@@ -99,7 +99,7 @@ const Login = () => {
             justifyContent="space-between"
             width="100%"
           >
-            <Link href="/Registro" underline="hover">
+            <Link href="/register" underline="hover">
               ¿No tienes cuenta? Registrarse
             </Link>
             <Link href="/Recovery" underline="hover">

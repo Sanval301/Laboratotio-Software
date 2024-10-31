@@ -10,17 +10,22 @@ const login = async (req, res) => {
   }
 };
 
-// Registrar un nuevo usuario (opcional si decides tener registro)
-const register = require("../services/flightService");
+
 
 const register = async (req, res) => {
-  const { username, nombreCompleto, email, password, genero, cedula } = req.body;
-  
+  const { username, fullName, email, password, gender, idCard } = req.body;
+
+  // Validar datos obligatorios
+  if (!username || !fullName || !email || !password || !idCard) {
+    return res.status(400).json({ message: "Todos los campos marcados con * son obligatorios" });
+  }
+
   try {
-    const newUser = await flightService.register(username, nombreCompleto, email, password, genero, cedula);
-    res.status(201).json(newUser);
+    const newUser = await flightService.register({ username, fullName, email, password, gender, idCard });
+    res.status(201).json({ message: "Usuario registrado exitosamente", userId: newUser.insertId });
   } catch (error) {
-    res.status(500).json({ error: "Error al registrar el usuario" });
+    console.error("Error al registrar usuario backend:", error);
+    res.status(500).json({ message: "Error al registrar el usuario backend" });
   }
 };
 
@@ -48,27 +53,7 @@ const createFlight = async (req, res) => {
   if (isNaN(costPerPerson)) {
     return res.status(400).json({ message: "El costo por persona debe ser un número válido" });
   }
-
-  try {
-    // Código para crear el vuelo en la base de datos
-    const result = await db.query("INSERT INTO flights SET ?", {
-      CodigoVuelo: flightCode,
-      FechaVuelo: date,
-      HoraSalida: time,
-      Origen: origin,
-      Destino: destination,
-      DuracionVuelo: duration,
-      EsInternacional: isInternational ? 1 : 0,
-      CostoPorPersona: costPerPerson,
-      HoraLlegadaLocal: estimatedArrival,
-    });
-
-    res.status(201).json({ message: "Vuelo creado exitosamente", flightId: result.insertId });
-  } catch (err) {
-    console.error("Error al crear el vuelo:", err);
-    res.status(500).json({ message: "Error al crear el vuelo" });
-  }
-};
+}
 
 
 module.exports = {

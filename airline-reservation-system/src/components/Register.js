@@ -37,7 +37,7 @@ function Registro() {
     e.preventDefault();
     try {
       // Llamada al endpoint de registro en el backend
-      const response = await axios.post("http://localhost:3000/register", {
+      const response = await axios.post("http://localhost:5000/register", {
         username: formData.username,
         nombreCompleto: formData.nombreCompleto,
         email: formData.email,
@@ -45,18 +45,19 @@ function Registro() {
         genero: formData.genero,
         cedula: formData.cedula,
       });
-
+  
       // Guardar el token si el backend lo proporciona
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
       }
-
+  
       setError("");
       alert("Usuario registrado con éxito");
     } catch (error) {
-      setError(error.response?.data?.error || "Error al registrar el usuario");
+      setError(error.response?.data?.message || "Error al registrar el mamahuevo usuario");
     }
   };
+  
 
   return (
     <Box

@@ -4,15 +4,17 @@ const jwt = require('jsonwebtoken');
 
 const register = (userDetails) => {
   return new Promise((resolve, reject) => {
-    const { username, password, email } = userDetails;
-
-    // Hashear la contraseña
     bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) return reject(err);
+      if (err) return reject(new Error("Error al encriptar la contraseña"));
 
-      const query = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
-      db.query(query, [username, hashedPassword, email], (err, result) => {
-        if (err) return reject(err);
+      const query = "INSERT INTO Usuarios (Email, Contraseña) VALUES (?, ?)";
+      db.query(query, [email, hashedPassword], (err, result) => {
+        if (err) {
+          if (err.code === 'ER_DUP_ENTRY') {
+            return reject(new Error("El email ya está registrado"));
+          }
+          return reject(err);
+        }
         resolve(result);
       });
     });

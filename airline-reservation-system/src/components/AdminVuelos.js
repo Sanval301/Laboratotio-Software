@@ -52,7 +52,7 @@ export default function AdminVuelos() {
               variant="contained"
               color="primary"
               startIcon={<Add />}
-              onClick={() => navigate("/crear-vuelo")}
+              onClick={() => navigate("/crearvuelo")}
               sx={{ height: "60px", fontSize: "1.2rem" }}
             >
               Crear Vuelo
@@ -76,7 +76,7 @@ export default function AdminVuelos() {
               variant="contained"
               color="error"
               startIcon={<Cancel />}
-              onClick={() => navigate("/cancelar-vuelo")}
+              onClick={() => navigate("/CancelarVuelos")}
               sx={{ height: "60px", fontSize: "1.2rem" }}
             >
               Cancelar Vuelo
