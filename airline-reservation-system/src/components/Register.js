@@ -16,10 +16,10 @@ import Footer from "./Footer";
 
 function Registro() {
   const [formData, setFormData] = useState({
-    username: "",
+    nombreusuario: "",
     nombreCompleto: "",
     email: "",
-    password: "",
+    contraseña: "",
     genero: "",
     cedula: "",
   });
@@ -35,28 +35,27 @@ function Registro() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      // Llamada al endpoint de registro en el backend
-      const response = await axios.post("http://localhost:5000/register", {
-        username: formData.username,
-        nombreCompleto: formData.nombreCompleto,
-        email: formData.email,
-        password: formData.password,
-        genero: formData.genero,
-        cedula: formData.cedula,
-      });
-  
-      // Guardar el token si el backend lo proporciona
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-      }
-  
-      setError("");
-      alert("Usuario registrado con éxito");
-    } catch (error) {
-      setError(error.response?.data?.message || "Error al registrar el mamahuevo usuario");
+
+    console.log(formData);
+
+    // Llamada al endpoint de registro en el backend
+    const response = await axios.post("http://localhost:5004/register", {
+      nombreusuario: formData.nombreusuario,
+      nombreCompleto: formData.nombreCompleto,
+      email: formData.email,
+      contraseña: formData.contraseña,
+      genero: formData.genero,
+      cedula: formData.cedula,
+    });
+    
+    // Guardar el token si el backend lo proporciona
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
     }
+  
+    alert("Usuario registrado con éxito");
   };
+  
   
 
   return (

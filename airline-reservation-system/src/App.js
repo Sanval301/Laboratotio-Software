@@ -19,11 +19,12 @@ import Navbar from "./components/Navbar"; // Tu Navbar personalizado
 import Footer from "./components/Footer"; // Pie de pagina
 import Perfil from "./components/Perfil";
 import Login from "./components/Login";
+import Dash from "./components/crearvuelo";
 import Recovery from "./components/Recovery";
 import Registro from "./components/Register";
 import EditarVuelos from "./components/EditarVuelos";
 import AdminVuelos from "./components/AdminVuelos";
-import Crearvuelo from "./components/Crearvuelo";
+import Crearvuelo from "./components/crearvuelo";
 import CancelarVuelos from "./components/CancelarVuelos";
 import VuelosRealizados from "./components/VuelosRealizados";
 
@@ -187,14 +188,13 @@ function App() {
         <Routes>
           <Route path="/" element={<PaginaPrincipal />} />
           <Route path="/perfil" element={<Perfil />} />
-          <Route path="/Crearvuelo" element={<Crearvuelo />} />
+          <Route path="/crearvuelo" element={<Dash />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Registro />} />
           <Route path="/editarvuelos" element={<EditarVuelos />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />
-          <Route path="/CancelarVuelos" element={<CancelarVuelos />} />
-          <Route path="/VuelosRealizados" element={<VuelosRealizados />} />
+          <Route path="/Cancelarvuelos" element={<CancelacionVuelosMejorada />} />
         </Routes>
       </Router>
     </ThemeProvider>
