@@ -36,7 +36,7 @@ const createFlight = async (flightData) => {
   }
 };
 
-export default function Dashboard() {
+export default function Dash() {
   const [activeTab, setActiveTab] = useState("create-flight");
 
   const renderContent = () => {

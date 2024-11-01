@@ -2,26 +2,28 @@ const db = require("../config/db.config");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const register = async (username, nombreCompleto, email, password, genero, cedula) => {
+const register = async (nombreusuario, nombreCompleto, email, contraseña, genero, cedula) => {
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     return new Promise((resolve, reject) => {
-      const query = `INSERT INTO users (username, nombreCompleto, email, password, genero, cedula) VALUES (?, ?, ?, ?, ?, ?)`;
-      const values = [username, nombreCompleto, email, hashedPassword, genero, cedula];
+      const query = `INSERT INTO usuarios (NombreUsuario, NombreCompleto, Email, Contraseña, Genero, Cedula) VALUES (?, ?, ?, ?, ?, ?)`;
+      const values = [nombreusuario, nombreCompleto, email, contraseña, genero, cedula];
       
+      console.log("Query:", query);
+      console.log("Values:", values);
+
       db.query(query, values, (err, results) => {
         if (err) {
           reject(err);
         } else {
-          resolve({ id: results.insertId, username, email });
+          resolve({ id: results.insertId, nombreusuario, email });
         }
       });
     });
   } catch (error) {
-    throw new Error("Error al registrar el usuario");
+    throw new Error("Error al registrar el 123456 usuario");
   }
 };
+
 
 
 // Inicio de sesión de usuario
