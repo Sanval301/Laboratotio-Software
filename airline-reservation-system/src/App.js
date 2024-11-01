@@ -23,7 +23,7 @@ import Recovery from "./components/Recovery";
 import Registro from "./components/Register";
 import EditarVuelos from "./components/EditarVuelos";
 import AdminVuelos from "./components/AdminVuelos";
-import Crearvuelo from "./components/crearvuelo";
+import Crearvuelo from "./components/Crearvuelo";
 import CancelarVuelos from "./components/CancelarVuelos";
 import VuelosRealizados from "./components/VuelosRealizados";
 
