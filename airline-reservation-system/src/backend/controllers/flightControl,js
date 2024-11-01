@@ -42,10 +42,10 @@ const getAllFlights = async (req, res) => {
 
 // Crear una nueva reserva de vuelo
 const createFlight = async (req, res) => {
-  const { flightCode, date, time, origin, destination, duration, isInternational, localTimeAdjustment, estimatedArrival, costPerPerson } = req.body;
+  const { CodigoVuelo, FechaVuelo, HoraSalida, Origen, Destino, DuracionVuelo, HoraLlegadaLocal, CostoPorPersona, EsInternacional, Estado, CreadoPor } = req.body;
 
   // Verificar que todos los datos requeridos estén presentes
-  if (!flightCode || !date || !time || !origin || !destination || !duration || !costPerPerson) {
+  if (!CodigoVuelo || !FechaVuelo || !HoraSalida|| !Origen || !Destino || !DuracionVuelo || !HoraLlegadaLocal || !CostoPorPersona || !EsInternacional || !Estado || !CreadoPor) {
     return res.status(400).json({ message: "Datos incompletos" });
   }
 
