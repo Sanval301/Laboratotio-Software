@@ -8,7 +8,9 @@ router.post("/register", flightController.register);
 router.post("/login", flightController.login);
 
 // Definir las rutas
-router.get("/", flightController.getAllFlights); // Obtener todos los vuelos
+router.get("/CancelarVuelos", flightController.getAllFlights); // Obtener todos los vuelos
 router.post("/crearvuelo", flightController.createFlight); // Crear un vuelo nuevo
+
+router.delete("/CancelarVuelos/:CodigoVuelo", flightController.cancelFlightController);
 
 module.exports = router;

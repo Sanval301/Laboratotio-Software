@@ -1,27 +1,30 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Link } from "@mui/material";
+import { Box, Typography, TextField, Button, Link, CircularProgress } from "@mui/material"; // Importa CircularProgress
 import axios from "axios";
 import Navbar from "./Navbar"; // Importa el Navbar
 import Footer from "./Footer"; // Importa el Footer
 
 const Login = () => {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [contraseña, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // Estado para manejar la carga
 
   const handleLogin = async () => {
+    setError(""); // Limpiar el error anterior
+    setLoading(true); // Activar la carga
     try {
-      const response = await axios.post("http://localhost:3000/login", {
-        username: email,
-        password: password,
+      const response = await axios.post("http://localhost:5009/login", { // Cambia a 5004 si es necesario
+        email,
+        contraseña,
       });
 
       localStorage.setItem("token", response.data.token);
-      setError("");
-
       alert("Inicio de sesión exitoso");
     } catch (err) {
-      setError(err.response?.data?.message || "Error en el inicio de sesión");
+      setError(err.response?.data?.error || "Error en el inicio de sesión");
+    } finally {
+      setLoading(false); // Desactivar la carga al finalizar
     }
   };
 
@@ -73,7 +76,7 @@ const Login = () => {
             margin="normal"
             type="password"
             required
-            value={password}
+            value={contraseña}
             onChange={(e) => setPassword(e.target.value)}
           />
 
@@ -89,8 +92,9 @@ const Login = () => {
             fullWidth
             sx={{ mt: 2 }}
             onClick={handleLogin}
+            disabled={loading} // Desactivar el botón si está cargando
           >
-            Iniciar Sesión
+            {loading ? <CircularProgress size={24} /> : "Iniciar Sesión"} {/* Mostrar cargador mientras se espera */}
           </Button>
 
           <Box

@@ -19,7 +19,7 @@ import { format, addMinutes, parse } from "date-fns";
 const createFlight = async (flightData) => {
   try {
     const response = await axios.post(
-      "http://localhost:3000/crearvuelo",
+      "http://localhost:5007/crearvuelo",
       flightData
     );
     console.log(response.data.message);
@@ -116,38 +116,50 @@ function CreateFlightForm() {
     "Sydney",
   ];
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (
-      !date ||
-      !time ||
-      !origin ||
-      !destination ||
-      !duration ||
-      !costPerPerson
-    ) {
-      alert("Por favor, complete todos los campos requeridos.");
-      return;
-    }
-    if (origin === destination) {
-      alert("El origen y destino no pueden ser iguales.");
-      return;
-    }
+  
 
-    const flightData = {
-      CodigoVuelo: flightCode,
-      FechaVuelo: date,
-      HoraSalida: time,
-      Origen: origin,
-      Destino: destination,
-      DuracionVuelo: duration,
-      CostoPorPersona: parseFloat(costPerPerson),
-      EsInternacional: isInternational ? 1 : 0,
-      HoraLlegadaLocal: estimatedArrival,
-    };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    await createFlight(flightData);
+  // Validación del formato de duración (HH:MM)
+  const durationRegex = /^\d{1,2}:\d{2}$/;
+  if (!durationRegex.test(duration)) {
+    alert("La duración debe estar en el formato HH:MM.");
+    return;
+  }
+
+  if (!date || !time || !origin || !destination || !costPerPerson) {
+    alert("Por favor, complete todos los campos requeridos.");
+    return;
+  }
+
+  if (origin === destination) {
+    alert("El origen y destino no pueden ser iguales.");
+    return;
+  }
+
+  // Convertir duración a formato HH:MM:SS
+  const formattedDuration = duration + ":00";
+
+  // Formatear la fecha a "YYYY-MM-DD"
+  const formattedDate = format(date, "yyyy-MM-dd");
+
+  const flightData = {
+    CodigoVuelo: flightCode,
+    FechaVuelo: formattedDate,  // Usar fecha en formato "YYYY-MM-DD"
+    HoraSalida: time,
+    Origen: origin,
+    Destino: destination,
+    DuracionVuelo: formattedDuration,
+    CostoPorPersona: parseFloat(costPerPerson),
+    EsInternacional: isInternational ? 1 : 0,
+    HoraLlegadaLocal: estimatedArrival,
   };
+
+  await createFlight(flightData);
+};
+
+  
 
   return (
     <form onSubmit={handleSubmit}>

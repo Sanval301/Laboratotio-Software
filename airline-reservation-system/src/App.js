@@ -25,6 +25,7 @@ import Registro from "./components/Register";
 import EditarVuelos from "./components/EditarVuelos";
 import AdminVuelos from "./components/AdminVuelos";
 import CancelacionVuelosMejorada from "./components/CancelarVuelos";
+import VuelosRealizados from "./components/VuelosRealizados";
 
 const theme = createTheme({
   palette: {
@@ -192,6 +193,7 @@ function App() {
           <Route path="/editarvuelos" element={<EditarVuelos />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />
+          <Route path="/VuelosRealizados" element={<VuelosRealizados />} />
           <Route path="/Cancelarvuelos" element={<CancelacionVuelosMejorada />} />
         </Routes>
       </Router>

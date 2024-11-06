@@ -9,7 +9,7 @@ app.use(express.json()); // Asegúrate de que estás usando middleware para mane
 app.use('/', flightRoutes); // O la ruta que estés usando
 
 // Puerto y arranque del servidor
-const PORT = 5004;
+const PORT = 5009;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

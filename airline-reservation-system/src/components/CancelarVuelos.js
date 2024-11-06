@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Container,
   Typography,
@@ -18,7 +19,6 @@ import {
   TextField,
   InputAdornment,
   Paper,
-  Divider,
   List,
   ListItem,
   ListItemText,
@@ -31,9 +31,8 @@ import {
   Schedule,
   Person,
   Search,
-  FlightLand,
-  Warning,
   Info,
+  Warning,
   EventBusy,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
@@ -58,66 +57,19 @@ const theme = createTheme({
   },
 });
 
-// Datos de ejemplo para los vuelos
-const vuelosActuales = [
-  {
-    id: 1,
-    numero: "AA123",
-    origen: "Pereira",
-    destino: "Madrid",
-    fecha: "2024-05-11",
-    hora: "10:00",
-    estado: "Programado",
-    pasajeros: 120,
-  },
-  {
-    id: 2,
-    numero: "IB456",
-    origen: "Bogota",
-    destino: "Miami",
-    fecha: "2024-11-11",
-    hora: "14:30",
-    estado: "En Espera",
-    pasajeros: 80,
-  },
-  {
-    id: 3,
-    numero: "VY789",
-    origen: "Medellin",
-    destino: "Londres",
-    fecha: "2024-31-10",
-    hora: "08:45",
-    estado: "Embarcando",
-    pasajeros: 150,
-  },
-  {
-    id: 4,
-    numero: "FR101",
-    origen: "Cali",
-    destino: "Cartagena",
-    fecha: "2024-15-12",
-    hora: "12:15",
-    estado: "Programado",
-    pasajeros: 95,
-  },
-  {
-    id: 5,
-    numero: "UX202",
-    origen: "Cartagena",
-    destino: "New York,",
-    fecha: "2024-03-19",
-    hora: "16:00",
-    estado: "En Espera",
-    pasajeros: 110,
-  },
-];
-
 export default function CancelacionVuelosMejorada() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [vuelos, setVuelos] = useState(vuelosActuales);
+  const [vuelos, setVuelos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    // Realizar la solicitud a la API para obtener los vuelos desde la base de datos
+    axios.get("http://localhost:5009/CancelarVuelos")
+      .then(response => setVuelos(response.data))
+      .catch(error => console.error("Error al obtener los vuelos:", error));
+  }, []);
 
   const handleOpenDialog = (vuelo) => {
     setSelectedFlight(vuelo);
@@ -130,10 +82,12 @@ export default function CancelacionVuelosMejorada() {
   };
 
   const handleCancelFlight = () => {
-    setVuelos(vuelos.filter((v) => v.id !== selectedFlight.id));
+    // Filtrar los vuelos por VueloID y no por id
+    setVuelos(vuelos.filter((v) => v.VueloID !== selectedFlight.VueloID));
     handleCloseDialog();
     setOpenSnackbar(true);
   };
+  
 
   const getChipColor = (estado) => {
     switch (estado) {
@@ -150,9 +104,9 @@ export default function CancelacionVuelosMejorada() {
 
   const filteredVuelos = vuelos.filter(
     (vuelo) =>
-      vuelo.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vuelo.origen.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vuelo.destino.toLowerCase().includes(searchTerm.toLowerCase())
+      vuelo.CodigoVuelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vuelo.Origen.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vuelo.Destino.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -162,6 +116,7 @@ export default function CancelacionVuelosMejorada() {
           <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3 }}>
             Panel de Cancelación de Vuelos
           </Typography>
+
           <Grid container spacing={3} sx={{ mb: 3 }}>
             <Grid item xs={12} sm={6} md={3}>
               <Card raised>
@@ -180,10 +135,7 @@ export default function CancelacionVuelosMejorada() {
                     Pasajeros Afectados
                   </Typography>
                   <Typography variant="h4">
-                    {vuelos.reduce(
-                      (total, vuelo) => total + vuelo.pasajeros,
-                      0
-                    )}
+                    {vuelos.reduce((total, vuelo) => total + vuelo.Pasajeros, 0)}
                   </Typography>
                 </CardContent>
               </Card>
@@ -195,10 +147,7 @@ export default function CancelacionVuelosMejorada() {
                     Vuelos En Espera
                   </Typography>
                   <Typography variant="h4">
-                    {
-                      vuelos.filter((vuelo) => vuelo.estado === "En Espera")
-                        .length
-                    }
+                    {vuelos.filter((vuelo) => vuelo.Estado === "En Espera").length}
                   </Typography>
                 </CardContent>
               </Card>
@@ -210,15 +159,13 @@ export default function CancelacionVuelosMejorada() {
                     Vuelos Embarcando
                   </Typography>
                   <Typography variant="h4">
-                    {
-                      vuelos.filter((vuelo) => vuelo.estado === "Embarcando")
-                        .length
-                    }
+                    {vuelos.filter((vuelo) => vuelo.Estado === "Embarcando").length}
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
           </Grid>
+
           <TextField
             fullWidth
             variant="outlined"
@@ -234,46 +181,29 @@ export default function CancelacionVuelosMejorada() {
             }}
             sx={{ mb: 3 }}
           />
+
           <Grid container spacing={3}>
             {filteredVuelos.map((vuelo) => (
-              <Grid item xs={12} sm={6} md={4} key={vuelo.id}>
-                <Card
-                  raised
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
+              <Grid item xs={12} sm={6} md={4} key={vuelo.VueloID}>
+                <Card raised sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
                   <CardContent sx={{ flexGrow: 1 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 2,
-                      }}
-                    >
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                       <Typography variant="h6" component="div">
-                        {vuelo.numero}
+                        {vuelo.CodigoVuelo}
                       </Typography>
-                      <Chip
-                        label={vuelo.estado}
-                        color={getChipColor(vuelo.estado)}
-                        size="small"
-                      />
+                      <Chip label={vuelo.Estado} color={getChipColor(vuelo.Estado)} size="small" />
                     </Box>
                     <Typography color="text.secondary" gutterBottom>
                       <FlightTakeoff sx={{ verticalAlign: "bottom", mr: 1 }} />
-                      {vuelo.origen} - {vuelo.destino}
+                      {vuelo.Origen} - {vuelo.Destino}
                     </Typography>
                     <Typography variant="body2" sx={{ mb: 1 }}>
                       <Schedule sx={{ verticalAlign: "bottom", mr: 1 }} />
-                      {vuelo.fecha} {vuelo.hora}
+                      {vuelo.FechaVuelo} {vuelo.HoraSalida}
                     </Typography>
                     <Typography variant="body2">
                       <Person sx={{ verticalAlign: "bottom", mr: 1 }} />
-                      {vuelo.pasajeros} pasajeros
+                      {vuelo.Pasajeros} pasajeros
                     </Typography>
                   </CardContent>
                   <CardActions>
@@ -293,6 +223,7 @@ export default function CancelacionVuelosMejorada() {
           </Grid>
         </Paper>
 
+        {/* Información adicional sobre la cancelación */}
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Paper elevation={3} sx={{ p: 3 }}>
@@ -337,39 +268,23 @@ export default function CancelacionVuelosMejorada() {
           </Grid>
         </Grid>
 
-        <Dialog
-          open={openDialog}
-          onClose={handleCloseDialog}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"¿Está seguro que desea cancelar este vuelo?"}
-          </DialogTitle>
+        {/* Confirmación de cancelación */}
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle>{"¿Está seguro que desea cancelar este vuelo?"}</DialogTitle>
           <DialogContent>
-            <Typography
-              variant="body1"
-              id="alert-dialog-description"
-              sx={{ mb: 2 }}
-            >
+            <Typography variant="body1" sx={{ mb: 2 }}>
               Esta acción no se puede deshacer. Se cancelará el siguiente vuelo:
             </Typography>
             {selectedFlight && (
-              <Box
-                sx={{
-                  backgroundColor: "background.paper",
-                  p: 2,
-                  borderRadius: 1,
-                }}
-              >
-                <Typography variant="h6">{selectedFlight.numero}</Typography>
+              <Box sx={{ backgroundColor: "background.paper", p: 2, borderRadius: 1 }}>
+                <Typography variant="h6">{selectedFlight.CodigoVuelo}</Typography>
                 <Typography>
-                  {selectedFlight.origen} - {selectedFlight.destino}
+                  {selectedFlight.Origen} - {selectedFlight.Destino}
                 </Typography>
                 <Typography>
-                  {selectedFlight.fecha} {selectedFlight.hora}
+                  {selectedFlight.FechaVuelo} {selectedFlight.HoraSalida}
                 </Typography>
-                <Typography>{selectedFlight.pasajeros} pasajeros</Typography>
+                <Typography>{selectedFlight.Pasajeros} pasajeros</Typography>
               </Box>
             )}
           </DialogContent>
@@ -377,44 +292,27 @@ export default function CancelacionVuelosMejorada() {
             <Button onClick={handleCloseDialog} color="primary">
               Cancelar
             </Button>
-            <Button
-              onClick={handleCancelFlight}
-              color="error"
-              variant="contained"
-              autoFocus
-            >
+            <Button onClick={handleCancelFlight} color="error" variant="contained" autoFocus>
               Sí, Cancelar Vuelo
             </Button>
           </DialogActions>
         </Dialog>
 
+        {/* Snackbar para notificación de éxito */}
         <Snackbar
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center",
-          }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
           open={openSnackbar}
           autoHideDuration={6000}
           onClose={() => setOpenSnackbar(false)}
           message="Vuelo cancelado exitosamente"
           action={
-            <IconButton
-              size="small"
-              aria-label="close"
-              color="inherit"
-              onClick={() => setOpenSnackbar(false)}
-            >
+            <IconButton size="small" aria-label="close" color="inherit" onClick={() => setOpenSnackbar(false)}>
               <Cancel fontSize="small" />
             </IconButton>
           }
         />
-        <Button
-          component={Link}
-          to="/adminvuelos"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
+
+        <Button component={Link} to="/adminvuelos" variant="contained" color="primary" sx={{ mt: 2 }}>
           Regresar a Administración de Vuelos
         </Button>
       </Container>

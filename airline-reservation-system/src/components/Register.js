@@ -36,27 +36,26 @@ function Registro() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(formData);
+    console.log("Datos enviados:", formData);
 
-    // Llamada al endpoint de registro en el backend
-    const response = await axios.post("http://localhost:5004/register", {
-      nombreusuario: formData.nombreusuario,
-      nombreCompleto: formData.nombreCompleto,
-      email: formData.email,
-      contraseña: formData.contraseña,
-      genero: formData.genero,
-      cedula: formData.cedula,
-    });
-    
-    // Guardar el token si el backend lo proporciona
-    if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
+    try {
+      // Enviar la solicitud de registro al backend
+      const response = await axios.post("http://localhost:5009/register", formData, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      // Guardar el token en localStorage si el backend lo proporciona
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+
+      alert("Usuario registrado con éxito");
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || "Error en el registro");
+      console.error("Error al registrar usuario:", err);
     }
-  
-    alert("Usuario registrado con éxito");
   };
-  
-  
 
   return (
     <Box
@@ -89,8 +88,8 @@ function Registro() {
               margin="normal"
               fullWidth
               label="Nombre de Usuario"
-              name="username"
-              value={formData.username}
+              name="nombreusuario"
+              value={formData.nombreusuario}
               onChange={handleChange}
               required
             />
@@ -117,8 +116,8 @@ function Registro() {
               margin="normal"
               fullWidth
               label="Contraseña"
-              name="password"
-              value={formData.password}
+              name="contraseña"
+              value={formData.contraseña}
               onChange={handleChange}
               type="password"
               required

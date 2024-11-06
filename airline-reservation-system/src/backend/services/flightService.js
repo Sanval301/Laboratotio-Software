@@ -2,12 +2,18 @@ const db = require("../config/db.config");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+
+const saltRounds = 10; // Número de rondas de sal
+
 const register = async (nombreusuario, nombreCompleto, email, contraseña, genero, cedula) => {
   try {
+    // Cifrar la contraseña antes de almacenarla
+    const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
+
     return new Promise((resolve, reject) => {
       const query = `INSERT INTO usuarios (NombreUsuario, NombreCompleto, Email, Contraseña, Genero, Cedula) VALUES (?, ?, ?, ?, ?, ?)`;
-      const values = [nombreusuario, nombreCompleto, email, contraseña, genero, cedula];
-      
+      const values = [nombreusuario, nombreCompleto, email, hashedPassword, genero, cedula]; // Usa el hash en lugar de la contraseña
+
       console.log("Query:", query);
       console.log("Values:", values);
 
@@ -20,41 +26,63 @@ const register = async (nombreusuario, nombreCompleto, email, contraseña, gener
       });
     });
   } catch (error) {
-    throw new Error("Error al registrar el 123456 usuario");
+    throw new Error("Error al registrar el usuario");
   }
 };
 
 
 
 // Inicio de sesión de usuario
-const login = (username, password) => {
+const login = (email, contraseña) => {
   return new Promise((resolve, reject) => {
-    const query = "SELECT * FROM users WHERE username = ?";
-    db.query(query, [username], (err, results) => {
-      if (err) return reject(err);
+    console.log("Intentando iniciar sesión con email:", email); // Log del email que se está usando
+    const query = "SELECT * FROM usuarios WHERE Email = ?";
+    db.query(query, [email], (err, results) => {
+      if (err) {
+        console.error("Error al ejecutar la consulta:", err); // Log del error de consulta
+        return reject(err);
+      }
 
-      if (results.length === 0) return reject("Usuario no encontrado");
+      // Verifica si se encontraron resultados
+      if (results.length === 0) {
+        console.log("Usuario no encontrado con el email:", email); // Log de error
+        return reject("Usuario no encontrado");
+      }
 
-      const user = results[0];
+      const user = results[0]; // Aquí ya puedes acceder a 'user'
+      console.log("Usuario encontrado:", user); // Log del usuario encontrado
 
       // Verificar la contraseña
-      bcrypt.compare(password, user.password, (err, isMatch) => {
-        if (err) return reject(err);
-
-        if (!isMatch) return reject("Contraseña incorrecta");
-
+      bcrypt.compare(contraseña, user.Contraseña, (err, isMatch) => {
+        if (err) {
+            console.error("Error al comparar contraseñas:", err);
+            return reject(err);
+        }
+    
+        console.log("Contraseña ingresada:", contraseña);
+        console.log("Contraseña almacenada:", user.Contraseña);
+    
+        if (!isMatch) {
+            console.log("Contraseña incorrecta para el usuario:", user.NombreUsuario);
+            return reject("Contraseña incorrecta");
+        }
+    
         // Generar token JWT
-        const token = jwt.sign({ id: user.id, username: user.username }, "secreto", { expiresIn: '1h' });
+        const token = jwt.sign({ id: user.UsuarioID, nombreusuario: user.NombreUsuario }, "secreto", { expiresIn: '1h' });
         resolve({ token, user });
-      });
+    });
+    
     });
   });
 };
 
+
+
+
 // Obtener todos los vuelos desde la base de datos
 const getAllFlights = () => {
   return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM flights", (err, results) => {
+    db.query("SELECT * FROM vuelos", (err, results) => {
       if (err) {
         return reject(err);
       }
@@ -68,8 +96,8 @@ const createFlight = (flightDetails) => {
   return new Promise((resolve, reject) => {
     const query = `
       INSERT INTO vuelos
-      (CodigoVuelo, FechaVuelo, HoraSalida, Origen, Destino, DuracionVuelo, HoraLlegadaLocal, CostoPorPersona, EsInternacional, Estado, CreadoPor)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (CodigoVuelo, FechaVuelo, HoraSalida, Origen, Destino, DuracionVuelo, HoraLlegadaLocal, CostoPorPersona, EsInternacional)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const values = [
       flightDetails.CodigoVuelo,
@@ -80,9 +108,8 @@ const createFlight = (flightDetails) => {
       flightDetails.DuracionVuelo,
       flightDetails.HoraLlegadaLocal,
       flightDetails.CostoPorPersona,
-      flightDetails.EsInternacional,
-      flightDetails.Estado,
-      flightDetails.CreadoPor
+      flightDetails.EsInternacional
+    
     ];
 
     db.query(query, values, (err, result) => {
@@ -94,9 +121,27 @@ const createFlight = (flightDetails) => {
   });
 };
 
+
+const cancelFlight = (CodigoVuelo) => {
+  return new Promise((resolve, reject) => {
+    const query = `DELETE FROM vuelos WHERE CodigoVuelo = ?`;
+    db.query(query, [CodigoVuelo], (err, result) => {
+      if (err) {
+        return reject(err);
+      }
+      if (result.affectedRows === 0) {
+        return reject("El vuelo no existe o ya ha sido cancelado.");
+      }
+      resolve({ message: "Vuelo cancelado exitosamente." });
+    });
+  });
+};
+
+
 module.exports = {
   register,
   login,
   getAllFlights,
   createFlight,
+  cancelFlight,
 };
