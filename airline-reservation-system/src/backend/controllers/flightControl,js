@@ -1,9 +1,9 @@
 const flightService = require("../services/flightService");
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { username, password } = req.body;
   try {
-    const token = await flightService.login(email, password);
+    const token = await flightService.login(username, password);
     res.status(200).json({ token });
   } catch (error) {
     res.status(401).json({ error: "Credenciales inválidas" });
@@ -42,10 +42,10 @@ const getAllFlights = async (req, res) => {
 
 // Crear una nueva reserva de vuelo
 const createFlight = async (req, res) => {
-  const { flightCode, date, time, origin, destination, duration, isInternational, localTimeAdjustment, estimatedArrival, costPerPerson } = req.body;
+  const { CodigoVuelo, FechaVuelo, HoraSalida, Origen, Destino, DuracionVuelo, HoraLlegadaLocal, CostoPorPersona, EsInternacional, Estado, CreadoPor } = req.body;
 
   // Verificar que todos los datos requeridos estén presentes
-  if (!flightCode || !date || !time || !origin || !destination || !duration || !costPerPerson) {
+  if (!CodigoVuelo || !FechaVuelo || !HoraSalida|| !Origen || !Destino || !DuracionVuelo || !HoraLlegadaLocal || !CostoPorPersona || !EsInternacional || !Estado || !CreadoPor) {
     return res.status(400).json({ message: "Datos incompletos" });
   }
 
@@ -53,6 +53,7 @@ const createFlight = async (req, res) => {
   if (isNaN(costPerPerson)) {
     return res.status(400).json({ message: "El costo por persona debe ser un número válido" });
   }
+  
 }
 
 
