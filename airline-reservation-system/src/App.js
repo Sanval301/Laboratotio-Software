@@ -194,7 +194,7 @@ function App() {
           <Route path="/editarvuelos" element={<EditarVuelos />} />
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />
-          <Route path="/Cancelarvuelos" element={<CancelacionVuelosMejorada />} />
+          <Route path="/CancelarVuelos" element={<CancelarVuelos />} />
         </Routes>
       </Router>
     </ThemeProvider>

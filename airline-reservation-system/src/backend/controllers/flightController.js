@@ -76,6 +76,20 @@ const createFlight = async (req, res) => {
   if (isNaN(costPerPerson)) {
     return res.status(400).json({ message: "El costo por persona debe ser un número válido" });
   }
+  // Validar formato de fecha (YYYY-MM-DD)
+  if (!/^\d{2}-\d{2}-\d{4}$/.test(date) || isNaN(new Date(date).getTime())) {
+    return res.status(400).json({ message: "La fecha debe estar en formato DD-MM-YYYY y ser válida" });
+  }
+   // Validar que la duración sea un número positivo
+   if (isNaN(duration) || duration <= 0) {
+    return res.status(400).json({ message: "La duración debe ser un número positivo" });
+  }
+  if (estimatedArrival) {
+    const estimatedDate = new Date(estimatedArrival);
+    if (isNaN(estimatedDate.getTime()) || estimatedDate <= new Date(date + ' ' + time)) {
+      return res.status(400).json({ message: "La fecha estimada de llegada debe ser válida y posterior a la fecha y hora de salida" });
+    }
+  }
 }
 
 
