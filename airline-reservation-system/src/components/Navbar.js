@@ -6,7 +6,6 @@ import {
   Button,
   Box,
   Select,
-  MenuItem,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 
@@ -60,13 +59,6 @@ const Navbar = () => {
           >
             Estado del vuelo
           </Button>
-          <Select
-            defaultValue="ES"
-            sx={{ color: "primary.main", bgcolor: "white", minWidth: 80 }}
-          >
-            <MenuItem value="ES">ES</MenuItem>
-            <MenuItem value="EN">EN</MenuItem>
-          </Select>
         </Box>
       </Toolbar>
     </AppBar>

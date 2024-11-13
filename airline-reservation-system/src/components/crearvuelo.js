@@ -107,59 +107,58 @@ function CreateFlightForm() {
   }, [date, time, duration]);
 
   const locations = [
+    "Pereira",
+    "Bogota",
+    "Medellin",
+    "Cali",
+    "Cartagena",
+    "Madrid",
+    "Londres",
     "New York",
-    "Los Angeles",
-    "Chicago",
-    "London",
-    "Paris",
-    "Tokyo",
-    "Sydney",
+    "Buenos Aires",
+    "Miami",
   ];
 
-  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+    // Validación del formato de duración (HH:MM)
+    const durationRegex = /^\d{1,2}:\d{2}$/;
+    if (!durationRegex.test(duration)) {
+      alert("La duración debe estar en el formato HH:MM.");
+      return;
+    }
 
-  // Validación del formato de duración (HH:MM)
-  const durationRegex = /^\d{1,2}:\d{2}$/;
-  if (!durationRegex.test(duration)) {
-    alert("La duración debe estar en el formato HH:MM.");
-    return;
-  }
+    if (!date || !time || !origin || !destination || !costPerPerson) {
+      alert("Por favor, complete todos los campos requeridos.");
+      return;
+    }
 
-  if (!date || !time || !origin || !destination || !costPerPerson) {
-    alert("Por favor, complete todos los campos requeridos.");
-    return;
-  }
+    if (origin === destination) {
+      alert("El origen y destino no pueden ser iguales.");
+      return;
+    }
 
-  if (origin === destination) {
-    alert("El origen y destino no pueden ser iguales.");
-    return;
-  }
+    // Convertir duración a formato HH:MM:SS
+    const formattedDuration = duration + ":00";
 
-  // Convertir duración a formato HH:MM:SS
-  const formattedDuration = duration + ":00";
+    // Formatear la fecha a "YYYY-MM-DD"
+    const formattedDate = format(date, "yyyy-MM-dd");
 
-  // Formatear la fecha a "YYYY-MM-DD"
-  const formattedDate = format(date, "yyyy-MM-dd");
+    const flightData = {
+      CodigoVuelo: flightCode,
+      FechaVuelo: formattedDate, // Usar fecha en formato "YYYY-MM-DD"
+      HoraSalida: time,
+      Origen: origin,
+      Destino: destination,
+      DuracionVuelo: formattedDuration,
+      CostoPorPersona: parseFloat(costPerPerson),
+      EsInternacional: isInternational ? 1 : 0,
+      HoraLlegadaLocal: estimatedArrival,
+    };
 
-  const flightData = {
-    CodigoVuelo: flightCode,
-    FechaVuelo: formattedDate,  // Usar fecha en formato "YYYY-MM-DD"
-    HoraSalida: time,
-    Origen: origin,
-    Destino: destination,
-    DuracionVuelo: formattedDuration,
-    CostoPorPersona: parseFloat(costPerPerson),
-    EsInternacional: isInternational ? 1 : 0,
-    HoraLlegadaLocal: estimatedArrival,
+    await createFlight(flightData);
   };
-
-  await createFlight(flightData);
-};
-
-  
 
   return (
     <form onSubmit={handleSubmit}>

@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Link, CircularProgress } from "@mui/material"; // Importa CircularProgress
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Link,
+  CircularProgress,
+} from "@mui/material"; // Importa CircularProgress
 import axios from "axios";
 import Navbar from "./Navbar"; // Importa el Navbar
 import Footer from "./Footer"; // Importa el Footer
@@ -14,13 +21,14 @@ const Login = () => {
     setError(""); // Limpiar el error anterior
     setLoading(true); // Activar la carga
     try {
-      const response = await axios.post("http://localhost:5009/login", { // Cambia a 5004 si es necesario
+      const response = await axios.post("http://localhost:5009/login", {
+        // Cambia a 5004 si es necesario
         email,
         contraseña,
       });
 
       localStorage.setItem("token", response.data.token);
-      alert("Inicio de sesión exitoso");
+      alert("Inicio de sesión exitoso"); // mandar a inicio dependiendo del perfil
     } catch (err) {
       setError(err.response?.data?.error || "Error en el inicio de sesión");
     } finally {
@@ -94,7 +102,8 @@ const Login = () => {
             onClick={handleLogin}
             disabled={loading} // Desactivar el botón si está cargando
           >
-            {loading ? <CircularProgress size={24} /> : "Iniciar Sesión"} {/* Mostrar cargador mientras se espera */}
+            {loading ? <CircularProgress size={24} /> : "Iniciar Sesión"}{" "}
+            {/* Mostrar cargador mientras se espera */}
           </Button>
 
           <Box

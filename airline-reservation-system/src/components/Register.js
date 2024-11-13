@@ -10,148 +10,317 @@ import {
   FormControl,
   Typography,
   Container,
+  Grid,
+  Paper,
+  Avatar,
+  CircularProgress,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import {
+  AccountCircle,
+  Email,
+  Lock,
+  LocationOn,
+  Today,
+  AssignmentInd,
+} from "@mui/icons-material";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  marginTop: theme.spacing(8),
+  padding: theme.spacing(4),
+  boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
+  borderRadius: "15px",
+  backgroundColor: "#fff",
+}));
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  backgroundColor: theme.palette.secondary.main,
+  width: theme.spacing(7),
+  height: theme.spacing(7),
+  marginBottom: theme.spacing(2),
+}));
 
 function Registro() {
   const [formData, setFormData] = useState({
     nombreusuario: "",
-    nombreCompleto: "",
+    nombres: "",
+    apellidos: "",
     email: "",
     contraseña: "",
     genero: "",
-    cedula: "",
+    dni: "",
+    fechaNacimiento: "",
+    paisNacimiento: "",
+    estadoNacimiento: "",
+    ciudadNacimiento: "",
+    direccionFacturacion: "",
+    imagenUsuario: null,
   });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, files } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: files ? files[0] : value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    console.log("Datos enviados:", formData);
+    const formDataToSend = new FormData();
+    for (const key in formData) {
+      formDataToSend.append(key, formData[key]);
+    }
 
     try {
-      // Enviar la solicitud de registro al backend
-      const response = await axios.post("http://localhost:5009/register", formData, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axios.post(
+        "http://localhost:5009/register",
+        formDataToSend,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
-      // Guardar el token en localStorage si el backend lo proporciona
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
       }
-
       alert("Usuario registrado con éxito");
       setError("");
     } catch (err) {
       setError(err.response?.data?.message || "Error en el registro");
-      console.error("Error al registrar usuario:", err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-      }}
-    >
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar />
 
-      <Container component="main" maxWidth="xs">
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: "20px",
-            boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
-            borderRadius: "10px",
-            backgroundColor: "#fff",
-          }}
-        >
-          <Typography component="h1" variant="h5" sx={{ fontWeight: "bold" }}>
-            Registro de Usuario
+      <Container component="main" maxWidth="md">
+        <StyledPaper>
+          <StyledAvatar>
+            <AccountCircle />
+          </StyledAvatar>
+          <Typography
+            component="h1"
+            variant="h5"
+            sx={{ fontWeight: "bold", mb: 3 }}
+          >
+            Registro de Cliente
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }} noValidate>
-            <TextField
-              margin="normal"
-              fullWidth
-              label="Nombre de Usuario"
-              name="nombreusuario"
-              value={formData.nombreusuario}
-              onChange={handleChange}
-              required
-            />
-            <TextField
-              margin="normal"
-              fullWidth
-              label="Nombre Completo"
-              name="nombreCompleto"
-              value={formData.nombreCompleto}
-              onChange={handleChange}
-              required
-            />
-            <TextField
-              margin="normal"
-              fullWidth
-              label="Correo Electrónico"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              type="email"
-              required
-            />
-            <TextField
-              margin="normal"
-              fullWidth
-              label="Contraseña"
-              name="contraseña"
-              value={formData.contraseña}
-              onChange={handleChange}
-              type="password"
-              required
-            />
-            <FormControl fullWidth margin="normal">
-              <InputLabel id="genero-label">Género</InputLabel>
-              <Select
-                labelId="genero-label"
-                name="genero"
-                value={formData.genero}
-                onChange={handleChange}
-                required
-                label="Género"
-              >
-                <MenuItem value="">
-                  <em>Selecciona tu género</em>
-                </MenuItem>
-                <MenuItem value="masculino">Masculino</MenuItem>
-                <MenuItem value="femenino">Femenino</MenuItem>
-                <MenuItem value="otro">Otro</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              margin="normal"
-              fullWidth
-              label="Cédula"
-              name="cedula"
-              value={formData.cedula}
-              onChange={handleChange}
-              required
-            />
+
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
+            <Grid container spacing={2}>
+              {/* Información Personal */}
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="DNI"
+                  name="dni"
+                  value={formData.dni}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <AssignmentInd color="action" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Nombres"
+                  name="nombres"
+                  value={formData.nombres}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <AccountCircle color="action" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Apellidos"
+                  name="apellidos"
+                  value={formData.apellidos}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <AccountCircle color="action" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Fecha de Nacimiento"
+                  name="fechaNacimiento"
+                  type="date"
+                  value={formData.fechaNacimiento}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{
+                    startAdornment: <Today color="action" />,
+                  }}
+                />
+              </Grid>
+
+              {/* Lugar de Nacimiento */}
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>
+                  Lugar de Nacimiento
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  label="País"
+                  name="paisNacimiento"
+                  value={formData.paisNacimiento}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <LocationOn color="action" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  label="Estado"
+                  name="estadoNacimiento"
+                  value={formData.estadoNacimiento}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <LocationOn color="action" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  label="Ciudad"
+                  name="ciudadNacimiento"
+                  value={formData.ciudadNacimiento}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <LocationOn color="action" />,
+                  }}
+                />
+              </Grid>
+
+              {/* Detalles de Cuenta */}
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Correo Electrónico"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <Email color="action" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Nombre de Usuario"
+                  name="nombreusuario"
+                  value={formData.nombreusuario}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <AccountCircle color="action" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Contraseña"
+                  name="contraseña"
+                  type="password"
+                  value={formData.contraseña}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <Lock color="action" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl fullWidth>
+                  <InputLabel id="genero-label">Género</InputLabel>
+                  <Select
+                    labelId="genero-label"
+                    name="genero"
+                    value={formData.genero}
+                    onChange={handleChange}
+                    required
+                    label="Género"
+                  >
+                    <MenuItem value="">
+                      <em>Selecciona tu género</em>
+                    </MenuItem>
+                    <MenuItem value="masculino">Masculino</MenuItem>
+                    <MenuItem value="femenino">Femenino</MenuItem>
+                    <MenuItem value="otro">Otro</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+
+              {/* Dirección y Foto */}
+              <Grid item xs={12}>
+                <TextField
+                  label="Dirección de Facturación"
+                  name="direccionFacturacion"
+                  value={formData.direccionFacturacion}
+                  onChange={handleChange}
+                  fullWidth
+                  required
+                  InputProps={{
+                    startAdornment: <LocationOn color="action" />,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Imagen de Usuario (opcional)"
+                  name="imagenUsuario"
+                  type="file"
+                  onChange={handleChange}
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            </Grid>
 
             {error && (
-              <Typography color="error" variant="body2" gutterBottom>
+              <Typography
+                color="error"
+                variant="body2"
+                gutterBottom
+                sx={{ mt: 2 }}
+              >
                 {error}
               </Typography>
             )}
@@ -160,20 +329,19 @@ function Registro() {
               type="submit"
               fullWidth
               variant="contained"
+              color="primary"
               sx={{
                 mt: 3,
-                mb: 2,
-                backgroundColor: "#1976d2",
-                "&:hover": {
-                  backgroundColor: "#1565c0",
-                },
+                backgroundColor: "#6a1b9a",
+                "&:hover": { backgroundColor: "#ab47bc" },
                 fontWeight: "bold",
               }}
+              disabled={isLoading}
             >
-              Registrarse
+              {isLoading ? <CircularProgress size={24} /> : "Registrarse"}
             </Button>
           </Box>
-        </Box>
+        </StyledPaper>
       </Container>
 
       <Footer />

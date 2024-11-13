@@ -26,7 +26,10 @@ import EditarVuelos from "./components/EditarVuelos";
 import AdminVuelos from "./components/AdminVuelos";
 import CancelacionVuelosMejorada from "./components/CancelarVuelos";
 import VuelosRealizados from "./components/VuelosRealizados";
-
+import Tarjetas from "./components/Tarjetas";
+import Historial from "./components/Historial";
+import Promociones from "./components/Promociones";
+import MenuLateral from "./components/MenuLateral";
 const theme = createTheme({
   palette: {
     primary: {
@@ -53,7 +56,7 @@ function PaginaPrincipal() {
               "& img": { width: "100%", height: "100%", objectFit: "cover" },
             }}
           >
-            <img src="/playa.jpg" alt="Vista de ciudad costera" />
+            <img src="/Cartagena.jpg" alt="Vista de Cartagena" />
             <Box
               sx={{
                 position: "absolute",
@@ -145,9 +148,21 @@ function PaginaPrincipal() {
             </Typography>
             <Grid container spacing={4}>
               {[
-                { destino: "París", precio: "199€", imagen: "/tarifas.jpg" },
-                { destino: "Nueva York", precio: "499€", imagen: "/playa.jpg" },
-                { destino: "Tokio", precio: "699€", imagen: "/playa.jpg" },
+                {
+                  destino: "Londres",
+                  precio: "5.500.000 cop",
+                  imagen: "/Londres.jpg",
+                },
+                {
+                  destino: "Nueva York",
+                  precio: "3.000.000 cop",
+                  imagen: "/Newyork.jpg",
+                },
+                {
+                  destino: "Madrid",
+                  precio: "6.000.000 cop",
+                  imagen: "/Madrid.jpg",
+                },
               ].map((promo, index) => (
                 <Grid item xs={12} sm={6} md={4} key={index}>
                   <Card>
@@ -194,7 +209,14 @@ function App() {
           <Route path="/recovery" element={<Recovery />} />
           <Route path="/adminvuelos" element={<AdminVuelos />} />
           <Route path="/VuelosRealizados" element={<VuelosRealizados />} />
-          <Route path="/Cancelarvuelos" element={<CancelacionVuelosMejorada />} />
+          <Route
+            path="/Cancelarvuelos"
+            element={<CancelacionVuelosMejorada />}
+          />
+          <Route path="/MenuLateral" element={<MenuLateral />} />
+          <Route path="/Tarjetas" element={<Tarjetas />} />
+          <Route path="/Promociones" element={<Promociones />} />
+          <Route path="/Historial" element={<Historial />} />
         </Routes>
       </Router>
     </ThemeProvider>
