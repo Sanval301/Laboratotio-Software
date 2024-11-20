@@ -10,6 +10,7 @@ import {
   Switch,
   TextField,
   MenuItem,
+  Box,
 } from "@mui/material";
 import { AccessTime } from "@mui/icons-material";
 import axios from "axios";
@@ -165,7 +166,7 @@ function CreateFlightForm() {
       <Card>
         <CardHeader title="Crear Vuelo" />
         <CardContent>
-          <div style={{ display: "grid", gap: 16 }}>
+          <Box component="form" onSubmit={handleSubmit} display="grid" gap={2}>
             <TextField
               label="Código de Vuelo"
               value={flightCode}
@@ -178,6 +179,12 @@ function CreateFlightForm() {
               value={date ? format(date, "yyyy-MM-dd") : ""}
               onChange={(e) => setDate(new Date(e.target.value))}
               fullWidth
+              InputLabelProps={{
+                shrink: true, // Esto asegura que la etiqueta no se sobreponga
+              }}
+              inputProps={{
+                placeholder: date ? "" : "dd/mm/aaaa", // Solo muestra placeholder si no hay valor
+              }}
             />
             <TextField
               label="Hora de Vuelo"
@@ -185,6 +192,12 @@ function CreateFlightForm() {
               value={time}
               onChange={(e) => setTime(e.target.value)}
               fullWidth
+              InputLabelProps={{
+                shrink: true, // Esto asegura que la etiqueta no se sobreponga
+              }}
+              inputProps={{
+                placeholder: time ? "" : "hh:mm", // Solo muestra placeholder si no hay valor
+              }}
               InputProps={{
                 endAdornment: <AccessTime fontSize="small" />,
               }}
@@ -216,29 +229,28 @@ function CreateFlightForm() {
               ))}
             </TextField>
             <TextField
-              label="Duración del Vuelo"
+              label="Duración del Vuelo (HH:MM)"
               placeholder="HH:MM"
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
               fullWidth
             />
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <Box display="flex" alignItems="center">
               <Switch
                 checked={isInternational}
                 onChange={(e) => setIsInternational(e.target.checked)}
+                inputProps={{ "aria-label": "Es un vuelo internacional" }}
               />
-              <Typography style={{ marginLeft: 8 }}>
-                Vuelo Internacional
-              </Typography>
-            </div>
+              <Typography>Vuelo Internacional</Typography>
+            </Box>
             <TextField
-              label="Costo por Persona"
+              label="Costo por Persona ($)"
               type="number"
               value={costPerPerson}
               onChange={(e) => setCostPerPerson(e.target.value)}
               fullWidth
             />
-          </div>
+          </Box>
         </CardContent>
         <CardActions>
           <Button type="submit" variant="contained" fullWidth>
