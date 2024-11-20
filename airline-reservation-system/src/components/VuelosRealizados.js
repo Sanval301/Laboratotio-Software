@@ -30,8 +30,8 @@ import { Link } from "react-router-dom";
 
 const theme = createTheme({
   palette: {
-    primary: { main: "#1976d2" },
-    secondary: { main: "#9c27b0" },
+    primary: { main: "#6a1b9a" },
+    secondary: { main: "#ab47bc" },
     info: { main: "#4caf50" },
   },
 });
@@ -72,6 +72,15 @@ export default function VuelosRealizados() {
 
   return (
     <ThemeProvider theme={theme}>
+      <Button
+        component={Link}
+        to="/adminvuelos"
+        variant="contained"
+        color="primary"
+        sx={{ mt: 2 }}
+      >
+        Regresar a Administración de Vuelos
+      </Button>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Paper elevation={3} sx={{ p: 3, mb: 4, backgroundColor: "#f8f9fa" }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3 }}>
@@ -151,15 +160,6 @@ export default function VuelosRealizados() {
           </Grid>
         </Grid>
         <Divider sx={{ my: 3 }} />
-        <Button
-          component={Link}
-          to="/adminvuelos"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2 }}
-        >
-          Regresar a Administración de Vuelos
-        </Button>
       </Container>
     </ThemeProvider>
   );

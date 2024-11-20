@@ -30,6 +30,7 @@ import Tarjetas from "./components/Tarjetas";
 import Historial from "./components/Historial";
 import Promociones from "./components/Promociones";
 import MenuLateral from "./components/MenuLateral";
+import Reservar from "./components/Reservar";
 const theme = createTheme({
   palette: {
     primary: {
@@ -217,6 +218,7 @@ function App() {
           <Route path="/Tarjetas" element={<Tarjetas />} />
           <Route path="/Promociones" element={<Promociones />} />
           <Route path="/Historial" element={<Historial />} />
+          <Route path="/Reservar" element={<Reservar />} />
         </Routes>
       </Router>
     </ThemeProvider>
