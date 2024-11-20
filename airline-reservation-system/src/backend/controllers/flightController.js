@@ -153,8 +153,6 @@ const cancelFlightController = async (req, res) => {
   }
 };
 
-// Inserta tarjeta
-const cardService = require("../services/cardService");
 
 const createCard = async (req, res) => {
   const { numero, titular, fechaExpiracion, cvv } = req.body;
@@ -226,7 +224,7 @@ const BuyTicket = async (req, res) => {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
 
-  // Validar nombre (solo letras y espacios)
+  // Validar nombre
   if (!/^[a-zA-Z\s]+$/.test(nombre)) {
     return res.status(400).json({ error: "El nombre debe contener solo letras y espacios" });
   }
@@ -236,24 +234,32 @@ const BuyTicket = async (req, res) => {
     return res.status(400).json({ error: "El correo electrónico no es válido" });
   }
 
-  // Validar vuelo (no vacío)
-  if (!vuelo || vuelo.trim() === '') {
+  // Validar vuelo
+  if (!vuelo.trim()) {
     return res.status(400).json({ error: "El vuelo es obligatorio" });
   }
 
-  // Validar fecha (formato YYYY-MM-DD)
+  // Validar fecha
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
     return res.status(400).json({ error: "La fecha no es válida, debe tener el formato YYYY-MM-DD" });
   }
 
-  // Validar tarjeta (16 dígitos)
+  // Validar tarjeta
   if (!/^\d{16}$/.test(tarjeta)) {
     return res.status(400).json({ error: "El número de tarjeta debe tener exactamente 16 dígitos" });
   }
 
   try {
-    const resultado = await compraService.comprarTiquete(nombre, email, vuelo, fecha, tarjeta);
-    res.status(200).json({ mensaje: 'Compra realizada exitosamente', resultado });
+    // Validar límite de compras
+    const ticketsCount = await flightService.contarTiquetesPorPersona(email);
+
+    if (ticketsCount >= 5) {
+      return res.status(400).json({ error: "No puedes comprar más de 5 tiquetes por persona" });
+    }
+
+    // Realizar compra
+    const resultado = await flightService.BuyTicket(nombre, email, vuelo, fecha, tarjeta);
+    res.status(200).json({ mensaje: "Compra realizada exitosamente", resultado });
   } catch (error) {
     console.error("Error al realizar la compra:", error);
     res.status(500).json({ error: "Error en el servidor" });
@@ -261,7 +267,120 @@ const BuyTicket = async (req, res) => {
 };
 
 
+const cancelBuy = async (req, res) => {
+  const { id } = req.params; // ID de la compra desde params
+  const { email } = req.body; // Email desde el body
 
+  // Validar ID y email
+  if (!id) {
+    return res.status(400).json({ error: "El ID de la compra es obligatorio" });
+  }
+  if (!email) {
+    return res.status(400).json({ error: "El correo electrónico es obligatorio" });
+  }
+
+  try {
+    const BuyTicket = await flightService.obtenerCompraPorId(id);
+
+    // Validar si la compra existe
+    if (!compra) {
+      return res.status(404).json({ error: "Compra no encontrada" });
+    }
+
+    // Verificar que el email coincida
+    if (BuyTicket.email !== email) {
+      return res.status(403).json({ error: "El correo electrónico no coincide con la compra" });
+    }
+
+    // Verificar la restricción de tiempo (24 horas antes del vuelo)
+    const fechaVuelo = new Date(BuyTicket.fecha);
+    const fechaActual = new Date();
+    const diferenciaHoras = (fechaVuelo - fechaActual) / (1000 * 60 * 60); // Diferencia en horas
+
+    if (diferenciaHoras <= 24) {
+      return res.status(400).json({ error: "La cancelación solo es posible más de 24 horas antes del vuelo" });
+    }
+
+    // Cancelar la compra
+    const result = await compraService.cancelarCompra(id);
+
+    res.status(200).json({ message: "Compra cancelada exitosamente", result });
+  } catch (error) {
+    console.error("Error al cancelar la compra:", error);
+    res.status(500).json({ error: "Error del servidor" });
+  }
+};
+
+const reserveTicket = async (req, res) => {
+  const { nombre, email, vuelo, fecha } = req.body;
+
+  // Validar datos obligatorios
+  if (!nombre || !email || !vuelo || !fecha) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios" });
+  }
+
+  // Validar nombre
+  if (!/^[a-zA-Z\s]+$/.test(nombre)) {
+    return res.status(400).json({ error: "El nombre debe contener solo letras y espacios" });
+  }
+
+  // Validar email
+  if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+    return res.status(400).json({ error: "El correo electrónico no es válido" });
+  }
+
+  // Validar vuelo
+  if (!vuelo.trim()) {
+    return res.status(400).json({ error: "El vuelo es obligatorio" });
+  }
+
+  // Validar fecha
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    return res.status(400).json({ error: "La fecha no es válida, debe tener el formato YYYY-MM-DD" });
+  }
+
+  try {
+    // Validar límite de reservas y compras para el vuelo
+    const totalTiquetes = await flightService.contarTiquetesPorPersona(email);
+
+    if (totalTiquetes >= 5) {
+      return res.status(400).json({ error: "Solo puedes reservar o comprar un máximo de 5 tiquetes por vuelo" });
+    }
+
+    // Crear reserva
+    const resultado = await flightService.crearReserva(nombre, email, vuelo, fecha);
+    res.status(200).json({ mensaje: "Reserva creada exitosamente", resultado });
+  } catch (error) {
+    console.error("Error al crear la reserva:", error);
+    res.status(500).json({ error: "Error del servidor" });
+  }
+};
+
+const cancelReservation = async (req, res) => {
+  const { id } = req.params;
+
+  // Validar ID
+  if (!id) {
+    return res.status(400).json({ error: "El ID de la reserva es obligatorio" });
+  }
+
+  try {
+    const reserva = await flightService.obtenerReservaPorId(id);
+
+    // Validar si la reserva existe
+    if (!reserva) {
+      return res.status(404).json({ error: "Reserva no encontrada" });
+    }
+
+    // Cancelar la reserva
+    const resultado = await flightService.cancelarReserva(id);
+
+    res.status(200).json({ mensaje: "Reserva cancelada exitosamente", resultado });
+  } catch (error) {
+    console.error("Error al cancelar la reserva:", error);
+    res.status(500).json({ error: "Error del servidor" });
+  }
+};
 
 module.exports = {
   login,
@@ -271,6 +390,9 @@ module.exports = {
   cancelFlightController,
   createCard,
   deleteCard,
-  BuyTicket
+  BuyTicket,
+  cancelBuy,
+  reserveTicket,
+  cancelReservation
 
 };
