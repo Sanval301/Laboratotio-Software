@@ -25,7 +25,6 @@ const MenuLateral = ({ activeTab, setActiveTab }) => {
             key={tab.label}
             variant={activeTab === tab.label ? "contained" : "text"}
             startIcon={tab.icon}
-            //onClick={() => setActiveTab(tab.label)}
             sx={{ justifyContent: "flex-start", mb: 1 }}
           >
             {tab.label}

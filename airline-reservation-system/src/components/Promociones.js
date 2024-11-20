@@ -32,7 +32,7 @@ const CardBackground = styled(Box)(({ theme }) => ({
   left: 0,
   right: 0,
   bottom: 0,
-  backgroundImage: "linear-gradient(135deg, #A1FFCE 0%, #FAFFD1 100%)",
+  backgroundImage: "linear-gradient(135deg, #A1A4FF 20%, #EEB3FF 100%)", //Cambiar Color fondo
   borderRadius: theme.shape.borderRadius,
   transform: "skew(-5deg)",
   boxShadow: "0 10px 20px rgba(0, 0, 0, 0.2)",
@@ -40,7 +40,7 @@ const CardBackground = styled(Box)(({ theme }) => ({
 
 const CardInfo = styled(Typography)(({ theme }) => ({
   fontSize: "1rem",
-  color: theme.palette.common.white,
+  color: "black",
   opacity: 0.9,
   position: "relative",
   zIndex: 1,
@@ -94,8 +94,8 @@ function Promociones() {
                       mb: 2,
                     }}
                   >
-                    <LocalOfferIcon fontSize="large" sx={{ color: "white" }} />
-                    <IconButton size="small" sx={{ color: "white" }}>
+                    <LocalOfferIcon fontSize="large" sx={{ color: "black" }} />
+                    <IconButton size="small" sx={{ color: "black" }}>
                       <DeleteIcon />
                     </IconButton>
                   </Box>

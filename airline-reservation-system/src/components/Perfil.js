@@ -32,7 +32,7 @@ export default function Perfil() {
     tarjetaFrecuente: "1234-5678-9123-4567",
     genero: "Masculino",
     fechaNacimiento: "1990-01-01",
-    paisResidencia: "México",
+    paisResidencia: "Colombia",
   });
 
   const handleImageUpload = (event) => {
