@@ -188,6 +188,48 @@ const BuyTicket = async (nombre, email, vuelo, fecha, tarjeta) => {
 };
 
 
+const contarTiquetesPorPersona = async (email) => {
+  const [rows] = await db.query('SELECT COUNT(*) AS total FROM compras WHERE email = ?', [email]);
+  return rows[0].total;
+};
+
+const obtenerCompraPorId = async (id) => {
+  const [rows] = await db.query('SELECT * FROM compras WHERE id = ?', [id]);
+  return rows[0];
+};
+
+const cancelarCompra = async (id) => {
+  const [result] = await db.query('UPDATE compras SET estado = ? WHERE id = ?', ['cancelada', id]);
+  return result.affectedRows > 0;
+};
+
+// Crear una nueva reserva
+const crearReserva = async (nombre, email, vuelo, fecha) => {
+  const [result] = await db.query(
+    'INSERT INTO reservas (nombre, email, vuelo, fechaVuelo, estado, expiracion) VALUES (?, ?, ?, ?, ?, NOW() + INTERVAL 24 HOUR)',
+    [nombre, email, vuelo, fecha, 'reservada']
+  );
+  return result.insertId;
+};
+
+// Obtener reserva por ID
+const obtenerReservaPorId = async (id) => {
+  const [rows] = await db.query('SELECT * FROM reservas WHERE id = ?', [id]);
+  return rows[0];
+};
+
+// Cancelar una reserva
+const cancelarReserva = async (id) => {
+  const [result] = await db.query('UPDATE reservas SET estado = ? WHERE id = ?', ['cancelada', id]);
+  return result.affectedRows > 0;
+};
+
+// Liberar reservas expiradas (puede ser usado en un proceso programado)
+const liberarReservasExpiradas = async () => {
+  const [result] = await db.query('UPDATE reservas SET estado = ? WHERE expiracion <= NOW() AND estado = ?', ['liberada', 'reservada']);
+  return result.affectedRows;
+};
+
 
 module.exports = {
   register,
@@ -197,5 +239,12 @@ module.exports = {
   cancelFlight,
   createCard,
   deleteCard,
-  BuyTicket
+  BuyTicket,
+  obtenerCompraPorId,
+  cancelarCompra,
+  contarTiquetesPorPersona,
+  crearReserva,
+  obtenerReservaPorId,
+  cancelarReserva,
+  liberarReservasExpiradas
 };
