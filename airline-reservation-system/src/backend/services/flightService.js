@@ -137,6 +137,57 @@ const cancelFlight = (CodigoVuelo) => {
   });
 };
 
+const db = require("../config/db.config"); // Configuración de la base de datos
+
+const createCard = async ({ cardNumber, cardHolder, expirationDate, cvv }) => {
+  // Verificar si ya existe una tarjeta con el mismo número
+  const [existingCard] = await db.promise().query(
+    "SELECT * FROM cards WHERE cardNumber = ?",
+    [cardNumber]
+  );
+
+  if (existingCard.length > 0) {
+    throw new Error("Tarjeta ya existe");
+  }
+
+  // Insertar nueva tarjeta en la base de datos
+  const [result] = await db.promise().query(
+    "INSERT INTO cards (cardNumber, cardHolder, expirationDate, cvv) VALUES (?, ?, ?, ?)",
+    [cardNumber, cardHolder, expirationDate, cvv]
+  );
+
+  // Retornar la tarjeta creada con su ID
+  return {
+    id: result.insertId,
+    cardNumber,
+    cardHolder,
+    expirationDate,
+    cvv,
+  };
+};
+
+const deleteCard = async (cardId) => {
+  // Eliminar tarjeta por ID
+  const [result] = await db.promise().query("DELETE FROM cards WHERE id = ?", [cardId]);
+
+  // Si no se eliminó ninguna tarjeta, retornar null
+  return result.affectedRows > 0;
+};
+
+
+const BuyTicket = async (nombre, email, vuelo, fecha, tarjeta) => {
+  try {
+    const [resultado] = await db.query(
+      'INSERT INTO compras (nombre, email, vuelo, fecha, tarjeta) VALUES (?, ?, ?, ?, ?)',
+      [nombre, email, vuelo, fecha, tarjeta]
+    );
+    return resultado;
+  } catch (error) {
+    throw new Error('Error al realizar la compra');
+  }
+};
+
+
 
 module.exports = {
   register,
@@ -144,4 +195,7 @@ module.exports = {
   getAllFlights,
   createFlight,
   cancelFlight,
+  createCard,
+  deleteCard,
+  BuyTicket
 };

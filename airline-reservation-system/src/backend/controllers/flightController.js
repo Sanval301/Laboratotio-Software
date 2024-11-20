@@ -153,6 +153,115 @@ const cancelFlightController = async (req, res) => {
   }
 };
 
+// Inserta tarjeta
+const cardService = require("../services/cardService");
+
+const createCard = async (req, res) => {
+  const { numero, titular, fechaExpiracion, cvv } = req.body;
+
+  // Validar datos obligatorios
+  if (!numero || !titular || !fechaExpiracion || !cvv) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios" });
+  }
+
+  // Validar número de tarjeta (16 dígitos)
+  if (!/^[0-9]{16}$/.test(numero)) {
+    return res.status(400).json({ error: "El número de tarjeta debe tener exactamente 16 dígitos" });
+  }
+
+  // Validar nombre del titular
+  if (!/^[a-zA-Z\s]+$/.test(titular)) {
+    return res.status(400).json({ error: "El nombre del titular solo debe contener letras y espacios" });
+  }
+
+  // Validar fecha de expiración (MM/YY)
+  if (!/^(0[1-9]|1[0-2])\/[0-9]{2}$/.test(fechaExpiracion)) {
+    return res.status(400).json({ error: "La fecha de expiración debe estar en formato MM/YY" });
+  }
+
+  // Validar CVV (4 dígitos)
+  if (!/^[0-9]{4}$/.test(cvv)) {
+    return res.status(400).json({ error: "El CVV debe tener 3 o 4 dígitos" });
+  }
+
+  try {
+    const card = await cardService.createCard({ numero, titular, fechaExpiracion, cvv });
+    res.status(201).json({ message: "Tarjeta creada exitosamente", card });
+  } catch (error) {
+    console.error("Error al crear la tarjeta:", error);
+    if (error.message === "Tarjeta ya existe") {
+      res.status(409).json({ error: "La tarjeta ya está registrada" });
+    } else {
+      res.status(500).json({ error: "Error del servidor" });
+    }
+  }
+};
+
+const deleteCard = async (req, res) => {
+  const { id } = req.params;
+
+  // Validar el ID
+  if (!id) {
+    return res.status(400).json({ error: "El ID de la tarjeta es obligatorio" });
+  }
+
+  try {
+    const result = await cardService.deleteCard(id);
+    if (!result) {
+      return res.status(404).json({ error: "Tarjeta no encontrada" });
+    }
+    res.status(200).json({ message: "Tarjeta eliminada exitosamente" });
+  } catch (error) {
+    console.error("Error al eliminar la tarjeta:", error);
+    res.status(500).json({ error: "Error del servidor" });
+  }
+};
+
+// Compra de tiquetes
+const BuyTicket = async (req, res) => {
+  const { nombre, email, vuelo, fecha, tarjeta } = req.body;
+
+  // Validar datos obligatorios
+  if (!nombre || !email || !vuelo || !fecha || !tarjeta) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios" });
+  }
+
+  // Validar nombre (solo letras y espacios)
+  if (!/^[a-zA-Z\s]+$/.test(nombre)) {
+    return res.status(400).json({ error: "El nombre debe contener solo letras y espacios" });
+  }
+
+  // Validar email
+  if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+    return res.status(400).json({ error: "El correo electrónico no es válido" });
+  }
+
+  // Validar vuelo (no vacío)
+  if (!vuelo || vuelo.trim() === '') {
+    return res.status(400).json({ error: "El vuelo es obligatorio" });
+  }
+
+  // Validar fecha (formato YYYY-MM-DD)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    return res.status(400).json({ error: "La fecha no es válida, debe tener el formato YYYY-MM-DD" });
+  }
+
+  // Validar tarjeta (16 dígitos)
+  if (!/^\d{16}$/.test(tarjeta)) {
+    return res.status(400).json({ error: "El número de tarjeta debe tener exactamente 16 dígitos" });
+  }
+
+  try {
+    const resultado = await compraService.comprarTiquete(nombre, email, vuelo, fecha, tarjeta);
+    res.status(200).json({ mensaje: 'Compra realizada exitosamente', resultado });
+  } catch (error) {
+    console.error("Error al realizar la compra:", error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+};
+
+
+
 
 module.exports = {
   login,
@@ -160,4 +269,8 @@ module.exports = {
   getAllFlights,
   createFlight,
   cancelFlightController,
+  createCard,
+  deleteCard,
+  BuyTicket
+
 };
