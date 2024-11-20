@@ -153,8 +153,6 @@ const cancelFlightController = async (req, res) => {
   }
 };
 
-// Inserta tarjeta
-const cardService = require("../services/cardService");
 
 const createCard = async (req, res) => {
   const { numero, titular, fechaExpiracion, cvv } = req.body;
