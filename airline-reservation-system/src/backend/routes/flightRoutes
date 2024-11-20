@@ -17,6 +17,7 @@ router.post("/ComprarVuelo", flightController.BuyTicket);
 router.delete('/CancelarCompra/:id', flightController.cancelBuy);
 router.post("/ReservarVuelo", flightController.reserveTicket);
 router.delete('/CancelarReserva/:id', flightController.cancelReservation);
+router.post('/CrearNoticias', flightController.createNews);
 
 
 module.exports = router;
