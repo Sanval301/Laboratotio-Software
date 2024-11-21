@@ -40,10 +40,10 @@ import { Link } from "react-router-dom";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#1976d2",
+      main: "#6a1b9a  ",
     },
     secondary: {
-      main: "#dc004e",
+      main: "#ab47bc",
     },
     error: {
       main: "#f44336",
@@ -66,9 +66,10 @@ export default function CancelacionVuelosMejorada() {
 
   useEffect(() => {
     // Realizar la solicitud a la API para obtener los vuelos desde la base de datos
-    axios.get("http://localhost:5009/CancelarVuelos")
-      .then(response => setVuelos(response.data))
-      .catch(error => console.error("Error al obtener los vuelos:", error));
+    axios
+      .get("http://localhost:5009/CancelarVuelos")
+      .then((response) => setVuelos(response.data))
+      .catch((error) => console.error("Error al obtener los vuelos:", error));
   }, []);
 
   const handleOpenDialog = (vuelo) => {
@@ -87,7 +88,6 @@ export default function CancelacionVuelosMejorada() {
     handleCloseDialog();
     setOpenSnackbar(true);
   };
-  
 
   const getChipColor = (estado) => {
     switch (estado) {
@@ -111,6 +111,15 @@ export default function CancelacionVuelosMejorada() {
 
   return (
     <ThemeProvider theme={theme}>
+      <Button
+        component={Link}
+        to="/adminvuelos"
+        variant="contained"
+        color="primary"
+        sx={{ mt: 2 }}
+      >
+        Regresar a Administración de Vuelos
+      </Button>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <Paper elevation={3} sx={{ p: 3, mb: 4, backgroundColor: "#f8f9fa" }}>
           <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3 }}>
@@ -135,7 +144,10 @@ export default function CancelacionVuelosMejorada() {
                     Pasajeros Afectados
                   </Typography>
                   <Typography variant="h4">
-                    {vuelos.reduce((total, vuelo) => total + vuelo.Pasajeros, 0)}
+                    {vuelos.reduce(
+                      (total, vuelo) => total + vuelo.Pasajeros,
+                      0
+                    )}
                   </Typography>
                 </CardContent>
               </Card>
@@ -147,7 +159,10 @@ export default function CancelacionVuelosMejorada() {
                     Vuelos En Espera
                   </Typography>
                   <Typography variant="h4">
-                    {vuelos.filter((vuelo) => vuelo.Estado === "En Espera").length}
+                    {
+                      vuelos.filter((vuelo) => vuelo.Estado === "En Espera")
+                        .length
+                    }
                   </Typography>
                 </CardContent>
               </Card>
@@ -159,7 +174,10 @@ export default function CancelacionVuelosMejorada() {
                     Vuelos Embarcando
                   </Typography>
                   <Typography variant="h4">
-                    {vuelos.filter((vuelo) => vuelo.Estado === "Embarcando").length}
+                    {
+                      vuelos.filter((vuelo) => vuelo.Estado === "Embarcando")
+                        .length
+                    }
                   </Typography>
                 </CardContent>
               </Card>
@@ -185,13 +203,31 @@ export default function CancelacionVuelosMejorada() {
           <Grid container spacing={3}>
             {filteredVuelos.map((vuelo) => (
               <Grid item xs={12} sm={6} md={4} key={vuelo.VueloID}>
-                <Card raised sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+                <Card
+                  raised
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
                   <CardContent sx={{ flexGrow: 1 }}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 2,
+                      }}
+                    >
                       <Typography variant="h6" component="div">
                         {vuelo.CodigoVuelo}
                       </Typography>
-                      <Chip label={vuelo.Estado} color={getChipColor(vuelo.Estado)} size="small" />
+                      <Chip
+                        label={vuelo.Estado}
+                        color={getChipColor(vuelo.Estado)}
+                        size="small"
+                      />
                     </Box>
                     <Typography color="text.secondary" gutterBottom>
                       <FlightTakeoff sx={{ verticalAlign: "bottom", mr: 1 }} />
@@ -270,14 +306,24 @@ export default function CancelacionVuelosMejorada() {
 
         {/* Confirmación de cancelación */}
         <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle>{"¿Está seguro que desea cancelar este vuelo?"}</DialogTitle>
+          <DialogTitle>
+            {"¿Está seguro que desea cancelar este vuelo?"}
+          </DialogTitle>
           <DialogContent>
             <Typography variant="body1" sx={{ mb: 2 }}>
               Esta acción no se puede deshacer. Se cancelará el siguiente vuelo:
             </Typography>
             {selectedFlight && (
-              <Box sx={{ backgroundColor: "background.paper", p: 2, borderRadius: 1 }}>
-                <Typography variant="h6">{selectedFlight.CodigoVuelo}</Typography>
+              <Box
+                sx={{
+                  backgroundColor: "background.paper",
+                  p: 2,
+                  borderRadius: 1,
+                }}
+              >
+                <Typography variant="h6">
+                  {selectedFlight.CodigoVuelo}
+                </Typography>
                 <Typography>
                   {selectedFlight.Origen} - {selectedFlight.Destino}
                 </Typography>
@@ -292,7 +338,12 @@ export default function CancelacionVuelosMejorada() {
             <Button onClick={handleCloseDialog} color="primary">
               Cancelar
             </Button>
-            <Button onClick={handleCancelFlight} color="error" variant="contained" autoFocus>
+            <Button
+              onClick={handleCancelFlight}
+              color="error"
+              variant="contained"
+              autoFocus
+            >
               Sí, Cancelar Vuelo
             </Button>
           </DialogActions>
@@ -306,15 +357,16 @@ export default function CancelacionVuelosMejorada() {
           onClose={() => setOpenSnackbar(false)}
           message="Vuelo cancelado exitosamente"
           action={
-            <IconButton size="small" aria-label="close" color="inherit" onClick={() => setOpenSnackbar(false)}>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={() => setOpenSnackbar(false)}
+            >
               <Cancel fontSize="small" />
             </IconButton>
           }
         />
-
-        <Button component={Link} to="/adminvuelos" variant="contained" color="primary" sx={{ mt: 2 }}>
-          Regresar a Administración de Vuelos
-        </Button>
       </Container>
     </ThemeProvider>
   );

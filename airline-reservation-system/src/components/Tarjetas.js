@@ -18,8 +18,6 @@ import {
 import { styled, keyframes } from "@mui/material/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
-import AirplanemodeActiveIcon from "@mui/icons-material/AirplanemodeActive";
 import MenuLateral from "./MenuLateral";
 
 const floatAnimation = keyframes`
@@ -33,11 +31,6 @@ const StyledCard = styled(Card)(({ theme }) => ({
   overflow: "visible",
   backgroundColor: "transparent",
   boxShadow: "none",
-  "&:hover": {
-    "& .airplane-icon": {
-      animation: `${floatAnimation} 3s ease-in-out infinite`,
-    },
-  },
 }));
 
 const CardBackground = styled(Box)(({ theme }) => ({
@@ -51,16 +44,6 @@ const CardBackground = styled(Box)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   transform: "skew(-5deg)",
   boxShadow: "0 10px 20px rgba(0, 0, 0, 0.2)",
-  "&:after": {
-    content: '""',
-    position: "absolute",
-    top: "20%",
-    left: "-10%",
-    right: "-10%",
-    bottom: "20%",
-    background: "rgba(255, 255, 255, 0.1)",
-    transform: "rotate(-5deg)",
-  },
 }));
 
 const CardNumber = styled(Typography)(({ theme }) => ({
@@ -68,9 +51,7 @@ const CardNumber = styled(Typography)(({ theme }) => ({
   letterSpacing: "0.2em",
   marginBottom: theme.spacing(2),
   color: theme.palette.common.white,
-  textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
   position: "relative",
-  zIndex: 1,
 }));
 
 const CardInfo = styled(Typography)(({ theme }) => ({
@@ -78,7 +59,6 @@ const CardInfo = styled(Typography)(({ theme }) => ({
   color: theme.palette.common.white,
   opacity: 0.9,
   position: "relative",
-  zIndex: 1,
 }));
 
 function Tarjetas() {
@@ -89,22 +69,42 @@ function Tarjetas() {
     titular: "",
     fechaExpiracion: "",
     cvv: "",
+    saldo: "",
   });
+  const [compra, setCompra] = useState("");
+  const [errorFecha, setErrorFecha] = useState("");
 
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "fechaExpiracion") {
+      const regex = /^(0[1-9]|1[0-2])\/\d{2}$/; // Validar MM/AA
+      if (!regex.test(value) && value !== "") {
+        setErrorFecha("El formato debe ser MM/AA");
+      } else {
+        setErrorFecha("");
+      }
+    }
+
     setNuevaTarjeta({ ...nuevaTarjeta, [name]: value });
   };
 
   const handleAgregarTarjeta = () => {
+    const regex = /^(0[1-9]|1[0-2])\/\d{2}$/; // Validación antes de guardar
+    if (!regex.test(nuevaTarjeta.fechaExpiracion)) {
+      setErrorFecha("El formato debe ser MM/AA");
+      return;
+    }
+
     if (
       nuevaTarjeta.numero &&
       nuevaTarjeta.titular &&
       nuevaTarjeta.fechaExpiracion &&
-      nuevaTarjeta.cvv
+      nuevaTarjeta.cvv &&
+      nuevaTarjeta.saldo
     ) {
       setTarjetas([...tarjetas, { ...nuevaTarjeta, id: Date.now() }]);
       setNuevaTarjeta({
@@ -112,13 +112,31 @@ function Tarjetas() {
         titular: "",
         fechaExpiracion: "",
         cvv: "",
+        saldo: "",
       });
+      setErrorFecha("");
       handleCloseDialog();
     }
   };
 
   const handleEliminarTarjeta = (id) => {
     setTarjetas(tarjetas.filter((tarjeta) => tarjeta.id !== id));
+  };
+
+  const handleCompra = (id) => {
+    const monto = parseFloat(compra);
+    if (isNaN(monto) || monto <= 0) return;
+    setTarjetas((prev) =>
+      prev.map((tarjeta) =>
+        tarjeta.id === id
+          ? {
+              ...tarjeta,
+              saldo: Math.max(0, parseFloat(tarjeta.saldo) - monto).toFixed(2),
+            }
+          : tarjeta
+      )
+    );
+    setCompra("");
   };
 
   return (
@@ -133,11 +151,10 @@ function Tarjetas() {
             fontWeight: "bold",
             color: "#333",
             textAlign: "center",
-            textShadow: "2px 2px 4px rgba(0,0,0,0.1)",
             mb: 4,
           }}
         >
-          Mis Tarjetas de Vuelo
+          Gestión de Tarjetas de Vuelo
         </Typography>
         <Grid container spacing={3} sx={{ justifyContent: "center" }}>
           {tarjetas.map((tarjeta, index) => (
@@ -149,7 +166,7 @@ function Tarjetas() {
                 unmountOnExit
                 timeout={300 + index * 100}
               >
-                <StyledCard sx={{ width: "100%", minHeight: 240 }}>
+                <StyledCard sx={{ width: "100%", minHeight: 260 }}>
                   <CardBackground />
                   <CardContent sx={{ position: "relative", zIndex: 1 }}>
                     <Box
@@ -160,11 +177,12 @@ function Tarjetas() {
                         mb: 2,
                       }}
                     >
-                      <AirplanemodeActiveIcon
-                        className="airplane-icon"
-                        fontSize="large"
-                        sx={{ color: "white" }}
-                      />
+                      <Typography
+                        variant="h6"
+                        sx={{ color: "white", fontWeight: "bold" }}
+                      >
+                        {tarjeta.titular}
+                      </Typography>
                       <IconButton
                         onClick={() => handleEliminarTarjeta(tarjeta.id)}
                         size="small"
@@ -173,40 +191,10 @@ function Tarjetas() {
                         <DeleteIcon />
                       </IconButton>
                     </Box>
-                    <CardNumber variant="body1">
+                    <CardNumber>
                       {tarjeta.numero.replace(/\d{4}(?=.)/g, "$& ")}
                     </CardNumber>
-                    <CardInfo variant="body2">
-                      Nombre: {tarjeta.titular}
-                    </CardInfo>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mt: 2,
-                      }}
-                    >
-                      <CardInfo variant="body2">
-                        Válido hasta: {tarjeta.fechaExpiracion}
-                      </CardInfo>
-                      <Box
-                        sx={{
-                          backgroundColor: "rgba(255,255,255,0.2)",
-                          padding: "4px 8px",
-                          borderRadius: "12px",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <FlightTakeoffIcon
-                          sx={{ fontSize: 16, marginRight: 1, color: "white" }}
-                        />
-                        <Typography variant="caption" sx={{ color: "white" }}>
-                          SKYPASS
-                        </Typography>
-                      </Box>
-                    </Box>
+                    <CardInfo>Saldo: ${tarjeta.saldo}</CardInfo>
                   </CardContent>
                 </StyledCard>
               </Slide>
@@ -232,17 +220,16 @@ function Tarjetas() {
                   },
                 }}
               >
-                Agregar Nueva Tarjeta de Vuelo
+                Agregar Tarjeta
               </Button>
             </Fade>
           </Grid>
         </Grid>
 
         <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle>Agregar Nueva Tarjeta de Vuelo</DialogTitle>
+          <DialogTitle>Agregar Nueva Tarjeta</DialogTitle>
           <DialogContent>
             <TextField
-              autoFocus
               margin="dense"
               name="numero"
               label="Número de Tarjeta"
@@ -254,7 +241,7 @@ function Tarjetas() {
             <TextField
               margin="dense"
               name="titular"
-              label="Nombre del Pasajero"
+              label="Titular"
               type="text"
               fullWidth
               value={nuevaTarjeta.titular}
@@ -263,11 +250,13 @@ function Tarjetas() {
             <TextField
               margin="dense"
               name="fechaExpiracion"
-              label="Fecha de Expiración (MM/AA)"
+              label="Fecha Expiración (MM/AA)"
               type="text"
               fullWidth
               value={nuevaTarjeta.fechaExpiracion}
               onChange={handleInputChange}
+              error={!!errorFecha}
+              helperText={errorFecha}
             />
             <TextField
               margin="dense"
@@ -278,16 +267,19 @@ function Tarjetas() {
               value={nuevaTarjeta.cvv}
               onChange={handleInputChange}
             />
+            <TextField
+              margin="dense"
+              name="saldo"
+              label="Saldo Inicial ($)"
+              type="number"
+              fullWidth
+              value={nuevaTarjeta.saldo}
+              onChange={handleInputChange}
+            />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseDialog}>Cancelar</Button>
-            <Button
-              onClick={handleAgregarTarjeta}
-              variant="contained"
-              color="primary"
-            >
-              Agregar
-            </Button>
+            <Button onClick={handleAgregarTarjeta}>Guardar</Button>
           </DialogActions>
         </Dialog>
       </Box>

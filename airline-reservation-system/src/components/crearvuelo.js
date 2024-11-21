@@ -15,6 +15,16 @@ import {
 import { AccessTime } from "@mui/icons-material";
 import axios from "axios";
 import { format, addMinutes, parse } from "date-fns";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { Link } from "react-router-dom";
+
+const theme = createTheme({
+  palette: {
+    primary: { main: "#6a1b9a" },
+    secondary: { main: "#ab47bc" },
+    info: { main: "#4caf50" },
+  },
+});
 
 // Función para enviar la información de un vuelo al backend
 const createFlight = async (flightData) => {
@@ -50,35 +60,46 @@ export default function Dash() {
   };
 
   return (
-    <div
-      style={{ display: "flex", height: "100vh", backgroundColor: "#f3f4f6" }}
-    >
-      <div
-        style={{
-          width: 250,
-          backgroundColor: "#fff",
-          boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
-        }}
+    <ThemeProvider theme={theme}>
+      <Button
+        component={Link}
+        to="/adminvuelos"
+        variant="contained"
+        color="primary"
+        sx={{ mt: 2 }}
       >
-        <div style={{ padding: 16 }}>
-          <Typography variant="h5" color="primary">
-            AeroTicket
-          </Typography>
+        Regresar a Administración de Vuelos
+      </Button>
+      <div
+        style={{ display: "flex", height: "100vh", backgroundColor: "#f3f4f6" }}
+      >
+        <div
+          style={{
+            width: 250,
+            backgroundColor: "#fff",
+            boxShadow: "2px 0 5px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <div style={{ padding: 16 }}>
+            <Typography variant="h5" color="primary">
+              AeroTicket
+            </Typography>
+          </div>
+          <nav>
+            <Button
+              variant={activeTab === "create-flight" ? "contained" : "text"}
+              fullWidth
+              onClick={() => setActiveTab("create-flight")}
+            >
+              Crear Vuelo
+            </Button>
+          </nav>
         </div>
-        <nav>
-          <Button
-            variant={activeTab === "create-flight" ? "contained" : "text"}
-            fullWidth
-            onClick={() => setActiveTab("create-flight")}
-          >
-            Crear Vuelo
-          </Button>
-        </nav>
+        <div style={{ flex: 1, padding: 16, overflowY: "auto" }}>
+          {renderContent()}
+        </div>
       </div>
-      <div style={{ flex: 1, padding: 16, overflowY: "auto" }}>
-        {renderContent()}
-      </div>
-    </div>
+    </ThemeProvider>
   );
 }
 
