@@ -19,7 +19,7 @@ import {
   History,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./Navbar"; // Asegúrate de que esta ruta sea correcta
+import NavbarAdmin from "./NavbarAdmin"; // Asegúrate de que esta ruta sea correcta
 import Footer from "./Footer"; // Asegúrate de que esta ruta sea correcta
 
 const theme = createTheme({
@@ -36,7 +36,7 @@ export default function AdminVuelos() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Navbar /> {/* Navbar al inicio del componente */}
+      <NavbarAdmin /> {/* Navbar al inicio del componente */}
       <Container maxWidth="lg" sx={{ mt: 4, minHeight: "80vh" }}>
         {" "}
         {/* minHeight para mantener contenido y footer en posición correcta */}

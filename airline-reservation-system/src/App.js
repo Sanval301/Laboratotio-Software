@@ -16,6 +16,9 @@ import {
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import Navbar from "./components/Navbar"; // Tu Navbar personalizado
+import NavbarCliente from "./components/NavbarCliente"; // Tu Navbar personalizado Cliente
+import NavbarAdmin from "./components/NavbarAdmin"; // Tu Navbar personalizado Admin
+import NavbarRoot from "./components/NavbarRoot"; // Tu Navbar personalizado Root
 import Footer from "./components/Footer"; // Pie de pagina
 import Perfil from "./components/Perfil";
 import Login from "./components/Login";
@@ -45,7 +48,7 @@ const theme = createTheme({
 function PaginaPrincipal() {
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <Navbar />
+      <NavbarCliente />
       <Box component="main" sx={{ flexGrow: 1 }}>
         {/* Sección de búsqueda de vuelos */}
         <section>

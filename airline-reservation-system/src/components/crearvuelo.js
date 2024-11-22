@@ -17,6 +17,8 @@ import axios from "axios";
 import { format, addMinutes, parse } from "date-fns";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Link } from "react-router-dom";
+import NavbarAdmin from "./NavbarAdmin"; // Asegúrate de que la ruta sea correcta
+import Footer from "./Footer"; // Asegúrate de que la ruta sea correcta
 
 const theme = createTheme({
   palette: {
@@ -61,15 +63,7 @@ export default function Dash() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Button
-        component={Link}
-        to="/adminvuelos"
-        variant="contained"
-        color="primary"
-        sx={{ mt: 2 }}
-      >
-        Regresar a Administración de Vuelos
-      </Button>
+      <NavbarAdmin />
       <div
         style={{ display: "flex", height: "100vh", backgroundColor: "#f3f4f6" }}
       >
@@ -99,6 +93,7 @@ export default function Dash() {
           {renderContent()}
         </div>
       </div>
+      <Footer />
     </ThemeProvider>
   );
 }
