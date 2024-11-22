@@ -15,7 +15,7 @@ const NavbarCliente = () => {
 
         {/* Opciones del cliente */}
         <Box sx={{ display: "flex", gap: 2 }}>
-          <Button color="inherit" component={Link} to="/buscar">
+          <Button color="inherit" component={Link} to="/">
             Buscar Vuelos
           </Button>
           <Button color="inherit" component={Link} to="/reservar">
