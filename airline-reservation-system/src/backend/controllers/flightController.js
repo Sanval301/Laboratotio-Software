@@ -183,7 +183,7 @@ const createCard = async (req, res) => {
   }
 
   try {
-    const card = await cardService.createCard({ numero, titular, fechaExpiracion, cvv });
+    const card = flightService.createCard({ numero, titular, fechaExpiracion, cvv });
     res.status(201).json({ message: "Tarjeta creada exitosamente", card });
   } catch (error) {
     console.error("Error al crear la tarjeta:", error);
@@ -196,15 +196,15 @@ const createCard = async (req, res) => {
 };
 
 const deleteCard = async (req, res) => {
-  const { id } = req.params;
+  const { numero } = req.params;
 
   // Validar el ID
-  if (!id) {
+  if (!numero) {
     return res.status(400).json({ error: "El ID de la tarjeta es obligatorio" });
   }
 
   try {
-    const result = await cardService.deleteCard(id);
+    const result = await flightService.deleteCard(numero);
     if (!result) {
       return res.status(404).json({ error: "Tarjeta no encontrada" });
     }
@@ -217,10 +217,10 @@ const deleteCard = async (req, res) => {
 
 // Compra de tiquetes
 const BuyTicket = async (req, res) => {
-  const { nombre, email, vuelo, fecha, tarjeta } = req.body;
+  const { nombre, email, vuelo, fechaVuelo, estado,tarjeta,fechacompra } = req.body;
 
   // Validar datos obligatorios
-  if (!nombre || !email || !vuelo || !fecha || !tarjeta) {
+  if (!nombre || !email || !vuelo || !fechaVuelo || !estado || !tarjeta || !fechacompra) {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
 
@@ -240,9 +240,9 @@ const BuyTicket = async (req, res) => {
   }
 
   // Validar fecha
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
-    return res.status(400).json({ error: "La fecha no es válida, debe tener el formato YYYY-MM-DD" });
-  }
+  //if (!/^\d{4}-\d{2}-\d{2}$/.test(fechaVuelo)) {
+    //return res.status(400).json({ error: "La fecha no es válida, debe tener el formato YYYY-MM-DD" });
+  //}
 
   // Validar tarjeta
   if (!/^\d{16}$/.test(tarjeta)) {
@@ -258,7 +258,7 @@ const BuyTicket = async (req, res) => {
     }
 
     // Realizar compra
-    const resultado = await flightService.BuyTicket(nombre, email, vuelo, fecha, tarjeta);
+    const resultado = await flightService.BuyTicket(nombre, email, vuelo, fechaVuelo, estado, tarjeta,fechacompra);
     res.status(200).json({ mensaje: "Compra realizada exitosamente", resultado });
   } catch (error) {
     console.error("Error al realizar la compra:", error);
@@ -283,9 +283,9 @@ const cancelBuy = async (req, res) => {
     const BuyTicket = await flightService.obtenerCompraPorId(id);
 
     // Validar si la compra existe
-    if (!compra) {
-      return res.status(404).json({ error: "Compra no encontrada" });
-    }
+   // if (!compra) {
+   //   return res.status(404).json({ error: "Compra no encontrada" });
+   // }
 
     // Verificar que el email coincida
     if (BuyTicket.email !== email) {
@@ -302,7 +302,7 @@ const cancelBuy = async (req, res) => {
     }
 
     // Cancelar la compra
-    const result = await compraService.cancelarCompra(id);
+    const result = await flightService.cancelarCompra(id);
 
     res.status(200).json({ message: "Compra cancelada exitosamente", result });
   } catch (error) {

@@ -109,7 +109,7 @@ const createFlight = (flightDetails) => {
       flightDetails.HoraLlegadaLocal,
       flightDetails.CostoPorPersona,
       flightDetails.EsInternacional
-    
+
     ];
 
     db.query(query, values, (err, result) => {
@@ -137,13 +137,13 @@ const cancelFlight = (CodigoVuelo) => {
   });
 };
 
-const db = require("../config/db.config"); // Configuración de la base de datos
 
-const createCard = async ({ cardNumber, cardHolder, expirationDate, cvv }) => {
+
+const createCard = async ({ numero, titular, fechaExpiracion, cvv }) => {
   // Verificar si ya existe una tarjeta con el mismo número
   const [existingCard] = await db.promise().query(
-    "SELECT * FROM cards WHERE cardNumber = ?",
-    [cardNumber]
+    "SELECT * FROM tarjetas WHERE numero = ?",
+    [numero]
   );
 
   if (existingCard.length > 0) {
@@ -152,34 +152,34 @@ const createCard = async ({ cardNumber, cardHolder, expirationDate, cvv }) => {
 
   // Insertar nueva tarjeta en la base de datos
   const [result] = await db.promise().query(
-    "INSERT INTO cards (cardNumber, cardHolder, expirationDate, cvv) VALUES (?, ?, ?, ?)",
-    [cardNumber, cardHolder, expirationDate, cvv]
+    "INSERT INTO tarjetas (numero, titular, fechaExpiracion, cvv) VALUES (?, ?, ?, ?)",
+    [numero, titular, fechaExpiracion, cvv]
   );
 
   // Retornar la tarjeta creada con su ID
   return {
     id: result.insertId,
-    cardNumber,
-    cardHolder,
-    expirationDate,
+    numero,
+    titular,
+    fechaExpiracion,
     cvv,
   };
 };
 
-const deleteCard = async (cardId) => {
+const deleteCard = async (numero) => {
   // Eliminar tarjeta por ID
-  const [result] = await db.promise().query("DELETE FROM cards WHERE id = ?", [cardId]);
+  const [result] = await db.promise().query("DELETE FROM tarjetas WHERE numero = ?", [numero]);
 
   // Si no se eliminó ninguna tarjeta, retornar null
   return result.affectedRows > 0;
 };
 
 
-const BuyTicket = async (nombre, email, vuelo, fecha, tarjeta) => {
+const BuyTicket = async (nombre, email, vuelo, fechaVuelo, estado,tarjeta,fechacompra) => {
   try {
     const [resultado] = await db.query(
-      'INSERT INTO compras (nombre, email, vuelo, fecha, tarjeta) VALUES (?, ?, ?, ?, ?)',
-      [nombre, email, vuelo, fecha, tarjeta]
+      'INSERT INTO compras (nombre, email, vuelo, fechaVuelo, estado, tarjeta,fechacompra) VALUES (?, ?, ?, ?, ?,?,?)',
+      [nombre, email, vuelo, fechaVuelo, estado, tarjeta,fechacompra]
     );
     return resultado;
   } catch (error) {
