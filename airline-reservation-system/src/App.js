@@ -48,7 +48,7 @@ const theme = createTheme({
 function PaginaPrincipal() {
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <NavbarCliente />
+      <Navbar />
       <Box component="main" sx={{ flexGrow: 1 }}>
         {/* Sección de búsqueda de vuelos */}
         <section>

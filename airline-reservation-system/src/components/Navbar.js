@@ -15,7 +15,7 @@ const NavbarVisitante = () => {
 
         {/* Opciones básicas */}
         <Box sx={{ display: "flex", gap: 2 }}>
-          <Button color="inherit" component={Link} to="/buscar" sx={{ mx: 1 }}>
+          <Button color="inherit" component={Link} to="/" sx={{ mx: 1 }}>
             Buscar Vuelos
           </Button>
           <Button color="inherit" component={Link} to="/login" sx={{ mx: 1 }}>
@@ -24,7 +24,7 @@ const NavbarVisitante = () => {
           <Button
             color="inherit"
             component={Link}
-            to="/registro"
+            to="/Register"
             sx={{ mx: 1 }}
           >
             Registrarse
