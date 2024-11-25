@@ -28,10 +28,10 @@ const login = async (req, res) => {
 
 
 const register = async (req, res) => {
-  const { nombreusuario, nombreCompleto, email, contraseña, genero, cedula } = req.body;
+  const { nombreusuario, nombres, apellidos, email, contraseña, genero, dni, fechaNacimiento, paisNacimiento, estadoNacimiento, ciudadNacimiento,direccionFacturacion, imagenUsuario } = req.body;
 
   // Validar datos obligatorios
-  if (!nombreusuario || !nombreCompleto || !email || !contraseña || !cedula) {
+  if (!nombreusuario || !nombres || !email ||!apellidos|| !contraseña || !dni || !fechaNacimiento ||!paisNacimiento || !estadoNacimiento || !ciudadNacimiento || !direccionFacturacion || !imagenUsuario ) {
     return res.status(400).json({ message: "Todos los campos marcados con * son obligatorios" });
   }
 
@@ -50,11 +50,18 @@ const register = async (req, res) => {
     // Llamar a flightService.register con parámetros individuales
     const newUser = await flightService.register(
       nombreusuario,
-      nombreCompleto,
+      nombres,
+      apellidos,
       email,
       contraseña,
       genero,
-      cedula
+      dni, 
+      fechaNacimiento,
+      paisNacimiento,
+      estadoNacimiento,
+      ciudadNacimiento,
+      direccionFacturacion,
+      imagenUsuario
     );
 
     res.status(201).json({ message: "Usuario registrado exitosamente", userId: newUser.id });

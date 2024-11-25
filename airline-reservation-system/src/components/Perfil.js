@@ -20,6 +20,7 @@ import {
 } from "@mui/icons-material";
 import MenuLateral from "./MenuLateral";
 import { Outlet } from "react-router-dom";
+import Navbar from "./NavbarAdmin"
 
 export default function Perfil() {
   const [activeTab, setActiveTab] = useState("General");
@@ -59,6 +60,7 @@ export default function Perfil() {
   };
 
   return (
+ 
     <Box display="flex" height="100vh" bgcolor="background.paper">
       {/* Menú lateral para navegar entre secciones */}
       <MenuLateral activeTab={activeTab} setActiveTab={setActiveTab} />

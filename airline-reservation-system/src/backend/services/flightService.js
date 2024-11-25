@@ -5,14 +5,14 @@ const jwt = require('jsonwebtoken');
 
 const saltRounds = 10; // Número de rondas de sal
 
-const register = async (nombreusuario, nombreCompleto, email, contraseña, genero, cedula) => {
+const register = async (nombreusuario, nombres, apellidos, email, contraseña, genero, dni, fechaNacimiento, paisNacimiento, estadoNacimiento, ciudadNacimiento,direccionFacturacion, imagenUsuario) => {
   try {
     // Cifrar la contraseña antes de almacenarla
     const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
 
     return new Promise((resolve, reject) => {
-      const query = `INSERT INTO usuarios (NombreUsuario, NombreCompleto, Email, Contraseña, Genero, Cedula) VALUES (?, ?, ?, ?, ?, ?)`;
-      const values = [nombreusuario, nombreCompleto, email, hashedPassword, genero, cedula]; // Usa el hash en lugar de la contraseña
+      const query = `INSERT INTO usuarios (NombreUsuario, NombreCompleto, Email, Contraseña, Genero, Cedula) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?,?, ?,?, ?)`;
+      const values = [nombreusuario, nombres, apellidos, email, contraseña, genero, dni, fechaNacimiento, paisNacimiento, estadoNacimiento, ciudadNacimiento,direccionFacturacion, imagenUsuario]; // Usa el hash en lugar de la contraseña
 
       console.log("Query:", query);
       console.log("Values:", values);
