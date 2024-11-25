@@ -19,30 +19,31 @@ import {
   History,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./Navbar"; // Asegúrate de que esta ruta sea correcta
+import NavbarAdmin from "./NavbarAdmin"; // Asegúrate de que esta ruta sea correcta
 import Footer from "./Footer"; // Asegúrate de que esta ruta sea correcta
 
 const theme = createTheme({
   palette: {
     primary: { main: "#6a1b9a" },
     secondary: { main: "#9A40BD" },
-    success: { main: "#4caf50" },
-    error: { main: "#6A00DC" },
+    success: { main: "#6A1B9A" },
+    error: { main: "#BD0C06" },
+    allow: {main: "#008A1E"}
   },
-});
+}); 
 
 export default function AdminVuelos() {
   const navigate = useNavigate();
 
   return (
     <ThemeProvider theme={theme}>
-      <Navbar /> {/* Navbar al inicio del componente */}
+      <NavbarAdmin /> {/* Navbar al inicio del componente */}
       <Container maxWidth="lg" sx={{ mt: 4, minHeight: "80vh" }}>
         {" "}
         {/* minHeight para mantener contenido y footer en posición correcta */}
         <Box sx={{ textAlign: "center", mb: 4 }}>
-          <Typography variant="h4" component="h1" gutterBottom>
-            Administración de Vuelos
+          <Typography variant="h5" component="h1" gutterBottom>
+            Ingresa los datos para encontrar tu vuelo.
           </Typography>
         </Box>
         {/* Botones de acciones principales */}
@@ -53,10 +54,14 @@ export default function AdminVuelos() {
             <Button
               fullWidth
               variant="contained"
-              color="primary"
+              color="allow"
               startIcon={<Add />}
               onClick={() => navigate("/crearvuelo")}
-              sx={{ height: "60px", fontSize: "1.2rem" }}
+              sx={{ height: "60px", fontSize: "1.2rem", color: 'white', // Asegura que el texto sea blanco
+                '&:hover': {
+                  backgroundColor: theme.palette.primary.dark, // 
+                },
+          }}
             >
               Crear Vuelo
             </Button>
@@ -68,7 +73,10 @@ export default function AdminVuelos() {
               color="secondary"
               startIcon={<Edit />}
               onClick={() => navigate("/EditarVuelos")}
-              sx={{ height: "60px", fontSize: "1.2rem" }}
+              sx={{ height: "60px", fontSize: "1.2rem", '&:hover': {
+                  backgroundColor: theme.palette.primary.dark, // 
+                }, 
+              }}
             >
               Editar Vuelo
             </Button>
@@ -80,7 +88,9 @@ export default function AdminVuelos() {
               color="error"
               startIcon={<Cancel />}
               onClick={() => navigate("/CancelarVuelos")}
-              sx={{ height: "60px", fontSize: "1.2rem" }}
+              sx={{ height: "60px", fontSize: "1.2rem", '&:hover': {
+                backgroundColor: theme.palette.primary.dark, // 
+              }, }}
             >
               Cancelar Vuelo
             </Button>
@@ -89,10 +99,12 @@ export default function AdminVuelos() {
             <Button
               fullWidth
               variant="contained"
-              color="error"
+              color="success"
               startIcon={<History />}
               onClick={() => navigate("/VuelosRealizados")}
-              sx={{ height: "60px", fontSize: "1rem" }}
+              sx={{ height: "60px", fontSize: "1rem" , '&:hover': {
+                backgroundColor: theme.palette.primary.dark, // 
+              }, }}
             >
               Vuelos Realizados
             </Button>
@@ -102,7 +114,7 @@ export default function AdminVuelos() {
         <Typography variant="h5" gutterBottom sx={{ mt: 4 }}>
           Vuelos Actuales
         </Typography>
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ mb: '10%' }}>
           {[
             { id: 1, number: "AA123", status: "En Tiempo", color: "success" },
             { id: 2, number: "IB456", status: "Retrasado", color: "secondary" },

@@ -1,15 +1,8 @@
 import React from "react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  Select,
-} from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { Link } from "react-router-dom";
 
-const Navbar = () => {
+const NavbarVisitante = () => {
   return (
     <AppBar position="static" sx={{ bgcolor: "primary.main" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -20,44 +13,21 @@ const Navbar = () => {
           </Typography>
         </Link>
 
-        {/* Enlaces de navegación */}
+        {/* Opciones básicas */}
         <Box sx={{ display: "flex", gap: 2 }}>
+          <Button color="inherit" component={Link} to="/" sx={{ mx: 1 }}>
+            Buscar Vuelos
+          </Button>
           <Button color="inherit" component={Link} to="/login" sx={{ mx: 1 }}>
             Iniciar Sesión
           </Button>
           <Button
             color="inherit"
             component={Link}
-            to="/Reservar"
+            to="/Register"
             sx={{ mx: 1 }}
           >
-            Reservar
-          </Button>
-          <Button color="inherit" component={Link} to="/perfil" sx={{ mx: 1 }}>
-            Perfil
-          </Button>
-          <Button
-            color="inherit"
-            component={Link}
-            to="/AdminVuelos"
-            sx={{ mx: 1 }}
-          >
-            Administración de Vuelos
-          </Button>{" "}
-          {/* Esto no va aca se supone que se puede hacer unicamente desde la vista de administrador, se deja aca momentaneamente para uso de vista */}
-        </Box>
-
-        {/* Opciones adicionales */}
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <Button
-            variant="outlined"
-            sx={{
-              color: "white",
-              borderColor: "white",
-              "&:hover": { bgcolor: "white", color: "primary.main" },
-            }}
-          >
-            Estado del vuelo
+            Registrarse
           </Button>
         </Box>
       </Toolbar>
@@ -65,4 +35,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default NavbarVisitante;

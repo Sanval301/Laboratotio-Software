@@ -38,10 +38,14 @@ const Login = () => {
 
   return (
     <Box
+    
       sx={{
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
+        backgroundImage: 'url("https://images.pexels.com/photos/8493781/pexels-photo-8493781.jpeg")',  // Asegúrate de que esta ruta sea correcta
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
       }}
     >
       <Navbar />
@@ -53,6 +57,7 @@ const Login = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          m: '5%',
         }}
       >
         <Box
@@ -62,6 +67,7 @@ const Login = () => {
             boxShadow: 3,
             borderRadius: "8px",
             textAlign: "center",
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
           }}
         >
           <Typography variant="h5" gutterBottom>

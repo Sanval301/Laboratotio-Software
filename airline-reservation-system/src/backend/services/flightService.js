@@ -230,6 +230,26 @@ const liberarReservasExpiradas = async () => {
   return result.affectedRows;
 };
 
+const createNews = async (titulo, informacion, precio_antes, precio_despues) => {
+  try {
+    const [resultado] = await db.query(
+      'INSERT INTO noticias (titulo, informacion, precio_antes, precio_despues) VALUES (?, ?, ?, ?)',
+      [titulo, informacion, precio_antes, precio_despues]
+    );
+
+    // Devolver la noticia creada con su ID
+    return {
+      id: resultado.insertId,
+      titulo,
+      informacion,
+      precio_antes,
+      precio_despues,
+    };
+  } catch (error) {
+    console.error('Error al insertar la noticia:', error);
+    throw new Error('Error al crear la noticia');
+  }
+};
 
 module.exports = {
   register,
@@ -246,5 +266,6 @@ module.exports = {
   crearReserva,
   obtenerReservaPorId,
   cancelarReserva,
-  liberarReservasExpiradas
+  liberarReservasExpiradas,
+  createNews
 };

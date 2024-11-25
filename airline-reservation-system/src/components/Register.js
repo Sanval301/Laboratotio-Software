@@ -103,7 +103,7 @@ function Registro() {
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar />
 
-      <Container component="main" maxWidth="md">
+      <Container component="main" maxWidth="md" sx={{ mb: "5%"  }}>
         <StyledPaper>
           <StyledAvatar>
             <AccountCircle />

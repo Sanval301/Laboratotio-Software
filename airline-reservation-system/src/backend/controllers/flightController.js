@@ -389,6 +389,35 @@ const cancelReservation = async (req, res) => {
   }
 };
 
+const createNews = async (req, res) => {
+  const { titulo, informacion, precio_antes, precio_despues } = req.body;
+
+  // Validar campos obligatorios
+  if (!titulo || !informacion || !precio_antes || !precio_despues) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  }
+
+  // Validar que los precios sean números válidos
+  if (isNaN(precio_antes) || isNaN(precio_despues)) {
+    return res.status(400).json({ error: 'Los precios deben ser números válidos' });
+  }
+
+  try {
+    const noticia = await newsService.createNews({
+      titulo,
+      informacion,
+      precio_antes,
+      precio_despues,
+    });
+
+    res.status(201).json({ message: 'Noticia creada exitosamente', noticia });
+  } catch (error) {
+    console.error('Error al crear la noticia:', error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+};
+
+
 module.exports = {
   login,
   register,
@@ -400,6 +429,7 @@ module.exports = {
   BuyTicket,
   cancelBuy,
   reserveTicket,
-  cancelReservation
+  cancelReservation,
+  createNews
 
 };
