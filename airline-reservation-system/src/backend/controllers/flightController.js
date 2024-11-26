@@ -417,6 +417,20 @@ const createNews = async (req, res) => {
   }
 };
 
+const searchFlights = async (req, res) => {
+  const { origen, destino, fechaVuelo, precioMin, precioMax } = req.query;
+
+  try {
+    // Buscar vuelos con los filtros proporcionados
+    const vuelos = await flightService.buscarVuelos(origen, destino, fechaVuelo, precioMin, precioMax);
+
+    // Responder con los resultados
+    res.status(200).json(vuelos);
+  } catch (error) {
+    console.error('Error al buscar vuelos:', error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+};
 
 module.exports = {
   login,
@@ -430,6 +444,7 @@ module.exports = {
   cancelBuy,
   reserveTicket,
   cancelReservation,
-  createNews
+  createNews,
+  searchFlights
 
 };
