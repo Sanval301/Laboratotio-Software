@@ -5,14 +5,14 @@ const jwt = require('jsonwebtoken');
 
 const saltRounds = 10; // Número de rondas de sal
 
-const register = async (nombreusuario, nombreCompleto, email, contraseña, genero, cedula) => {
+const register = async (nombreusuario, nombres, apellidos, email, contraseña, genero, dni, fechaNacimiento, paisNacimiento, estadoNacimiento, ciudadNacimiento,direccionFacturacion, imagenUsuario) => {
   try {
     // Cifrar la contraseña antes de almacenarla
     const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
 
     return new Promise((resolve, reject) => {
-      const query = `INSERT INTO usuarios (NombreUsuario, NombreCompleto, Email, Contraseña, Genero, Cedula) VALUES (?, ?, ?, ?, ?, ?)`;
-      const values = [nombreusuario, nombreCompleto, email, hashedPassword, genero, cedula]; // Usa el hash en lugar de la contraseña
+      const query = `INSERT INTO usuarios (NombreUsuario, NombreCompleto, Email, Contraseña, Genero, Cedula) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?,?, ?,?, ?)`;
+      const values = [nombreusuario, nombres, apellidos, email, contraseña, genero, dni, fechaNacimiento, paisNacimiento, estadoNacimiento, ciudadNacimiento,direccionFacturacion, imagenUsuario]; // Usa el hash en lugar de la contraseña
 
       console.log("Query:", query);
       console.log("Values:", values);
@@ -109,7 +109,7 @@ const createFlight = (flightDetails) => {
       flightDetails.HoraLlegadaLocal,
       flightDetails.CostoPorPersona,
       flightDetails.EsInternacional
-    
+
     ];
 
     db.query(query, values, (err, result) => {
@@ -137,11 +137,13 @@ const cancelFlight = (CodigoVuelo) => {
   });
 };
 
-const createCard = async ({ cardNumber, cardHolder, expirationDate, cvv }) => {
+
+
+const createCard = async ({ numero, titular, fechaExpiracion, cvv }) => {
   // Verificar si ya existe una tarjeta con el mismo número
   const [existingCard] = await db.promise().query(
-    "SELECT * FROM cards WHERE cardNumber = ?",
-    [cardNumber]
+    "SELECT * FROM tarjetas WHERE numero = ?",
+    [numero]
   );
 
   if (existingCard.length > 0) {
@@ -150,34 +152,34 @@ const createCard = async ({ cardNumber, cardHolder, expirationDate, cvv }) => {
 
   // Insertar nueva tarjeta en la base de datos
   const [result] = await db.promise().query(
-    "INSERT INTO cards (cardNumber, cardHolder, expirationDate, cvv) VALUES (?, ?, ?, ?)",
-    [cardNumber, cardHolder, expirationDate, cvv]
+    "INSERT INTO tarjetas (numero, titular, fechaExpiracion, cvv) VALUES (?, ?, ?, ?)",
+    [numero, titular, fechaExpiracion, cvv]
   );
 
   // Retornar la tarjeta creada con su ID
   return {
     id: result.insertId,
-    cardNumber,
-    cardHolder,
-    expirationDate,
+    numero,
+    titular,
+    fechaExpiracion,
     cvv,
   };
 };
 
-const deleteCard = async (cardId) => {
+const deleteCard = async (numero) => {
   // Eliminar tarjeta por ID
-  const [result] = await db.promise().query("DELETE FROM cards WHERE id = ?", [cardId]);
+  const [result] = await db.promise().query("DELETE FROM tarjetas WHERE numero = ?", [numero]);
 
   // Si no se eliminó ninguna tarjeta, retornar null
   return result.affectedRows > 0;
 };
 
 
-const BuyTicket = async (nombre, email, vuelo, fecha, tarjeta) => {
+const BuyTicket = async (nombre, email, vuelo, fechaVuelo, estado,tarjeta,fechacompra) => {
   try {
     const [resultado] = await db.query(
-      'INSERT INTO compras (nombre, email, vuelo, fecha, tarjeta) VALUES (?, ?, ?, ?, ?)',
-      [nombre, email, vuelo, fecha, tarjeta]
+      'INSERT INTO compras (nombre, email, vuelo, fechaVuelo, estado, tarjeta,fechacompra) VALUES (?, ?, ?, ?, ?,?,?)',
+      [nombre, email, vuelo, fechaVuelo, estado, tarjeta,fechacompra]
     );
     return resultado;
   } catch (error) {
@@ -249,6 +251,38 @@ const createNews = async (titulo, informacion, precio_antes, precio_despues) => 
   }
 };
 
+const buscarVuelos = async (origen, destino, fechaVuelo, precioMin, precioMax) => {
+  // Base query
+  let query = 'SELECT * FROM Vuelos WHERE 1=1';
+  const params = [];
+
+  // Filtros dinámicos
+  if (origen) {
+    query += ' AND origen = ?';
+    params.push(origen);
+  }
+  if (destino) {
+    query += ' AND destino = ?';
+    params.push(destino);
+  }
+  if (fechaVuelo) {
+    query += ' AND DATE(fechaVuelo) = ?';
+    params.push(fechaVuelo); // Aseguramos que solo compare la fecha, no la hora
+  }
+  if (precioMin) {
+    query += ' AND precio >= ?';
+    params.push(precioMin);
+  }
+  if (precioMax) {
+    query += ' AND precio <= ?';
+    params.push(precioMax);
+  }
+
+  // Ejecutar consulta
+  const [rows] = await db.query(query, params);
+  return rows;
+};
+
 module.exports = {
   register,
   login,
@@ -265,5 +299,6 @@ module.exports = {
   obtenerReservaPorId,
   cancelarReserva,
   liberarReservasExpiradas,
-  createNews
+  createNews,
+  buscarVuelos
 };

@@ -16,6 +16,7 @@ import MenuLateral from "./MenuLateral";
 import Footer from "./Footer";
 import NavbarCliente from "./NavbarCliente"; // Importar NavbarCliente
 import { Outlet } from "react-router-dom";
+import Navbar from "./NavbarAdmin"
 
 export default function Perfil() {
   const [activeTab, setActiveTab] = useState("General");

@@ -7,25 +7,21 @@ import {
   CardContent,
   IconButton,
 } from "@mui/material";
-import { styled, keyframes } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import MenuLateral from "./MenuLateral";
 import NavbarCliente from "./NavbarCliente"; // Importa NavbarCliente
 import Footer from "./Footer"; // Importa Footer
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const floatAnimation = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-`;
+
 
 const StyledCard = styled(Card)(({ theme }) => ({
   position: "relative",
   overflow: "visible",
   backgroundColor: "transparent",
   boxShadow: "none",
-  animation: `${floatAnimation} 5s ease-in-out infinite`,
+  
 }));
 
 const CardBackground = styled(Box)(({ theme }) => ({
