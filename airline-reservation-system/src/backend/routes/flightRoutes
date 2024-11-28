@@ -18,6 +18,6 @@ router.delete('/CancelarCompra/:id', flightController.cancelBuy);
 router.post("/ReservarVuelo", flightController.reserveTicket);
 router.delete('/CancelarReserva/:id', flightController.cancelReservation);
 router.post('/CrearNoticias', flightController.createNews);
-
+router.get('/Obtenervuelos', flightController.searchFlights);
 
 module.exports = router;

@@ -262,6 +262,38 @@ const createNews = async (titulo, informacion, precio_antes, precio_despues) => 
   }
 };
 
+const buscarVuelos = async (origen, destino, fechaVuelo, precioMin, precioMax) => {
+  // Base query
+  let query = 'SELECT * FROM Vuelos WHERE 1=1';
+  const params = [];
+
+  // Filtros dinámicos
+  if (origen) {
+    query += ' AND origen = ?';
+    params.push(origen);
+  }
+  if (destino) {
+    query += ' AND destino = ?';
+    params.push(destino);
+  }
+  if (fechaVuelo) {
+    query += ' AND DATE(fechaVuelo) = ?';
+    params.push(fechaVuelo); // Aseguramos que solo compare la fecha, no la hora
+  }
+  if (precioMin) {
+    query += ' AND precio >= ?';
+    params.push(precioMin);
+  }
+  if (precioMax) {
+    query += ' AND precio <= ?';
+    params.push(precioMax);
+  }
+
+  // Ejecutar consulta
+  const [rows] = await db.query(query, params);
+  return rows;
+};
+
 module.exports = {
   register,
   login,
