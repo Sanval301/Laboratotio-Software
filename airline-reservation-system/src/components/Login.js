@@ -10,12 +10,15 @@ import {
 import axios from "axios";
 import Navbar from "./Navbar"; // Importa el Navbar
 import Footer from "./Footer"; // Importa el Footer
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [contraseña, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false); // Estado para manejar la carga
+
+  const navigate = useNavigate(); // Hook para navegación
 
   const handleLogin = async () => {
     setError(""); // Limpiar el error anterior
@@ -27,8 +30,12 @@ const Login = () => {
         contraseña,
       });
 
-      localStorage.setItem("token", response.data.token);
-      alert("Inicio de sesión exitoso"); // mandar a inicio dependiendo del perfil
+      localStorage.setItem("token", response.data.token); // Guarda el token en el localStorage
+      alert("Inicio de sesión exitoso"); // Notificar éxito
+
+      // Redirigir al usuario al NavbarCliente (ajusta la ruta según sea necesario)
+      navigate("/NavbarCliente"); // Redirige a la página "navbarcliente" después del login exitoso
+
     } catch (err) {
       setError(err.response?.data?.error || "Error en el inicio de sesión");
     } finally {

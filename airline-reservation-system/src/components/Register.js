@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";  // Importamos el hook useNavigate
 import {
   Button,
   TextField,
@@ -44,22 +45,25 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
 
 function Registro() {
   const [formData, setFormData] = useState({
-    nombreusuario: "",
+    cedula: "",
     nombres: "",
     apellidos: "",
+    fechaNacimiento: "",
+    pais: "",
+    estado: "",
+    ciudad: "",
+    direccionFacturacion: "",
     email: "",
+    nombreusuario: "",
     contraseña: "",
     genero: "",
-    dni: "",
-    fechaNacimiento: "",
-    paisNacimiento: "",
-    estadoNacimiento: "",
-    ciudadNacimiento: "",
-    direccionFacturacion: "",
     imagenUsuario: null,
   });
+
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigate = useNavigate(); // Inicializamos el hook useNavigate
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -73,24 +77,42 @@ function Registro() {
     e.preventDefault();
     setIsLoading(true);
 
-    const formDataToSend = new FormData();
-    for (const key in formData) {
-      formDataToSend.append(key, formData[key]);
-    }
+    const dataToSend = {
+      cedula: formData.cedula,
+      nombres: formData.nombres,
+      apellidos: formData.apellidos,
+      fechaNacimiento: formData.fechaNacimiento,
+      pais: formData.pais,
+      estado: formData.estado,
+      ciudad: formData.ciudad,
+      direccionFacturacion: formData.direccionFacturacion,
+      email: formData.email,
+      nombreusuario: formData.nombreusuario,
+      contraseña: formData.contraseña,
+      genero: formData.genero,
+      imagenUsuario: formData.imagenUsuario ? formData.imagenUsuario.name : null,
+    };
 
     try {
       const response = await axios.post(
         "http://localhost:5009/register",
-        formDataToSend,
+        dataToSend,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
       );
 
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
       }
+
       alert("Usuario registrado con éxito");
+
+      // Redirige a la página de login después de un registro exitoso
+      navigate("/login");
+
       setError("");
     } catch (err) {
       setError(err.response?.data?.message || "Error en el registro");
@@ -98,37 +120,27 @@ function Registro() {
       setIsLoading(false);
     }
   };
-
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar />
 
-      <Container component="main" maxWidth="md" sx={{ mb: "5%"  }}>
+      <Container component="main" maxWidth="md" sx={{ mb: "5%" }}>
         <StyledPaper>
           <StyledAvatar>
             <AccountCircle />
           </StyledAvatar>
-          <Typography
-            component="h1"
-            variant="h5"
-            sx={{ fontWeight: "bold", mb: 3 }}
-          >
+          <Typography component="h1" variant="h5" sx={{ fontWeight: "bold", mb: 3 }}>
             Registro de Cliente
           </Typography>
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <Grid container spacing={2}>
               {/* Información Personal */}
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="DNI"
-                  name="dni"
-                  value={formData.dni}
+                  name="cedula"
+                  value={formData.cedula}
                   onChange={handleChange}
                   fullWidth
                   required
@@ -188,8 +200,8 @@ function Registro() {
               <Grid item xs={12} sm={4}>
                 <TextField
                   label="País"
-                  name="paisNacimiento"
-                  value={formData.paisNacimiento}
+                  name="pais"
+                  value={formData.pais}
                   onChange={handleChange}
                   fullWidth
                   required
@@ -201,8 +213,8 @@ function Registro() {
               <Grid item xs={12} sm={4}>
                 <TextField
                   label="Estado"
-                  name="estadoNacimiento"
-                  value={formData.estadoNacimiento}
+                  name="estado"
+                  value={formData.estado}
                   onChange={handleChange}
                   fullWidth
                   required
@@ -214,8 +226,8 @@ function Registro() {
               <Grid item xs={12} sm={4}>
                 <TextField
                   label="Ciudad"
-                  name="ciudadNacimiento"
-                  value={formData.ciudadNacimiento}
+                  name="ciudad"
+                  value={formData.ciudad}
                   onChange={handleChange}
                   fullWidth
                   required
@@ -315,12 +327,7 @@ function Registro() {
             </Grid>
 
             {error && (
-              <Typography
-                color="error"
-                variant="body2"
-                gutterBottom
-                sx={{ mt: 2 }}
-              >
+              <Typography color="error" variant="body2" gutterBottom sx={{ mt: 2 }}>
                 {error}
               </Typography>
             )}

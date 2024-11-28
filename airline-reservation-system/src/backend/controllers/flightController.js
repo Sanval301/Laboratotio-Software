@@ -28,23 +28,50 @@ const login = async (req, res) => {
 
 
 const register = async (req, res) => {
-  const { nombreusuario, nombres, apellidos, email, contraseña, genero, dni, fechaNacimiento, paisNacimiento, estadoNacimiento, ciudadNacimiento,direccionFacturacion, imagenUsuario } = req.body;
+  const {
+    cedula,
+    nombres,
+    apellidos,
+    fechaNacimiento,
+    pais,
+    estado,
+    ciudad,
+    direccionFacturacion,
+    email,
+    nombreusuario,
+    contraseña,
+    genero,
+    imagenUsuario
+  } = req.body;
+  
 
   // Validar datos obligatorios
-  if (!nombreusuario || !nombres || !email ||!apellidos|| !contraseña || !dni || !fechaNacimiento ||!paisNacimiento || !estadoNacimiento || !ciudadNacimiento || !direccionFacturacion || !imagenUsuario ) {
-    return res.status(400).json({ message: "Todos los campos marcados con * son obligatorios" });
-  }
+  const missingFields = [];
+
+if (!nombreusuario) missingFields.push("Nombre de Usuario");
+if (!nombres) missingFields.push("Nombres");
+if (!apellidos) missingFields.push("Apellidos");
+if (!email) missingFields.push("Correo Electrónico");
+if (!contraseña) missingFields.push("Contraseña");
+if (!cedula) missingFields.push("Cédula");
+if (!fechaNacimiento) missingFields.push("Fecha de Nacimiento");
+if (!pais) missingFields.push("País");
+if (!estado) missingFields.push("Estado");
+if (!ciudad) missingFields.push("Ciudad");
+if (!direccionFacturacion) missingFields.push("Dirección de Facturación");
+
+if (missingFields.length > 0) {
+  return res.status(400).json({
+    message: `Los siguientes campos son obligatorios: ${missingFields.join(", ")}`
+  });
+}
+
 
   // Validar formato de email (opcional, pero recomendable)
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return res.status(400).json({ message: "El formato del email es inválido" });
-  }
+  
 
   // Validar longitud de la contraseña (opcional)
-  if (contraseña.length < 6) {
-    return res.status(400).json({ message: "La contraseña debe tener al menos 6 caracteres" });
-  }
+  
 
   try {
     // Llamar a flightService.register con parámetros individuales
@@ -55,11 +82,11 @@ const register = async (req, res) => {
       email,
       contraseña,
       genero,
-      dni, 
+      cedula,
       fechaNacimiento,
-      paisNacimiento,
-      estadoNacimiento,
-      ciudadNacimiento,
+      pais,
+      estado,
+      ciudad,
       direccionFacturacion,
       imagenUsuario
     );
@@ -67,7 +94,7 @@ const register = async (req, res) => {
     res.status(201).json({ message: "Usuario registrado exitosamente", userId: newUser.id });
   } catch (error) {
     console.error("Error al registrar usuario backend:", error);
-    res.status(500).json({ message: "Error al registrar el usuario backend" });
+    res.status(500).json({ message: "Error al registrar el usuario mamahuevo" });
   }
 };
 
@@ -403,7 +430,7 @@ const createNews = async (req, res) => {
   }
 
   try {
-    const noticia = await newsService.createNews({
+    const noticia = await flightService.createNews({
       titulo,
       informacion,
       precio_antes,

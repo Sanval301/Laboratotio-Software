@@ -5,90 +5,101 @@ const jwt = require('jsonwebtoken');
 
 const saltRounds = 10; // Número de rondas de sal
 
-const register = async (nombreusuario, nombres, apellidos, email, contraseña, genero, dni, fechaNacimiento, paisNacimiento, estadoNacimiento, ciudadNacimiento,direccionFacturacion, imagenUsuario) => {
-  try {
-    // Cifrar la contraseña antes de almacenarla
-    const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
+const register = async ({ 
+  nombreusuario, 
+  nombres,
+  apellidos, 
+  email, 
+  contraseña, 
+  genero, 
+  cedula, 
+  fechaNacimiento, 
+  pais, 
+  estado, 
+  ciudad, 
+  direccionFacturacion, 
+  imagenUsuario
+}) => {
+  // Validar que la contraseña esté definida y no esté vacía
+ 
 
-    return new Promise((resolve, reject) => {
-      const query = `INSERT INTO usuarios (NombreUsuario, NombreCompleto, Email, Contraseña, Genero, Cedula) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?,?, ?,?, ?)`;
-      const values = [nombreusuario, nombres, apellidos, email, contraseña, genero, dni, fechaNacimiento, paisNacimiento, estadoNacimiento, ciudadNacimiento,direccionFacturacion, imagenUsuario]; // Usa el hash en lugar de la contraseña
+  // Cifrar la contraseña antes de almacenarla
+  const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
 
-      console.log("Query:", query);
-      console.log("Values:", values);
+  // Obtener la fecha actual para FechaRegistro
+  const now = new Date();
+  const fechaRegistro = now.toISOString().slice(0, 19).replace('T', ' ');
 
-      db.query(query, values, (err, results) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ id: results.insertId, nombreusuario, email });
-        }
-      });
-    });
-  } catch (error) {
-    throw new Error("Error al registrar el usuario");
+  // Verificar si el usuario ya existe
+  const [existingUser] = await db.query(
+    "SELECT * FROM Usuarios WHERE Email = ?",
+    [email]
+  );
+
+  if (existingUser.length > 0) {
+    throw new Error("El correo electrónico ya está registrado.");
   }
+
+  // Insertar nuevo usuario en la base de datos
+  const [result] = await db.query(
+    `
+      INSERT INTO Usuarios (
+        Cedula, Nombres, Apellidos, FechaNacimiento, Pais, Estado, Ciudad,
+        DireccionFacturacion, Email, NombreUsuario, Contraseña, Genero, ImagenUsuario, FechaRegistro
+      ) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      cedula, nombres, apellidos, fechaNacimiento, pais, estado, ciudad,
+      direccionFacturacion, email, nombreusuario, hashedPassword, genero, imagenUsuario, fechaRegistro
+    ]
+  );
+
+  // Retornar el usuario creado con su ID
+  return {
+    id: result.insertId,
+    nombreusuario,
+    email,
+  };
 };
 
 
-
 // Inicio de sesión de usuario
-const login = (email, contraseña) => {
-  return new Promise((resolve, reject) => {
-    console.log("Intentando iniciar sesión con email:", email); // Log del email que se está usando
-    const query = "SELECT * FROM usuarios WHERE Email = ?";
-    db.query(query, [email], (err, results) => {
-      if (err) {
-        console.error("Error al ejecutar la consulta:", err); // Log del error de consulta
-        return reject(err);
-      }
+const login = async (email, contraseña) => {
+  // Obtener el usuario por email
+  const [results] = await db.query("SELECT * FROM usuarios WHERE Email = ?", [email]);
 
-      // Verifica si se encontraron resultados
-      if (results.length === 0) {
-        console.log("Usuario no encontrado con el email:", email); // Log de error
-        return reject("Usuario no encontrado");
-      }
+  // Verificar si se encontró el usuario
+  if (results.length === 0) {
+    throw new Error("Usuario no encontrado");
+  }
 
-      const user = results[0]; // Aquí ya puedes acceder a 'user'
-      console.log("Usuario encontrado:", user); // Log del usuario encontrado
+  const user = results[0];
 
-      // Verificar la contraseña
-      bcrypt.compare(contraseña, user.Contraseña, (err, isMatch) => {
-        if (err) {
-            console.error("Error al comparar contraseñas:", err);
-            return reject(err);
-        }
-    
-        console.log("Contraseña ingresada:", contraseña);
-        console.log("Contraseña almacenada:", user.Contraseña);
-    
-        if (!isMatch) {
-            console.log("Contraseña incorrecta para el usuario:", user.NombreUsuario);
-            return reject("Contraseña incorrecta");
-        }
-    
-        // Generar token JWT
-        const token = jwt.sign({ id: user.UsuarioID, nombreusuario: user.NombreUsuario }, "secreto", { expiresIn: '1h' });
-        resolve({ token, user });
-    });
-    
-    });
-  });
+  // Verificar la contraseña
+  const isMatch = await bcrypt.compare(contraseña, user.Contraseña);
+  if (!isMatch) {
+    throw new Error("Contraseña incorrecta");
+  }
+
+  // Generar el token JWT
+  const token = jwt.sign({ id: user.UsuarioID, nombreusuario: user.NombreUsuario }, "secreto", { expiresIn: '1h' });
+
+  // Retornar el token y el usuario
+  return { token, user };
 };
 
 
 
 
 // Obtener todos los vuelos desde la base de datos
-const getAllFlights = () => {
-  return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM vuelos", (err, results) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(results);
-    });
-  });
+const getAllFlights = async () => {
+  try {
+    const [results] = await db.query("SELECT * FROM vuelos"); // Sin callbacks, utilizando `await`
+    return results;
+  } catch (err) {
+    throw err; // Propaga el error para que sea manejado por el controlador
+  }
 };
 
 // Crear un nuevo vuelo en la base de datos
@@ -141,7 +152,7 @@ const cancelFlight = (CodigoVuelo) => {
 
 const createCard = async ({ numero, titular, fechaExpiracion, cvv }) => {
   // Verificar si ya existe una tarjeta con el mismo número
-  const [existingCard] = await db.promise().query(
+  const [existingCard] = await db.query(
     "SELECT * FROM tarjetas WHERE numero = ?",
     [numero]
   );
@@ -151,7 +162,7 @@ const createCard = async ({ numero, titular, fechaExpiracion, cvv }) => {
   }
 
   // Insertar nueva tarjeta en la base de datos
-  const [result] = await db.promise().query(
+  const [result] = await db.query(
     "INSERT INTO tarjetas (numero, titular, fechaExpiracion, cvv) VALUES (?, ?, ?, ?)",
     [numero, titular, fechaExpiracion, cvv]
   );
@@ -178,8 +189,8 @@ const deleteCard = async (numero) => {
 const BuyTicket = async (nombre, email, vuelo, fechaVuelo, estado,tarjeta,fechacompra) => {
   try {
     const [resultado] = await db.query(
-      'INSERT INTO compras (nombre, email, vuelo, fechaVuelo, estado, tarjeta,fechacompra) VALUES (?, ?, ?, ?, ?,?,?)',
-      [nombre, email, vuelo, fechaVuelo, estado, tarjeta,fechacompra]
+      'INSERT INTO compras (nombre, email, vuelo, fechaVuelo, tarjeta, estado,fechacompra) VALUES (?, ?, ?, ?, ?,?,?)',
+      [nombre, email, vuelo, fechaVuelo, tarjeta, estado,fechacompra]
     );
     return resultado;
   } catch (error) {
@@ -260,12 +271,12 @@ module.exports = {
   createCard,
   deleteCard,
   BuyTicket,
-  obtenerCompraPorId,
+  obtenerCompraPorId,//REvisarEssto
   cancelarCompra,
-  contarTiquetesPorPersona,
-  crearReserva,
-  obtenerReservaPorId,
-  cancelarReserva,
-  liberarReservasExpiradas,
-  createNews
+  contarTiquetesPorPersona,//revisar esto
+  crearReserva,//faltan campos
+  obtenerReservaPorId,//revisar esto
+  cancelarReserva,//revisar
+  liberarReservasExpiradas,//esta raro
+  createNews//revisar
 };

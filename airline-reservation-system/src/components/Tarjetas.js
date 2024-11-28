@@ -19,6 +19,7 @@ import { styled, keyframes } from "@mui/material/styles";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import MenuLateral from "./MenuLateral";
+import axios from "axios";
 
 const floatAnimation = keyframes`
   0% { transform: translateY(0px); }
@@ -92,13 +93,15 @@ function Tarjetas() {
     setNuevaTarjeta({ ...nuevaTarjeta, [name]: value });
   };
 
-  const handleAgregarTarjeta = () => {
+
+
+  const handleAgregarTarjeta = async () => {
     const regex = /^(0[1-9]|1[0-2])\/\d{2}$/; // Validación antes de guardar
     if (!regex.test(nuevaTarjeta.fechaExpiracion)) {
       setErrorFecha("El formato debe ser MM/AA");
       return;
     }
-
+  
     if (
       nuevaTarjeta.numero &&
       nuevaTarjeta.titular &&
@@ -106,18 +109,28 @@ function Tarjetas() {
       nuevaTarjeta.cvv &&
       nuevaTarjeta.saldo
     ) {
-      setTarjetas([...tarjetas, { ...nuevaTarjeta, id: Date.now() }]);
-      setNuevaTarjeta({
-        numero: "",
-        titular: "",
-        fechaExpiracion: "",
-        cvv: "",
-        saldo: "",
-      });
-      setErrorFecha("");
-      handleCloseDialog();
+      try {
+        // Envía los datos al backend
+        const response = await axios.post("http://localhost:5009/Tarjetas", nuevaTarjeta);
+        
+        // Si el backend responde exitosamente, agrega la tarjeta al estado local
+        setTarjetas([...tarjetas, { ...nuevaTarjeta, id: response.data.id }]); // Usa el ID generado por el backend si aplica
+        setNuevaTarjeta({
+          numero: "",
+          titular: "",
+          fechaExpiracion: "",
+          cvv: "",
+          saldo: "",
+        });
+        setErrorFecha("");
+        handleCloseDialog();
+      } catch (error) {
+        console.error("Error al guardar la tarjeta:", error);
+        // Manejo del error (puedes mostrar un mensaje al usuario)
+      }
     }
   };
+  
 
   const handleEliminarTarjeta = (id) => {
     setTarjetas(tarjetas.filter((tarjeta) => tarjeta.id !== id));
