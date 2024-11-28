@@ -72,18 +72,11 @@ export default function Perfil() {
           <Typography variant="h4" gutterBottom>
             Perfil del Usuario
           </Typography>
-
-          {/* Renderización dinámica de secciones */}
-          <Outlet />
-
-          {activeTab === "General" && (
-            <Box maxWidth={600} mx="auto">
-              <Box display="flex" alignItems="center" mb={4}>
-                <Avatar
+          <Avatar
                   src={userData.profileImage}
-                  sx={{ width: 100, height: 100 }}
+                  sx={{ width: 120, height: 120, mr: 4 }}
                 />
-                {isEditing && (
+                {isEditing && ( 
                   <Box ml={2}>
                     <Button
                       variant="contained"
@@ -99,7 +92,15 @@ export default function Perfil() {
                       />
                     </Button>
                   </Box>
-                )}
+                )}  
+          {/* Renderización dinámica de secciones */}
+          <Outlet />
+
+          {activeTab === "General" && (
+            <Box maxWidth={800} mx="auto" display="flex" alignItems="right" mb={4}>
+            
+              <Box display="flex" alignItems="right" mb={4}>
+                
               </Box>
 
               <form>

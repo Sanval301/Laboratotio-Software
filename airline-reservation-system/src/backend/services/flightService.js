@@ -137,8 +137,6 @@ const cancelFlight = (CodigoVuelo) => {
   });
 };
 
-const db = require("../config/db.config"); // Configuración de la base de datos
-
 const createCard = async ({ cardNumber, cardHolder, expirationDate, cvv }) => {
   // Verificar si ya existe una tarjeta con el mismo número
   const [existingCard] = await db.promise().query(

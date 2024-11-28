@@ -6,12 +6,32 @@ const NavbarCliente = () => {
   return (
     <AppBar position="static" sx={{ bgcolor: "primary.main" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        {/* Logo */}
-        <Link to="/" style={{ textDecoration: "none", color: "white" }}>
+        {/* Logo y enlace a la página principal */}
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {/* Logo */}
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <Box
+              component="img"
+              src="/logo.jpg"
+              alt="Logo AirTicket"
+              sx={{
+                width: 50,
+                height: 50,
+                borderRadius: "50%", // Forma circular
+                objectFit: "cover", // Ajustar imagen dentro del contenedor
+                marginRight: 1, // Espaciado entre logo y texto
+              }}
+            />
+          </Link>
+        <Link
+          to="/AdminVuelos"
+          style={{ textDecoration: "none", color: "white" }}
+        > 
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            AeroTicket
+            AirTicket - cliente
           </Typography>
         </Link>
+        </Box>
 
         {/* Opciones del cliente */}
         <Box sx={{ display: "flex", gap: 2 }}>
