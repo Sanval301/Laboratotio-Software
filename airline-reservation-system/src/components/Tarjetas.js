@@ -20,6 +20,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import MenuLateral from "./MenuLateral";
 import axios from "axios";
+import NavbarCliente from "./NavbarCliente";
+import Footer from "./Footer";
 
 const floatAnimation = keyframes`
   0% { transform: translateY(0px); }
@@ -153,150 +155,168 @@ function Tarjetas() {
   };
 
   return (
-    <Box display="flex" height="100vh">
-      <MenuLateral />
-
-      <Box sx={{ flex: 1, p: 4, overflow: "auto" }}>
-        <Typography
-          variant="h4"
-          gutterBottom
-          sx={{
-            fontWeight: "bold",
-            color: "#333",
-            textAlign: "center",
-            mb: 4,
-          }}
-        >
-          Gestión de Tarjetas de Vuelo
-        </Typography>
-        <Grid container spacing={3} sx={{ justifyContent: "center" }}>
-          {tarjetas.map((tarjeta, index) => (
-            <Grid item xs={12} sm={6} md={4} key={tarjeta.id}>
-              <Slide
-                direction="up"
-                in={true}
-                mountOnEnter
-                unmountOnExit
-                timeout={300 + index * 100}
-              >
-                <StyledCard sx={{ width: "100%", minHeight: 260 }}>
-                  <CardBackground />
-                  <CardContent sx={{ position: "relative", zIndex: 1 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 2,
-                      }}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{ color: "white", fontWeight: "bold" }}
-                      >
-                        {tarjeta.titular}
-                      </Typography>
-                      <IconButton
-                        onClick={() => handleEliminarTarjeta(tarjeta.id)}
-                        size="small"
-                        sx={{ color: "white" }}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Box>
-                    <CardNumber>
-                      {tarjeta.numero.replace(/\d{4}(?=.)/g, "$& ")}
-                    </CardNumber>
-                    <CardInfo>Saldo: ${tarjeta.saldo}</CardInfo>
-                  </CardContent>
-                </StyledCard>
-              </Slide>
-            </Grid>
-          ))}
-          <Grid item xs={12} sm={6} md={4}>
-            <Fade in={true}>
-              <Button
-                variant="outlined"
-                startIcon={<AddIcon />}
-                onClick={handleOpenDialog}
-                fullWidth
-                sx={{
-                  height: "100%",
-                  minHeight: 240,
-                  borderColor: "#7F7FD5",
-                  color: "#7F7FD5",
-                  borderWidth: 2,
-                  borderStyle: "dashed",
-                  "&:hover": {
-                    backgroundColor: "rgba(127, 127, 213, 0.1)",
-                    borderColor: "#86A8E7",
-                  },
-                }}
-              >
-                Agregar Tarjeta
-              </Button>
-            </Fade>
-          </Grid>
-        </Grid>
-
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle>Agregar Nueva Tarjeta</DialogTitle>
-          <DialogContent>
-            <TextField
-              margin="dense"
-              name="numero"
-              label="Número de Tarjeta"
-              type="text"
-              fullWidth
-              value={nuevaTarjeta.numero}
-              onChange={handleInputChange}
-            />
-            <TextField
-              margin="dense"
-              name="titular"
-              label="Titular"
-              type="text"
-              fullWidth
-              value={nuevaTarjeta.titular}
-              onChange={handleInputChange}
-            />
-            <TextField
-              margin="dense"
-              name="fechaExpiracion"
-              label="Fecha Expiración (MM/AA)"
-              type="text"
-              fullWidth
-              value={nuevaTarjeta.fechaExpiracion}
-              onChange={handleInputChange}
-              error={!!errorFecha}
-              helperText={errorFecha}
-            />
-            <TextField
-              margin="dense"
-              name="cvv"
-              label="CVV"
-              type="text"
-              fullWidth
-              value={nuevaTarjeta.cvv}
-              onChange={handleInputChange}
-            />
-            <TextField
-              margin="dense"
-              name="saldo"
-              label="Saldo Inicial ($)"
-              type="number"
-              fullWidth
-              value={nuevaTarjeta.saldo}
-              onChange={handleInputChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog}>Cancelar</Button>
-            <Button onClick={handleAgregarTarjeta}>Guardar</Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    </Box>
+      <Box display="flex" flexDirection="column" height="100vh">
+        <NavbarCliente />
+        <Box display="flex" flex={1} height="100%">
+          {/* Menú lateral */}
+          <MenuLateral />
+    
+          {/* Contenido principal */}
+          <Box sx={{ flex: 1, p: 4, overflow: "auto" }}>
+            <Typography
+              variant="h4"
+              gutterBottom
+              sx={{
+                fontWeight: "bold",
+                color: "#333",
+                textAlign: "center",
+                mb: 4,
+              }}
+            >
+              Gestión de Tarjetas de Vuelo
+            </Typography>
+    
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "16px",
+              }}
+            >
+              {tarjetas.map((tarjeta, index) => (
+                <div key={tarjeta.id} style={{ width: "calc(33.333% - 16px)", minWidth: "260px" }}>
+                  <Slide
+                    direction="up"
+                    in={true}
+                    mountOnEnter
+                    unmountOnExit
+                    timeout={300 + index * 100}
+                  >
+                    <StyledCard style={{ width: "100%", minHeight: "260px" }}>
+                      <CardBackground />
+                      <CardContent style={{ position: "relative", zIndex: 1 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: "16px",
+                          }}
+                        >
+                          <Typography
+                            variant="h6"
+                            style={{ color: "white", fontWeight: "bold" }}
+                          >
+                            {tarjeta.titular}
+                          </Typography>
+                          <IconButton
+                            onClick={() => handleEliminarTarjeta(tarjeta.id)}
+                            size="small"
+                            style={{ color: "white" }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </div>
+                        <CardNumber>
+                          {tarjeta.numero.replace(/\d{4}(?=.)/g, "$& ")}
+                        </CardNumber>
+                        <CardInfo>Saldo: ${tarjeta.saldo}</CardInfo>
+                      </CardContent>
+                    </StyledCard>
+                  </Slide>
+                </div>
+              ))}
+    
+              {/* Botón de agregar tarjeta */}
+              <div style={{ width: "calc(33.333% - 16px)", minWidth: "500px" }}>
+                <Fade in={true}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<AddIcon />}
+                    onClick={handleOpenDialog}
+                    fullWidth
+                    style={{
+                      height: "100%",
+                      minHeight: "240px",
+                      borderColor: "#7F7FD5",
+                      color: "#7F7FD5",
+                      borderWidth: "2px",
+                      borderStyle: "dashed",
+                      "&:hover": {
+                        backgroundColor: "rgba(127, 127, 213, 0.1)",
+                        borderColor: "#86A8E7",
+                      },
+                    }}
+                  >
+                    Agregar Tarjeta
+                  </Button>
+                </Fade>
+              </div>
+            </div>
+    
+            {/* Dialogo de agregar tarjeta */}
+            <Dialog open={openDialog} onClose={handleCloseDialog}>
+              <DialogTitle>Agregar Nueva Tarjeta</DialogTitle>
+              <DialogContent>
+                <TextField
+                  margin="dense"
+                  name="numero"
+                  label="Número de Tarjeta"
+                  type="text"
+                  fullWidth
+                  value={nuevaTarjeta.numero}
+                  onChange={handleInputChange}
+                />
+                <TextField
+                  margin="dense"
+                  name="titular"
+                  label="Titular"
+                  type="text"
+                  fullWidth
+                  value={nuevaTarjeta.titular}
+                  onChange={handleInputChange}
+                />
+                <TextField
+                  margin="dense"
+                  name="fechaExpiracion"
+                  label="Fecha Expiración (MM/AA)"
+                  type="text"
+                  fullWidth
+                  value={nuevaTarjeta.fechaExpiracion}
+                  onChange={handleInputChange}
+                  error={!!errorFecha}
+                  helperText={errorFecha}
+                />
+                <TextField
+                  margin="dense"
+                  name="cvv"
+                  label="CVV"
+                  type="text"
+                  fullWidth
+                  value={nuevaTarjeta.cvv}
+                  onChange={handleInputChange}
+                />
+                <TextField
+                  margin="dense"
+                  name="saldo"
+                  label="Saldo Inicial ($)"
+                  type="number"
+                  fullWidth
+                  value={nuevaTarjeta.saldo}
+                  onChange={handleInputChange}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseDialog}>Cancelar</Button>
+                <Button onClick={handleAgregarTarjeta}>Guardar</Button>
+              </DialogActions>
+            </Dialog>
+          </Box>
+        </Box>
+    
+        <Footer />
+      </Box>        
   );
 }
 
