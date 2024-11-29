@@ -3,64 +3,91 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 
-const saltRounds = 10; // Número de rondas de sal
 
-const register = async ({ 
-  nombreusuario, 
+const saltRounds = 10; // Número de rondas de salt
+
+const register = async (
+  cedula,
   nombres,
-  apellidos, 
-  email, 
-  contraseña, 
-  genero, 
-  cedula, 
-  fechaNacimiento, 
-  pais, 
-  estado, 
-  ciudad, 
-  direccionFacturacion, 
-  imagenUsuario
-}) => {
+  apellidos,
+  fechaNacimiento,
+  pais,
+  estado,
+  ciudad,
+  direccionFacturacion,
+  email,
+  nombreusuario,
+  contraseña,
+  genero,
+  imagenUsuario,
+) => {
+  // Imprimir los datos que llegan a la función
+  console.log("Datos recibidos para registro:");
+  console.log({
+    cedula,
+    nombres,
+    apellidos,
+    fechaNacimiento,
+    pais,
+    estado,
+    ciudad,
+    direccionFacturacion,
+    email,
+    nombreusuario,
+    contraseña, // Nota: En producción no deberías imprimir contraseñas.
+    genero,
+    imagenUsuario,
+  });
+
   // Validar que la contraseña esté definida y no esté vacía
- 
-
-  // Cifrar la contraseña antes de almacenarla
-  const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
-
-  // Obtener la fecha actual para FechaRegistro
-  const now = new Date();
-  const fechaRegistro = now.toISOString().slice(0, 19).replace('T', ' ');
-
-  // Verificar si el usuario ya existe
-  const [existingUser] = await db.query(
-    "SELECT * FROM Usuarios WHERE Email = ?",
-    [email]
-  );
-
-  if (existingUser.length > 0) {
-    throw new Error("El correo electrónico ya está registrado.");
+  if (!contraseña) {
+    throw new Error("La contraseña es obligatoria.");
   }
 
-  // Insertar nuevo usuario en la base de datos
-  const [result] = await db.query(
-    `
-      INSERT INTO Usuarios (
-        Cedula, Nombres, Apellidos, FechaNacimiento, Pais, Estado, Ciudad,
-        DireccionFacturacion, Email, NombreUsuario, Contraseña, Genero, ImagenUsuario, FechaRegistro
-      ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `,
-    [
-      cedula, nombres, apellidos, fechaNacimiento, pais, estado, ciudad,
-      direccionFacturacion, email, nombreusuario, hashedPassword, genero, imagenUsuario, fechaRegistro
-    ]
-  );
+  try {
+    // Cifrar la contraseña antes de almacenarla
+    const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
 
-  // Retornar el usuario creado con su ID
-  return {
-    id: result.insertId,
-    nombreusuario,
-    email,
-  };
+    // Obtener la fecha actual para FechaRegistro
+    const now = new Date();
+    const fechaRegistro = now.toISOString().slice(0, 19).replace('T', ' ');
+
+    // Verificar si el usuario ya existe
+    const [existingUser] = await db.query(
+      "SELECT * FROM Usuarios WHERE Email = ?",
+      [email]
+    );
+
+    if (existingUser.length > 0) {
+      throw new Error("El correo electrónico ya está registrado.");
+    }
+
+    // Insertar nuevo usuario en la base de datos
+    const [result] = await db.query(
+      `
+        INSERT INTO Usuarios (
+          Cedula, Nombres, Apellidos, FechaNacimiento, Pais, Estado, Ciudad,
+          DireccionFacturacion, Email, NombreUsuario, Contraseña, Genero, ImagenUsuario, FechaRegistro
+        ) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        cedula, nombres, apellidos, fechaNacimiento, pais, estado, ciudad,
+        direccionFacturacion, email, nombreusuario, hashedPassword, genero, imagenUsuario, fechaRegistro
+      ]
+    );
+
+    // Retornar el usuario creado con su ID
+    return {
+      id: result.insertId,
+      nombreusuario,
+      email,
+    };
+  } catch (error) {
+    // Manejar cualquier error que ocurra durante el proceso
+    console.error("Error al registrar usuario:", error.message); // Imprimir el error en la consola
+    throw new Error("Error al registrar el usuario: " + error.message);
+  }
 };
 
 
@@ -305,10 +332,10 @@ module.exports = {
   BuyTicket,
   obtenerCompraPorId,//REvisarEssto
   cancelarCompra,
-  contarTiquetesPorPersona,//revisar esto
-  crearReserva,//faltan campos
-  obtenerReservaPorId,//revisar esto
-  cancelarReserva,//revisar
-  liberarReservasExpiradas,//esta raro
-  createNews//revisar
+  contarTiquetesPorPersona,
+  crearReserva,
+  obtenerReservaPorId,
+  cancelarReserva,
+  liberarReservasExpiradas,
+  createNews
 };

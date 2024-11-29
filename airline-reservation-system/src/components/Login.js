@@ -34,7 +34,7 @@ const Login = () => {
       alert("Inicio de sesión exitoso"); // Notificar éxito
 
       // Redirigir al usuario al NavbarCliente (ajusta la ruta según sea necesario)
-      navigate("/NavbarCliente"); // Redirige a la página "navbarcliente" después del login exitoso
+      navigate("/Navbar"); // Redirige a la página "navbarcliente" después del login exitoso
 
     } catch (err) {
       setError(err.response?.data?.error || "Error en el inicio de sesión");
