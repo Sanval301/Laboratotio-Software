@@ -28,6 +28,7 @@ const login = async (req, res) => {
 
 
 const register = async (req, res) => {
+  console.log("Datos recibidos en req.body:", req.body)
   const {
     cedula,
     nombres,
@@ -76,19 +77,19 @@ if (missingFields.length > 0) {
   try {
     // Llamar a flightService.register con parámetros individuales
     const newUser = await flightService.register(
-      nombreusuario,
+      cedula,
       nombres,
       apellidos,
-      email,
-      contraseña,
-      genero,
-      cedula,
       fechaNacimiento,
       pais,
       estado,
       ciudad,
       direccionFacturacion,
-      imagenUsuario
+      email,
+      nombreusuario,
+      contraseña,
+      genero,
+      imagenUsuario,
     );
 
     res.status(201).json({ message: "Usuario registrado exitosamente", userId: newUser.id });

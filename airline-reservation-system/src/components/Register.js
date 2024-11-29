@@ -62,36 +62,51 @@ function Registro() {
 
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  const navigate = useNavigate(); // Inicializamos el hook useNavigate
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    setFormData({
-      ...formData,
-      [name]: files ? files[0] : value,
-    });
+    if (name === "imagenUsuario" && files.length > 0) {
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prevData) => ({
+          ...prevData,
+          imagenUsuario: reader.result, // Convertir a Base64
+        }));
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Eliminar campos que puedan estar vacíos o undefined
     const dataToSend = {
-      cedula: formData.cedula,
-      nombres: formData.nombres,
-      apellidos: formData.apellidos,
-      fechaNacimiento: formData.fechaNacimiento,
-      pais: formData.pais,
-      estado: formData.estado,
-      ciudad: formData.ciudad,
-      direccionFacturacion: formData.direccionFacturacion,
-      email: formData.email,
-      nombreusuario: formData.nombreusuario,
-      contraseña: formData.contraseña,
-      genero: formData.genero,
-      imagenUsuario: formData.imagenUsuario ? formData.imagenUsuario.name : null,
+      ...formData,
+      cedula: formData.cedula || null,
+      nombres: formData.nombres || "",
+      apellidos: formData.apellidos || "",
+      fechaNacimiento: formData.fechaNacimiento || null,
+      pais: formData.pais || "",
+      estado: formData.estado || "",
+      ciudad: formData.ciudad || "",
+      direccionFacturacion: formData.direccionFacturacion || "",
+      email: formData.email || "",
+      nombreusuario: formData.nombreusuario || "",
+      contraseña: formData.contraseña || "",
+      genero: formData.genero || "",
+      imagenUsuario: formData.imagenUsuario || null,
     };
+
+    console.log("Datos a enviar:", dataToSend);
 
     try {
       const response = await axios.post(
@@ -109,10 +124,7 @@ function Registro() {
       }
 
       alert("Usuario registrado con éxito");
-
-      // Redirige a la página de login después de un registro exitoso
       navigate("/login");
-
       setError("");
     } catch (err) {
       setError(err.response?.data?.message || "Error en el registro");
@@ -120,6 +132,7 @@ function Registro() {
       setIsLoading(false);
     }
   };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar />
