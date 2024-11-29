@@ -294,6 +294,48 @@ const buscarVuelos = async (origen, destino, fechaVuelo, precioMin, precioMax) =
   return rows;
 };
 
+
+const crearAdministrador = async (nombre, apellido, email, nombreUsuario, contraseñaTemporal, tipoAdmin) => {
+  const contraseñaEncriptada = await bcrypt.hash(contraseñaTemporal, 10); // Encriptar contraseña temporal
+  const [result] = await db.query(
+    `
+    INSERT INTO Administradores (Nombre, Apellido, Email, NombreUsuario, Contraseña, TipoAdmin)
+    VALUES (?, ?, ?, ?, ?, ?)
+    `,
+    [nombre, apellido, email, nombreUsuario, contraseñaEncriptada, tipoAdmin]
+  );
+  return result.insertId;
+};
+
+// Enviar correo con la contraseña temporal
+const enviarCorreo = async (email, contraseñaTemporal) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'tu-email@gmail.com', // Configurar tu correo
+      pass: 'tu-contraseña' // Configurar tu contraseña
+    }
+  });
+
+  const mailOptions = {
+    from: 'tu-email@gmail.com',
+    to: email,
+    subject: 'Contraseña Temporal para Acceso de Administrador',
+    text: `Hola, tu contraseña temporal para acceder al sistema es: ${contraseñaTemporal}\nPor favor, cámbiala al iniciar sesión.`
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+// Actualizar contraseña (después de iniciar sesión)
+const actualizarContraseña = async (adminId, nuevaContraseña) => {
+  const contraseñaEncriptada = await bcrypt.hash(nuevaContraseña, 10); // Encriptar nueva contraseña
+  await db.query(
+    'UPDATE Administradores SET Contraseña = ? WHERE AdminID = ?',
+    [contraseñaEncriptada, adminId]
+  );
+};
+
 module.exports = {
   register,
   login,
@@ -310,5 +352,8 @@ module.exports = {
   obtenerReservaPorId,//revisar esto
   cancelarReserva,//revisar
   liberarReservasExpiradas,//esta raro
-  createNews//revisar
+  createNews,//revisar
+  crearAdministrador,
+  actualizarContraseña,
+  enviarCorreo
 };

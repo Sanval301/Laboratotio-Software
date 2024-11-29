@@ -19,5 +19,7 @@ router.post("/ReservarVuelo", flightController.reserveTicket);
 router.delete('/CancelarReserva/:id', flightController.cancelReservation);
 router.post('/CrearNoticias', flightController.createNews);
 router.get('/Obtenervuelos', flightController.searchFlights);
+router.post('/admin', flightController.createAdmin);
+router.post('/admin/change-password', flightController.changePassword);
 
 module.exports = router;
