@@ -372,15 +372,14 @@ module.exports = {
   createCard,
   deleteCard,
   BuyTicket,
-  obtenerCompraPorId,//REvisarEssto
+  obtenerCompraPorId,
   cancelarCompra,
-  contarTiquetesPorPersona,//revisar esto
+  contarTiquetesPorPersona,
   crearReserva,//faltan campos
-  obtenerReservaPorId,//revisar esto
-  cancelarReserva,//revisar
-  liberarReservasExpiradas,//esta raro
-  createNews//revisar
-  createNews,//revisar
+  obtenerReservaPorId,
+  cancelarReserva,
+  liberarReservasExpiradas,
+  createNews,
   crearAdministrador,
   actualizarContraseña,
   enviarCorreo
