@@ -460,6 +460,49 @@ const searchFlights = async (req, res) => {
   }
 };
 
+const createAdmin = async (req, res) => {
+  const { nombre, apellido, email } = req.body;
+  const tipoAdmin = 'admin'; // Por defecto, creamos un administrador normal
+  const idCreador = req.userId; // Asumimos que el token tiene el ID del root
+
+  try {
+    // Generar una contraseña temporal
+    const contraseñaTemporal = crypto.randomBytes(8).toString('hex'); // Contraseña aleatoria de 8 caracteres
+
+    // Generar un nombre de usuario único basado en el correo
+    const nombreUsuario = email.split('@')[0]; // Puedes personalizar esta lógica
+
+    // Crear el administrador en la base de datos
+    const adminId = await adminService.crearAdministrador(nombre, apellido, email, nombreUsuario, contraseñaTemporal, tipoAdmin);
+
+    // Enviar correo con la contraseña temporal
+    await adminService.enviarCorreo(email, contraseñaTemporal);
+
+    res.status(201).json({ mensaje: 'Administrador creado exitosamente', adminId });
+  } catch (error) {
+    console.error('Error al crear administrador:', error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+};
+
+const changePassword = async (req, res) => {
+  const { adminId, nuevaContraseña } = req.body;
+
+  if (!nuevaContraseña) {
+    return res.status(400).json({ error: 'La nueva contraseña es obligatoria' });
+  }
+
+  try {
+    // Actualizar contraseña en la base de datos
+    await flightService.actualizarContraseña(adminId, nuevaContraseña);
+
+    res.status(200).json({ mensaje: 'Contraseña actualizada exitosamente' });
+  } catch (error) {
+    console.error('Error al cambiar contraseña:', error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -473,6 +516,8 @@ module.exports = {
   reserveTicket,
   cancelReservation,
   createNews,
-  searchFlights
+  searchFlights,
+  createAdmin,
+  changePassword
 
 };
