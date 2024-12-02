@@ -109,8 +109,10 @@ function Tarjetas() {
       nuevaTarjeta.cvv &&
       nuevaTarjeta.saldo
     ) {
+      const token = localStorage.getItem("token");  // Recuperar el token almacenado
       try {
         // Envía los datos al backend
+        
         const response = await axios.post("http://localhost:5009/Tarjetas", nuevaTarjeta);
         
         // Si el backend responde exitosamente, agrega la tarjeta al estado local

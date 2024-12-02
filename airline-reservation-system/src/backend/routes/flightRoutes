@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const flightController = require('../controllers/flightController');
+const authenticateToken = require('../middlewares/authMiddleware');
+
 // Ruta para registrar un nuevo usuario
 router.post("/register", flightController.register);
 
@@ -8,16 +10,17 @@ router.post("/register", flightController.register);
 router.post("/login", flightController.login);
 
 // Definir las rutas
-router.get("/CancelarVuelos", flightController.getAllFlights); // Obtener todos los vuelos
-router.post("/crearvuelo", flightController.createFlight); // Crear un vuelo nuevo
-router.post("/Tarjetas", flightController.createCard);
-router.delete("/Tarjetas", flightController.deleteCard);
-router.delete("/CancelarVuelos/:CodigoVuelo", flightController.cancelFlightController);
-router.post("/ComprarVuelo", flightController.BuyTicket);
-router.delete('/CancelarCompra/:id', flightController.cancelBuy);
-router.post("/ReservarVuelo", flightController.reserveTicket);
-router.delete('/CancelarReserva/:id', flightController.cancelReservation);
-router.post('/CrearNoticias', flightController.createNews);
-router.get('/Obtenervuelos', flightController.searchFlights);
+router.get("/CancelarVuelos", authenticateToken, flightController.getAllFlights); // Obtener vuelos del usuario
+router.get("/Reservar", authenticateToken, flightController.getAllFlights); // Obtener vuelos del usuario
+router.post("/crearvuelo", authenticateToken, flightController.createFlight); // Crear un vuelo nuevo
+router.post("/Tarjetas", authenticateToken, flightController.createCard);
+router.delete("/Tarjetas", authenticateToken, flightController.deleteCard);
+router.delete("/CancelarVuelos/:CodigoVuelo", authenticateToken, flightController.cancelFlightController);
+router.post("/ComprarVuelo", authenticateToken, flightController.BuyTicket);
+router.delete('/CancelarCompra/:id', authenticateToken, flightController.cancelBuy);
+router.post("/Reservar", authenticateToken, flightController.reserveTicket);
+router.delete('/CancelarReserva/:id', authenticateToken, flightController.cancelReservation);
+router.post('/CrearNoticias', authenticateToken, flightController.createNews);
+
 
 module.exports = router;

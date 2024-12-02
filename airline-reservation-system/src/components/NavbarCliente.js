@@ -1,8 +1,15 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const NavbarCliente = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Eliminar el token del almacenamiento local
+    navigate("/"); // Redirigir a la página de inicio
+  };
+
   return (
     <AppBar position="static" sx={{ bgcolor: "primary.main" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -23,14 +30,14 @@ const NavbarCliente = () => {
               }}
             />
           </Link>
-        <Link
-          to="/AdminVuelos"
-          style={{ textDecoration: "none", color: "white" }}
-        > 
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            AirTicket - cliente
-          </Typography>
-        </Link>
+          <Link
+            to="/AdminVuelos"
+            style={{ textDecoration: "none", color: "white" }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              AirTicket - cliente
+            </Typography>
+          </Link>
         </Box>
 
         {/* Opciones del cliente */}
@@ -57,6 +64,7 @@ const NavbarCliente = () => {
             borderColor: "white",
             "&:hover": { bgcolor: "white", color: "primary.main" },
           }}
+          onClick={handleLogout} // Llama a la función de logout
         >
           Cerrar Sesión
         </Button>
