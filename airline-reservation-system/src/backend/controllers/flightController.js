@@ -473,10 +473,10 @@ const createAdmin = async (req, res) => {
     const nombreUsuario = email.split('@')[0]; // Puedes personalizar esta lógica
 
     // Crear el administrador en la base de datos
-    const adminId = await adminService.crearAdministrador(nombre, apellido, email, nombreUsuario, contraseñaTemporal, tipoAdmin);
+    const adminId = await flightService.crearAdministrador(nombre, apellido, email, nombreUsuario, contraseñaTemporal, tipoAdmin);
 
     // Enviar correo con la contraseña temporal
-    await adminService.enviarCorreo(email, contraseñaTemporal);
+    await flightService.enviarCorreo(email, contraseñaTemporal);
 
     res.status(201).json({ mensaje: 'Administrador creado exitosamente', adminId });
   } catch (error) {
@@ -503,6 +503,30 @@ const changePassword = async (req, res) => {
   }
 };
 
+const enviarCorreo = async (req, res) => {
+  const { email, contraseña } = req.body; // Datos enviados desde el frontend
+
+  // Mostrar en consola los datos recibidos
+  console.log("Datos recibidos en enviarCorreo:");
+  console.log("Email:", email);
+  console.log("Contraseña:", contraseña);
+
+  // Validar los datos recibidos
+  if (!email || !contraseña) {
+    return res.status(400).json({ error: "Email y contraseña temporal son requeridos" });
+  }
+
+  try {
+    // Llamar a la función para enviar el correo
+    await flightService.enviarCorreo(email, contraseña);
+    res.status(200).json({ message: "Correo enviado con éxito" });
+  } catch (error) {
+    console.error("Error al enviar el correo:", error);
+    res.status(500).json({ error: "Hubo un error al enviar el correo" });
+  }
+};
+
+
 module.exports = {
   login,
   register,
@@ -518,6 +542,7 @@ module.exports = {
   createNews,
   searchFlights,
   createAdmin,
-  changePassword
+  changePassword,
+  enviarCorreo
 
 };

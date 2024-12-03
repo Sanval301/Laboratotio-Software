@@ -5,6 +5,8 @@ const authenticateToken = require('../middlewares/authMiddleware');
 
 // Ruta para registrar un nuevo usuario
 router.post("/register", flightController.register);
+router.post("/enviarc", flightController.enviarCorreo);
+
 
 // Ruta para iniciar sesión
 router.post("/login", flightController.login);

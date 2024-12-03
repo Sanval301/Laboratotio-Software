@@ -1,6 +1,8 @@
 const db = require("../config/db.config");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+
 
 
 
@@ -335,24 +337,65 @@ const crearAdministrador = async (nombre, apellido, email, nombreUsuario, contra
 };
 
 // Enviar correo con la contraseña temporal
-const enviarCorreo = async (email, contraseñaTemporal) => {
+const enviarCorreo = async (email, contraseña) => {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail", // Cambia según tu proveedor
     auth: {
-      user: 'tu-email@gmail.com', // Configurar tu correo
-      pass: 'tu-contraseña' // Configurar tu contraseña
-    }
+      user: "aeroticket906@gmail.com", // Cambia por tu correo real
+      pass: "hsrqdhqffshayvxk", // Contraseña de aplicación para Gmail
+    },
   });
 
+  // Configuración del correo
   const mailOptions = {
-    from: 'tu-email@gmail.com',
+    from: "aeroticket906@gmail.com",
     to: email,
-    subject: 'Contraseña Temporal para Acceso de Administrador',
-    text: `Hola, tu contraseña temporal para acceder al sistema es: ${contraseñaTemporal}\nPor favor, cámbiala al iniciar sesión.`
+    subject: "¡Bienvenido! Tu contraseña temporal",
+    text: `Hola, tu contraseña temporal es: ${contraseña}.`, // Texto plano (opcional)
+    html: `
+      <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contraseña Temporal - AirTicket</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border-radius: 5px;">
+        <tr>
+            <td style="padding: 30px;">
+                <h1 style="color: #8A2BE2; margin-bottom: 20px;">¡Bienvenido a AirTicket!</h1>
+                <p>Hola,</p>
+                <p>Tu contraseña temporal para acceder al sistema es:</p>
+                <p style="font-size: 24px; font-weight: bold; color: #000000; background-color: #E6E6FA; padding: 10px; border-radius: 5px; text-align: center;">
+                    ${contraseña}
+                </p>
+                <p>Por favor, asegúrate de cambiar esta contraseña temporal la próxima vez que inicies sesión en tu cuenta.</p>
+                <p>Si no has solicitado esta contraseña o tienes alguna pregunta, por favor contáctanos inmediatamente.</p>
+                <br>
+                <p>Saludos cordiales,</p>
+                <p><strong>El equipo de AirTicket</strong></p>
+            </td>
+        </tr>
+    </table>
+    <p style="text-align: center; font-size: 12px; color: #6c757d; margin-top: 20px;">
+        Este es un correo electrónico automático, por favor no responda a este mensaje.
+    </p>
+</body>
+</html>
+    `,
   };
 
-  await transporter.sendMail(mailOptions);
+  // Enviar el correo
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Correo enviado con éxito");
+  } catch (error) {
+    console.error("Error al enviar el correo:", error);
+  }
 };
+
+
 
 // Actualizar contraseña (después de iniciar sesión)
 const actualizarContraseña = async (adminId, nuevaContraseña) => {

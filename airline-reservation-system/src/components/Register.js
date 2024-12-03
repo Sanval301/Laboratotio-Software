@@ -87,7 +87,7 @@ function Registro() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     // Eliminar campos que puedan estar vacíos o undefined
     const dataToSend = {
       ...formData,
@@ -105,10 +105,15 @@ function Registro() {
       genero: formData.genero || "",
       imagenUsuario: formData.imagenUsuario || null,
     };
-
+  
     console.log("Datos a enviar:", dataToSend);
-
+  
     try {
+      // Guardar el email y la contraseña temporal en variables separadas
+      const email = dataToSend.email;
+      const contraseña = dataToSend.contraseña;
+  
+      // Enviar los datos al backend para el registro
       const response = await axios.post(
         "http://localhost:5009/register",
         dataToSend,
@@ -118,20 +123,30 @@ function Registro() {
           },
         }
       );
-
+  
+      // Si el registro es exitoso, enviar el correo con la contraseña temporal
       if (response.data.token) {
+        console.log("Enviando correo con:", { email, contraseña });
+  
+        await axios.post("http://localhost:5009/enviarc", {
+          email: email, // Usar la copia explícita
+          contraseña: contraseña, // Usar la copia explícita
+        });
+  
+        // Almacenar el token si el registro fue exitoso
         localStorage.setItem("token", response.data.token);
+        alert("Usuario registrado con éxito");
+        navigate("/login");
+        setError("");
       }
-
-      alert("Usuario registrado con éxito");
-      navigate("/login");
-      setError("");
     } catch (err) {
       setError(err.response?.data?.message || "Error en el registro");
     } finally {
       setIsLoading(false);
     }
   };
+  
+  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
