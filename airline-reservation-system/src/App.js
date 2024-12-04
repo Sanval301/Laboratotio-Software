@@ -34,6 +34,8 @@ import Historial from "./components/Historial";
 import Promociones from "./components/Promociones";
 import MenuLateral from "./components/MenuLateral";
 import Reservar from "./components/Reservar";
+import CheckIn from "./components/CheckIn";
+import SeatSelection from "./components/SeatSelection";
 import ProtectedRoute from "./components/Protected";
 const theme = createTheme({
   palette: {
@@ -200,8 +202,6 @@ function PaginaPrincipal() {
   );
 }
 
-
-
 function App() {
   return (
     <ThemeProvider theme={theme}>
@@ -214,19 +214,24 @@ function App() {
           <Route path="/recovery" element={<Recovery />} />
 
           {/* Rutas protegidas */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/perfil" element={<Perfil />} />
-            <Route path="/crearvuelo" element={<Dash />} />
-            <Route path="/editarvuelos" element={<EditarVuelos />} />
-            <Route path="/adminvuelos" element={<AdminVuelos />} />
-            <Route path="/VuelosRealizados" element={<VuelosRealizados />} />
-            <Route path="/Cancelarvuelos" element={<CancelacionVuelosMejorada />} />
-            <Route path="/MenuLateral" element={<MenuLateral />} />
-            <Route path="/Tarjetas" element={<Tarjetas />} />
-            <Route path="/Promociones" element={<Promociones />} />
-            <Route path="/Historial" element={<Historial />} />
-            <Route path="/Reservar" element={<Reservar />} />
-          </Route>
+          {/*<Route element={<ProtectedRoute />}>*/}
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/crearvuelo" element={<Dash />} />
+          <Route path="/editarvuelos" element={<EditarVuelos />} />
+          <Route path="/adminvuelos" element={<AdminVuelos />} />
+          <Route path="/VuelosRealizados" element={<VuelosRealizados />} />
+          <Route
+            path="/Cancelarvuelos"
+            element={<CancelacionVuelosMejorada />}
+          />
+          <Route path="/MenuLateral" element={<MenuLateral />} />
+          <Route path="/Tarjetas" element={<Tarjetas />} />
+          <Route path="/Promociones" element={<Promociones />} />
+          <Route path="/Historial" element={<Historial />} />
+          <Route path="/Reservar" element={<Reservar />} />
+          <Route path="/CheckIn" element={<CheckIn />} />
+          <Route path="/SeatSelection" element={<SeatSelection />} />
+          {/*</Route>*/}
         </Routes>
       </Router>
     </ThemeProvider>
@@ -234,4 +239,3 @@ function App() {
 }
 
 export default App;
-

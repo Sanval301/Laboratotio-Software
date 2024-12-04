@@ -48,6 +48,9 @@ const NavbarCliente = () => {
           <Button color="inherit" component={Link} to="/reservar">
             Mis Reservas
           </Button>
+          <Button color="inherit" component={Link} to="/CheckIn">
+            Check-In
+          </Button>
           <Button color="inherit" component={Link} to="/promociones">
             Promociones
           </Button>
