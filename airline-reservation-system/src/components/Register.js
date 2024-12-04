@@ -87,8 +87,7 @@ function Registro() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Eliminar campos que puedan estar vacíos o undefined
+  
     const dataToSend = {
       ...formData,
       cedula: formData.cedula || null,
@@ -105,33 +104,48 @@ function Registro() {
       genero: formData.genero || "",
       imagenUsuario: formData.imagenUsuario || null,
     };
-
+  
     console.log("Datos a enviar:", dataToSend);
-
+  
     try {
-      const response = await axios.post(
-        "http://localhost:5009/register",
-        dataToSend,
+      // Enviar los datos al backend para el registro
+      await axios.post(
+        "http://localhost:5009/enviarc",
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+          email: dataToSend.email, // Email decodificado del token
+          contraseña: dataToSend.contraseña, // Nombre de usuario del token
+        },
+      
       );
-
-      if (response.data.token) {
+      
+      
+      const response = await axios.post("http://localhost:5009/register", dataToSend, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      
+        // Guardar el token en localStorage
         localStorage.setItem("token", response.data.token);
-      }
-
-      alert("Usuario registrado con éxito");
-      navigate("/login");
-      setError("");
+  
+      
+        
+  
+        alert("Usuario registrado y correo enviado con éxito.");
+        navigate("/login");
+        setError("");
+      
     } catch (err) {
       setError(err.response?.data?.message || "Error en el registro");
+      console.error("Error en el registro:", err.message);
     } finally {
       setIsLoading(false);
     }
   };
+  
+  
+  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>

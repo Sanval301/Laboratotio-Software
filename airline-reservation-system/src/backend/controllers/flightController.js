@@ -1,4 +1,5 @@
 const flightService = require("../services/flightService");
+const jwt = require("jsonwebtoken");
 
 
 const login = async (req, res) => {
@@ -190,10 +191,10 @@ const cancelFlightController = async (req, res) => {
 
 
 const createCard = async (req, res) => {
-  const { numero, titular, fechaExpiracion, cvv } = req.body;
+  const { numero, titular, fechaExpiracion, cvv, saldo } = req.body;
 
   // Validar datos obligatorios
-  if (!numero || !titular || !fechaExpiracion || !cvv) {
+  if (!numero || !titular || !fechaExpiracion || !cvv|| !saldo) {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
 
@@ -218,7 +219,7 @@ const createCard = async (req, res) => {
   }
 
   try {
-    const card = flightService.createCard({ numero, titular, fechaExpiracion, cvv });
+    const card = flightService.createCard({ numero, titular, fechaExpiracion, cvv,saldo  });
     res.status(201).json({ message: "Tarjeta creada exitosamente", card });
   } catch (error) {
     console.error("Error al crear la tarjeta:", error);
@@ -473,10 +474,10 @@ const createAdmin = async (req, res) => {
     const nombreUsuario = email.split('@')[0]; // Puedes personalizar esta lógica
 
     // Crear el administrador en la base de datos
-    const adminId = await adminService.crearAdministrador(nombre, apellido, email, nombreUsuario, contraseñaTemporal, tipoAdmin);
+    const adminId = await flightService.crearAdministrador(nombre, apellido, email, nombreUsuario, contraseñaTemporal, tipoAdmin);
 
     // Enviar correo con la contraseña temporal
-    await adminService.enviarCorreo(email, contraseñaTemporal);
+    await flightService.enviarCorreo(email, contraseñaTemporal);
 
     res.status(201).json({ mensaje: 'Administrador creado exitosamente', adminId });
   } catch (error) {
@@ -503,6 +504,61 @@ const changePassword = async (req, res) => {
   }
 };
 
+const enviarCorreo = async (req, res) => {
+  const { email, contraseña } = req.body; // Datos enviados desde el frontend
+
+  // Mostrar en consola los datos recibidos
+  console.log("Datos recibidos en enviarCorreo:");
+  console.log("Email:", email);
+  console.log("Contraseña:", contraseña);
+
+  // Validar los datos recibidos
+  if (!email || !contraseña) {
+    return res.status(400).json({ error: "Email y contraseña temporal son requeridos" });
+  }
+
+  try {
+    // Llamar a la función para enviar el correo
+    await flightService.enviarCorreo(email, contraseña);
+    res.status(200).json({ message: "Correo enviado con éxito" });
+  } catch (error) {
+    console.error("Error al enviar el correo:", error);
+    res.status(500).json({ error: "Hubo un error al enviar el correo" });
+  }
+};
+
+
+const obtenerTarjetas = async (req, res) => {
+  try {
+    // Obtener el token desde los headers
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ error: "No se proporcionó un token" });
+    }
+
+    // Verificar el token y extraer el payload
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const nombreusuario = decoded.nombreusuario;
+
+    if (!nombreusuario) {
+      return res.status(400).json({ error: "Token inválido: no contiene nombreusuario" });
+    }
+
+    // Llamar al servicio para obtener las tarjetas
+    const tarjetas = await flightService.obtenerTarjetasPorUsuario(nombreusuario);
+
+    if (tarjetas.length === 0) {
+      return res.status(404).json({ message: "No se encontraron tarjetas asociadas al usuario" });
+    }
+
+    // Responder con las tarjetas encontradas
+    res.status(200).json({ tarjetas });
+  } catch (error) {
+    console.error("Error en el controlador de tarjetas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -518,6 +574,8 @@ module.exports = {
   createNews,
   searchFlights,
   createAdmin,
-  changePassword
+  changePassword,
+  enviarCorreo,
+  obtenerTarjetas
 
 };

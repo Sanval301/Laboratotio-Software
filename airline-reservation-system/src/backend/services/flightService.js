@@ -1,10 +1,18 @@
+// Importar dependencias necesarias
 const db = require("../config/db.config");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
 
+// Configuración general
+const saltRounds = 10; // Número de rondas para encriptar contraseñas
 
-
-const saltRounds = 10; // Número de rondas de salt
+/**
+ * Registrar un nuevo usuario.
+ * @param {...} Datos del usuario a registrar.
+ * @returns {Object} Información del usuario creado.
+ */
+const JWT_SECRET = "secreto"; // ¡Reemplaza esto por una clave más segura!
 
 const register = async (
   cedula,
@@ -19,119 +27,95 @@ const register = async (
   nombreusuario,
   contraseña,
   genero,
-  imagenUsuario,
+  imagenUsuario
 ) => {
-  // Imprimir los datos que llegan a la función
-  console.log("Datos recibidos para registro:");
-  console.log({
-    cedula,
-    nombres,
-    apellidos,
-    fechaNacimiento,
-    pais,
-    estado,
-    ciudad,
-    direccionFacturacion,
-    email,
-    nombreusuario,
-    contraseña, // Nota: En producción no deberías imprimir contraseñas.
-    genero,
-    imagenUsuario,
-  });
+  console.log("Datos recibidos para registro:", { cedula, nombres, apellidos, email, nombreusuario });
 
-  // Validar que la contraseña esté definida y no esté vacía
   if (!contraseña) {
     throw new Error("La contraseña es obligatoria.");
   }
 
   try {
-    // Cifrar la contraseña antes de almacenarla
+    // Hashear la contraseña
     const hashedPassword = await bcrypt.hash(contraseña, saltRounds);
-
-    // Obtener la fecha actual para FechaRegistro
-    const now = new Date();
-    const fechaRegistro = now.toISOString().slice(0, 19).replace('T', ' ');
+    const fechaRegistro = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
     // Verificar si el usuario ya existe
-    const [existingUser] = await db.query(
-      "SELECT * FROM Usuarios WHERE Email = ?",
-      [email]
-    );
-
+    const [existingUser] = await db.query("SELECT * FROM Usuarios WHERE Email = ?", [email]);
     if (existingUser.length > 0) {
       throw new Error("El correo electrónico ya está registrado.");
     }
 
-    // Insertar nuevo usuario en la base de datos
+    // Insertar el nuevo usuario en la base de datos
     const [result] = await db.query(
-      `
-        INSERT INTO Usuarios (
-          Cedula, Nombres, Apellidos, FechaNacimiento, Pais, Estado, Ciudad,
-          DireccionFacturacion, Email, NombreUsuario, Contraseña, Genero, ImagenUsuario, FechaRegistro
-        ) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        cedula, nombres, apellidos, fechaNacimiento, pais, estado, ciudad,
-        direccionFacturacion, email, nombreusuario, hashedPassword, genero, imagenUsuario, fechaRegistro
-      ]
+      `INSERT INTO Usuarios (Cedula, Nombres, Apellidos, FechaNacimiento, Pais, Estado, Ciudad, DireccionFacturacion, Email, NombreUsuario, Contraseña, Genero, ImagenUsuario, FechaRegistro) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [cedula, nombres, apellidos, fechaNacimiento, pais, estado, ciudad, direccionFacturacion, email, nombreusuario, hashedPassword, genero, imagenUsuario, fechaRegistro]
     );
 
-    // Retornar el usuario creado con su ID
-    return {
-      id: result.insertId,
-      nombreusuario,
-      email,
-    };
+    // Generar el token JWT
+    const token = jwt.sign(
+      { id: result.insertId, nombreusuario, email,contraseña }, // Datos que incluirás en el payload del token
+      JWT_SECRET, // Clave secreta para firmar el token
+      { expiresIn: "1h" } // El token expirará en 1 hora
+    );
+
+    // Retornar el token junto con otros datos opcionales
+    return { token, nombreusuario, email, id: result.insertId,contraseña };
   } catch (error) {
-    // Manejar cualquier error que ocurra durante el proceso
-    console.error("Error al registrar usuario:", error.message); // Imprimir el error en la consola
+    console.error("Error al registrar usuario:", error.message);
     throw new Error("Error al registrar el usuario: " + error.message);
   }
 };
 
-
-// Inicio de sesión de usuario
+/**
+ * Iniciar sesión de usuario.
+ * @param {string} email - Correo del usuario.
+ * @param {string} contraseña - Contraseña del usuario.
+ * @returns {Object} Token JWT y usuario autenticado.
+ */
 const login = async (email, contraseña) => {
-  // Obtener el usuario por email
-  const [results] = await db.query("SELECT * FROM usuarios WHERE Email = ?", [email]);
+  try {
+    const [results] = await db.query("SELECT * FROM usuarios WHERE Email = ?", [email]);
+    if (results.length === 0) {
+      throw new Error("Usuario no encontrado");
+    }
 
-  // Verificar si se encontró el usuario
-  if (results.length === 0) {
-    throw new Error("Usuario no encontrado");
+    const user = results[0];
+    const isMatch = await bcrypt.compare(contraseña, user.Contraseña);
+    if (!isMatch) {
+      throw new Error("Contraseña incorrecta");
+    }
+
+    const token = jwt.sign({ id: user.UsuarioID, nombreusuario: user.NombreUsuario }, "secreto", { expiresIn: '1h' });
+    return { token, user };
+  } catch (error) {
+    console.error("Error en inicio de sesión:", error.message);
+    throw new Error(error.message);
   }
-
-  const user = results[0];
-
-  // Verificar la contraseña
-  const isMatch = await bcrypt.compare(contraseña, user.Contraseña);
-  if (!isMatch) {
-    throw new Error("Contraseña incorrecta");
-  }
-
-  // Generar el token JWT
-  const token = jwt.sign({ id: user.UsuarioID, nombreusuario: user.NombreUsuario }, "secreto", { expiresIn: '1h' });
-
-  // Retornar el token y el usuario
-  return { token, user };
 };
 
-
-
-
-// Obtener todos los vuelos desde la base de datos
+/**
+ * Obtener todos los vuelos disponibles.
+ * @returns {Array} Lista de vuelos.
+ */
 const getAllFlights = async () => {
   try {
-    const [results] = await db.query("SELECT * FROM vuelos"); // Sin callbacks, utilizando `await`
+    const [results] = await db.query("SELECT * FROM vuelos");
     return results;
   } catch (err) {
-    throw err; // Propaga el error para que sea manejado por el controlador
+    console.error("Error al obtener vuelos:", err);
+    throw new Error("Error al obtener la lista de vuelos.");
   }
 };
 
-// Crear un nuevo vuelo en la base de datos
-const createFlight = (flightDetails) => {
-  return new Promise((resolve, reject) => {
+/**
+ * Crear un nuevo vuelo.
+ * @param {Object} flightDetails - Detalles del vuelo.
+ * @returns {Object} Resultado de la operación.
+ */
+const createFlight = async (flightDetails) => {
+  try {
     const query = `
       INSERT INTO vuelos
       (CodigoVuelo, FechaVuelo, HoraSalida, Origen, Destino, DuracionVuelo, HoraLlegadaLocal, CostoPorPersona, EsInternacional)
@@ -146,63 +130,72 @@ const createFlight = (flightDetails) => {
       flightDetails.DuracionVuelo,
       flightDetails.HoraLlegadaLocal,
       flightDetails.CostoPorPersona,
-      flightDetails.EsInternacional
-
+      flightDetails.EsInternacional,
     ];
 
-    db.query(query, values, (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(result);
-    });
-  });
-};
-
-
-const cancelFlight = (CodigoVuelo) => {
-  return new Promise((resolve, reject) => {
-    const query = `DELETE FROM vuelos WHERE CodigoVuelo = ?`;
-    db.query(query, [CodigoVuelo], (err, result) => {
-      if (err) {
-        return reject(err);
-      }
-      if (result.affectedRows === 0) {
-        return reject("El vuelo no existe o ya ha sido cancelado.");
-      }
-      resolve({ message: "Vuelo cancelado exitosamente." });
-    });
-  });
-};
-
-
-
-const createCard = async ({ numero, titular, fechaExpiracion, cvv }) => {
-  // Verificar si ya existe una tarjeta con el mismo número
-  const [existingCard] = await db.query(
-    "SELECT * FROM tarjetas WHERE numero = ?",
-    [numero]
-  );
-
-  if (existingCard.length > 0) {
-    throw new Error("Tarjeta ya existe");
+    const [result] = await db.query(query, values);
+    return result;
+  } catch (error) {
+    console.error("Error al crear vuelo:", error.message);
+    throw new Error("Error al crear el vuelo.");
   }
-
-  // Insertar nueva tarjeta en la base de datos
-  const [result] = await db.query(
-    "INSERT INTO tarjetas (numero, titular, fechaExpiracion, cvv) VALUES (?, ?, ?, ?)",
-    [numero, titular, fechaExpiracion, cvv]
-  );
-
-  // Retornar la tarjeta creada con su ID
-  return {
-    id: result.insertId,
-    numero,
-    titular,
-    fechaExpiracion,
-    cvv,
-  };
 };
+
+/**
+ * Cancelar un vuelo.
+ * @param {string} CodigoVuelo - Código del vuelo a cancelar.
+ * @returns {Object} Resultado de la operación.
+ */
+const cancelFlight = async (CodigoVuelo) => {
+  try {
+    const [result] = await db.query("DELETE FROM vuelos WHERE CodigoVuelo = ?", [CodigoVuelo]);
+    if (result.affectedRows === 0) {
+      throw new Error("El vuelo no existe o ya ha sido cancelado.");
+    }
+    return { message: "Vuelo cancelado exitosamente." };
+  } catch (error) {
+    console.error("Error al cancelar vuelo:", error.message);
+    throw new Error("Error al cancelar el vuelo.");
+  }
+};
+
+
+
+/**
+ * Crear una nueva tarjeta asociada a un usuario.
+ * @param {Object} cardDetails - Detalles de la tarjeta.
+ * @param {string} token - Token JWT del usuario.
+ * @returns {Object} Tarjeta creada.
+ */
+const createCard = async ({ numero, titular, fechaExpiracion, cvv, saldo }, token) => {
+  try {
+    // Decodificar el token para obtener el nombreusuario
+    const decoded = jwt.verify(token, "secreto"); // Reemplaza "secreto" por tu clave secreta real
+    const nombreusuario = decoded.nombreusuario;
+
+    if (!nombreusuario) {
+      throw new Error("Token inválido o usuario no encontrado.");
+    }
+
+    // Verificar si la tarjeta ya existe
+    const [existingCard] = await db.query("SELECT * FROM tarjetas WHERE numero = ?", [numero]);
+    if (existingCard.length > 0) {
+      throw new Error("La tarjeta ya existe.");
+    }
+
+    // Insertar la tarjeta en la base de datos asociada al nombreusuario
+    const [result] = await db.query(
+      "INSERT INTO tarjetas (numero, titular, fechaExpiracion, cvv, nombreusuario,saldo ) VALUES (?, ?, ?, ?, ?, ?)",
+      [numero, titular, fechaExpiracion, cvv, nombreusuario, saldo]
+    );
+
+    return { id: result.insertId, numero, titular, fechaExpiracion, cvv, saldo };
+  } catch (error) {
+    console.error("Error al crear tarjeta:", error.message);
+    throw new Error("Error al crear la tarjeta: " + error.message);
+  }
+};
+
 
 const deleteCard = async (numero) => {
   // Eliminar tarjeta por ID
@@ -335,24 +328,65 @@ const crearAdministrador = async (nombre, apellido, email, nombreUsuario, contra
 };
 
 // Enviar correo con la contraseña temporal
-const enviarCorreo = async (email, contraseñaTemporal) => {
+const enviarCorreo = async (email, contraseña) => {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail", // Cambia según tu proveedor
     auth: {
-      user: 'tu-email@gmail.com', // Configurar tu correo
-      pass: 'tu-contraseña' // Configurar tu contraseña
-    }
+      user: "aeroticket906@gmail.com", // Cambia por tu correo real
+      pass: "hsrqdhqffshayvxk", // Contraseña de aplicación para Gmail
+    },
   });
 
+  // Configuración del correo
   const mailOptions = {
-    from: 'tu-email@gmail.com',
+    from: "aeroticket906@gmail.com",
     to: email,
-    subject: 'Contraseña Temporal para Acceso de Administrador',
-    text: `Hola, tu contraseña temporal para acceder al sistema es: ${contraseñaTemporal}\nPor favor, cámbiala al iniciar sesión.`
+    subject: "¡Bienvenido! Tu contraseña temporal",
+    text: `Hola, tu contraseña temporal es: ${contraseña}.`, // Texto plano (opcional)
+    html: `
+      <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contraseña Temporal - AirTicket</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border-radius: 5px;">
+        <tr>
+            <td style="padding: 30px;">
+                <h1 style="color: #8A2BE2; margin-bottom: 20px;">¡Bienvenido a AirTicket!</h1>
+                <p>Hola,</p>
+                <p>Tu contraseña temporal para acceder al sistema es:</p>
+                <p style="font-size: 24px; font-weight: bold; color: #000000; background-color: #E6E6FA; padding: 10px; border-radius: 5px; text-align: center;">
+                    ${contraseña}
+                </p>
+                <p>Por favor, asegúrate de cambiar esta contraseña temporal la próxima vez que inicies sesión en tu cuenta.</p>
+                <p>Si no has solicitado esta contraseña o tienes alguna pregunta, por favor contáctanos inmediatamente.</p>
+                <br>
+                <p>Saludos cordiales,</p>
+                <p><strong>El equipo de AirTicket</strong></p>
+            </td>
+        </tr>
+    </table>
+    <p style="text-align: center; font-size: 12px; color: #6c757d; margin-top: 20px;">
+        Este es un correo electrónico automático, por favor no responda a este mensaje.
+    </p>
+</body>
+</html>
+    `,
   };
 
-  await transporter.sendMail(mailOptions);
+  // Enviar el correo
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Correo enviado con éxito");
+  } catch (error) {
+    console.error("Error al enviar el correo:", error);
+  }
 };
+
+
 
 // Actualizar contraseña (después de iniciar sesión)
 const actualizarContraseña = async (adminId, nuevaContraseña) => {
@@ -362,6 +396,20 @@ const actualizarContraseña = async (adminId, nuevaContraseña) => {
     [contraseñaEncriptada, adminId]
   );
 };
+
+const obtenerTarjetasPorUsuario = async (nombreusuario) => {
+  try {
+    const [rows] = await db.query(
+      "SELECT * FROM tarjetas WHERE nombreusuario = ?",
+      [nombreusuario]
+    );
+    return rows;
+  } catch (error) {
+    console.error("Error al consultar tarjetas:", error);
+    throw new Error("Error al obtener las tarjetas");
+  }
+};
+
 
 module.exports = {
   register,
@@ -382,5 +430,6 @@ module.exports = {
   createNews,
   crearAdministrador,
   actualizarContraseña,
-  enviarCorreo
+  enviarCorreo,
+  obtenerTarjetasPorUsuario
 };
