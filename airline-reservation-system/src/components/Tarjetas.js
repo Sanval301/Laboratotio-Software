@@ -23,11 +23,7 @@ import axios from "axios";
 import NavbarCliente from "./NavbarCliente";
 import Footer from "./Footer";
 
-const floatAnimation = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-`;
+
 
 const StyledCard = styled(Card)(({ theme }) => ({
   position: "relative",
@@ -95,46 +91,48 @@ function Tarjetas() {
     setNuevaTarjeta({ ...nuevaTarjeta, [name]: value });
   };
 
-
-
   const handleAgregarTarjeta = async () => {
     const regex = /^(0[1-9]|1[0-2])\/\d{2}$/; // Validación antes de guardar
     if (!regex.test(nuevaTarjeta.fechaExpiracion)) {
       setErrorFecha("El formato debe ser MM/AA");
       return;
     }
-  
+
     if (
       nuevaTarjeta.numero &&
       nuevaTarjeta.titular &&
       nuevaTarjeta.fechaExpiracion &&
       nuevaTarjeta.cvv &&
       nuevaTarjeta.saldo
-    ) {
-      const token = localStorage.getItem("token");  // Recuperar el token almacenado
+        ) {
       try {
         // Envía los datos al backend
-        
-        const response = await axios.post("http://localhost:5009/Tarjetas", nuevaTarjeta);
-        
+        const token = localStorage.getItem("token"); // Obtén el token desde el almacenamiento local
+        console.log(localStorage.getItem("token")); // Verifica que exista el token
+
+
+        const response = await axios.post(
+          "http://localhost:5009/Tarjetas",
+          nuevaTarjeta,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+
         // Si el backend responde exitosamente, agrega la tarjeta al estado local
         setTarjetas([...tarjetas, { ...nuevaTarjeta, id: response.data.id }]); // Usa el ID generado por el backend si aplica
-        setNuevaTarjeta({
-          numero: "",
-          titular: "",
-          fechaExpiracion: "",
-          cvv: "",
-          saldo: "",
-        });
-        setErrorFecha("");
+
         handleCloseDialog();
       } catch (error) {
-        console.error("Error al guardar la tarjeta:", error);
-        // Manejo del error (puedes mostrar un mensaje al usuario)
+        console.error("Error al guardar la tarjeta:", error.response || error.message);
+        alert(`Hubo un error al guardar la tarjeta: ${error.response?.data?.message || error.message}`);
       }
+      
+    } else {
+      alert("Por favor, completa todos los campos.");
     }
   };
-  
 
   const handleEliminarTarjeta = (id) => {
     setTarjetas(tarjetas.filter((tarjeta) => tarjeta.id !== id));
@@ -143,6 +141,7 @@ function Tarjetas() {
   const handleCompra = (id) => {
     const monto = parseFloat(compra);
     if (isNaN(monto) || monto <= 0) return;
+
     setTarjetas((prev) =>
       prev.map((tarjeta) =>
         tarjeta.id === id
@@ -155,7 +154,6 @@ function Tarjetas() {
     );
     setCompra("");
   };
-
   return (
       <Box display="flex" flexDirection="column" height="100vh">
         <NavbarCliente />

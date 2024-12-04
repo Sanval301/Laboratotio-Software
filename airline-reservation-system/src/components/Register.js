@@ -88,7 +88,6 @@ function Registro() {
     e.preventDefault();
     setIsLoading(true);
   
-    // Eliminar campos que puedan estar vacíos o undefined
     const dataToSend = {
       ...formData,
       cedula: formData.cedula || null,
@@ -109,42 +108,42 @@ function Registro() {
     console.log("Datos a enviar:", dataToSend);
   
     try {
-      // Guardar el email y la contraseña temporal en variables separadas
-      const email = dataToSend.email;
-      const contraseña = dataToSend.contraseña;
-  
       // Enviar los datos al backend para el registro
-      const response = await axios.post(
-        "http://localhost:5009/register",
-        dataToSend,
+      await axios.post(
+        "http://localhost:5009/enviarc",
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+          email: dataToSend.email, // Email decodificado del token
+          contraseña: dataToSend.contraseña, // Nombre de usuario del token
+        },
+      
       );
+      
+      
+      const response = await axios.post("http://localhost:5009/register", dataToSend, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
   
-      // Si el registro es exitoso, enviar el correo con la contraseña temporal
-      if (response.data.token) {
-        console.log("Enviando correo con:", { email, contraseña });
-  
-        await axios.post("http://localhost:5009/enviarc", {
-          email: email, // Usar la copia explícita
-          contraseña: contraseña, // Usar la copia explícita
-        });
-  
-        // Almacenar el token si el registro fue exitoso
+      
+        // Guardar el token en localStorage
         localStorage.setItem("token", response.data.token);
-        alert("Usuario registrado con éxito");
+  
+      
+        
+  
+        alert("Usuario registrado y correo enviado con éxito.");
         navigate("/login");
         setError("");
-      }
+      
     } catch (err) {
       setError(err.response?.data?.message || "Error en el registro");
+      console.error("Error en el registro:", err.message);
     } finally {
       setIsLoading(false);
     }
   };
+  
   
   
 

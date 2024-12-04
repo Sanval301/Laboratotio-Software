@@ -1,4 +1,5 @@
 const flightService = require("../services/flightService");
+const jwt = require("jsonwebtoken");
 
 
 const login = async (req, res) => {
@@ -190,10 +191,10 @@ const cancelFlightController = async (req, res) => {
 
 
 const createCard = async (req, res) => {
-  const { numero, titular, fechaExpiracion, cvv } = req.body;
+  const { numero, titular, fechaExpiracion, cvv, saldo } = req.body;
 
   // Validar datos obligatorios
-  if (!numero || !titular || !fechaExpiracion || !cvv) {
+  if (!numero || !titular || !fechaExpiracion || !cvv|| !saldo) {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
 
@@ -218,7 +219,7 @@ const createCard = async (req, res) => {
   }
 
   try {
-    const card = flightService.createCard({ numero, titular, fechaExpiracion, cvv });
+    const card = flightService.createCard({ numero, titular, fechaExpiracion, cvv,saldo  });
     res.status(201).json({ message: "Tarjeta creada exitosamente", card });
   } catch (error) {
     console.error("Error al crear la tarjeta:", error);
@@ -527,6 +528,37 @@ const enviarCorreo = async (req, res) => {
 };
 
 
+const obtenerTarjetas = async (req, res) => {
+  try {
+    // Obtener el token desde los headers
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ error: "No se proporcionó un token" });
+    }
+
+    // Verificar el token y extraer el payload
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const nombreusuario = decoded.nombreusuario;
+
+    if (!nombreusuario) {
+      return res.status(400).json({ error: "Token inválido: no contiene nombreusuario" });
+    }
+
+    // Llamar al servicio para obtener las tarjetas
+    const tarjetas = await flightService.obtenerTarjetasPorUsuario(nombreusuario);
+
+    if (tarjetas.length === 0) {
+      return res.status(404).json({ message: "No se encontraron tarjetas asociadas al usuario" });
+    }
+
+    // Responder con las tarjetas encontradas
+    res.status(200).json({ tarjetas });
+  } catch (error) {
+    console.error("Error en el controlador de tarjetas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -543,6 +575,7 @@ module.exports = {
   searchFlights,
   createAdmin,
   changePassword,
-  enviarCorreo
+  enviarCorreo,
+  obtenerTarjetas
 
 };
