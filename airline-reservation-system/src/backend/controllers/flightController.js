@@ -29,7 +29,7 @@ const login = async (req, res) => {
 
 
 const register = async (req, res) => {
-  console.log("Datos recibidos en req.body:", req.body)
+  console.log("Datos recibidos en req.body:", req.body);
   const {
     cedula,
     nombres,
@@ -45,35 +45,58 @@ const register = async (req, res) => {
     genero,
     imagenUsuario
   } = req.body;
-  
 
   // Validar datos obligatorios
   const missingFields = [];
 
-if (!nombreUsuario) missingFields.push("Nombre de Usuario");
-if (!nombres) missingFields.push("Nombres");
-if (!apellidos) missingFields.push("Apellidos");
-if (!email) missingFields.push("Correo Electrónico");
-if (!contraseña) missingFields.push("Contraseña");
-if (!cedula) missingFields.push("Cédula");
-if (!fechaNacimiento) missingFields.push("Fecha de Nacimiento");
-if (!pais) missingFields.push("País");
-if (!estado) missingFields.push("Estado");
-if (!ciudad) missingFields.push("Ciudad");
-if (!direccionFacturacion) missingFields.push("Dirección de Facturación");
+  if (!nombreUsuario) missingFields.push("Nombre de Usuario");
+  if (!nombres) missingFields.push("Nombres");
+  if (!apellidos) missingFields.push("Apellidos");
+  if (!email) missingFields.push("Correo Electrónico");
+  if (!contraseña) missingFields.push("Contraseña");
+  if (!cedula) missingFields.push("Cédula");
+  if (!fechaNacimiento) missingFields.push("Fecha de Nacimiento");
+  if (!pais) missingFields.push("País");
+  if (!estado) missingFields.push("Estado");
+  if (!ciudad) missingFields.push("Ciudad");
+  if (!direccionFacturacion) missingFields.push("Dirección de Facturación");
 
-if (missingFields.length > 0) {
-  return res.status(400).json({
-    message: `Los siguientes campos son obligatorios: ${missingFields.join(", ")}`
-  });
-}
+  if (missingFields.length > 0) {
+    return res.status(400).json({
+      message: `Los siguientes campos son obligatorios: ${missingFields.join(", ")}`
+    });
+  }
 
+  // Validaciones adicionales
+  const errors = [];
 
-  // Validar formato de email (opcional, pero recomendable)
-  
+  // Validar longitud mínima de la contraseña
+  if (contraseña && contraseña.length < 8) {
+    errors.push("La contraseña debe tener al menos 8 caracteres.");
+  }
 
-  // Validar longitud de la contraseña (opcional)
-  
+  // Validar formato del email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (email && !emailRegex.test(email)) {
+    errors.push("El formato del correo electrónico no es válido.");
+  }
+
+  // Validar que la cédula sea numérica
+  if (cedula && !/^\d+$/.test(cedula)) {
+    errors.push("La cédula debe contener solo números.");
+  }
+
+  // Validar fecha de nacimiento (opcional: verificar formato y rango de fechas)
+  const fechaNacimientoRegex = /^\d{4}-\d{2}-\d{2}$/;
+  if (fechaNacimiento && !fechaNacimientoRegex.test(fechaNacimiento)) {
+    errors.push("La fecha de nacimiento debe estar en formato YYYY-MM-DD.");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      message: `Errores de validación: ${errors.join(" ")}`
+    });
+  }
 
   try {
     // Llamar a flightService.register con parámetros individuales
@@ -96,7 +119,7 @@ if (missingFields.length > 0) {
     res.status(201).json({ message: "Usuario registrado exitosamente", userId: newUser.id });
   } catch (error) {
     console.error("Error al registrar usuario backend:", error);
-    res.status(500).json({ message: "Error al registrar el usuario mamahuevo" });
+    res.status(500).json({ message: "Error al registrar el usuario." });
   }
 };
 
