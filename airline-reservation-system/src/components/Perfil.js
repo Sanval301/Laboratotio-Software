@@ -76,10 +76,26 @@ export default function Perfil() {
     setIsEditing(!isEditing);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = async (e) => {
     const { name, value } = e.target;
     setUserData((prevData) => ({ ...prevData, [name]: value }));
+  
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token no encontrado");
+  
+      await axios.put(
+        "http://localhost:5009/editarperfil",
+        { [name]: value }, // Solo el campo modificado
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      console.log(`Campo ${name} actualizado exitosamente en el servidor.`);
+    } catch (error) {
+      console.error(`Error al actualizar el campo ${name}:`, error);
+    }
   };
+  
 
   if (!userData) {
     return <Typography>Cargando datos del usuario...</Typography>;

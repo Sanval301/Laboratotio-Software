@@ -193,10 +193,10 @@ const createFlight = async (req, res) => {
 
 const cancelFlightController = async (req, res) => {
   try {
-    const { CodigoVuelo } = req.params; // Suponiendo que el código de vuelo viene en los parámetros de la URL
-    
+    const { VueloID } = req.params; // Suponiendo que el código de vuelo viene en los parámetros de la URL
+    console.log("datos recibidos:",VueloID)
     // Llama al servicio de cancelación de vuelo
-    const result = await flightService.cancelFlight(CodigoVuelo);
+    const result = await flightService.cancelFlight(VueloID);
 
     // Enviar respuesta exitosa
     res.status(200).json({
@@ -601,6 +601,29 @@ const obtenerTarjetas = async (req, res) => {
   }
 };
 
+const editarPerfil = async (req, res) => {
+  try {
+    const { userId } = req.user; // Obtener el ID del usuario desde el token decodificado
+    const updates = req.body; // Datos enviados en la solicitud (parciales o completos)
+
+    // Validar que haya datos para actualizar
+    if (!Object.keys(updates).length) {
+      return res.status(400).json({ message: "No se enviaron datos para actualizar." });
+    }
+
+    // Llamar al servicio para actualizar el perfil
+    const updatedUser = await flightService.editarPerfil(userId, updates);
+
+    res.status(200).json({ 
+      message: "Perfil actualizado correctamente", 
+      user: updatedUser 
+    });
+  } catch (error) {
+    console.error("Error al actualizar el perfil:", error);
+    res.status(500).json({ message: "Error al actualizar el perfil", error });
+  }
+};
+
 module.exports = {
   login,
   register,
@@ -619,6 +642,7 @@ module.exports = {
   createAdmin,
   changePassword,
   enviarCorreo,
+  editarPerfil,
   obtenerTarjetas
 
 };

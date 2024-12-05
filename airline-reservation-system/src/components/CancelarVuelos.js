@@ -77,12 +77,30 @@ export default function CancelacionVuelosMejorada() {
     setSelectedFlight(null);
   };
 
-  const handleCancelFlight = () => {
-    // Filtrar los vuelos por VueloID y no por id
-    setVuelos(vuelos.filter((v) => v.VueloID !== selectedFlight.VueloID));
-    handleCloseDialog();
-    setOpenSnackbar(true);
+  const handleCancelFlight = async () => {
+    try {
+      // Asegúrate de tener el `CodigoVuelo` del vuelo seleccionado
+      const { VueloID } = selectedFlight;
+      console.log("datosdel front: ",VueloID)
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token no encontrado");
+  
+      // Solicitud DELETE al backend
+      await axios.delete(`http://localhost:5009/CancelarVuelos/${VueloID}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      // Actualiza la lista de vuelos en el estado local
+      setVuelos(vuelos.filter((v) => v.VueloID !== VueloID));
+      handleCloseDialog();
+      setOpenSnackbar(true);
+  
+      console.log(`Vuelo con ID ${VueloID} cancelado exitosamente.`);
+    } catch (error) {
+      console.error("Error al cancelar el vuelo:", error);
+    }
   };
+  
 
   const getChipColor = (estado) => {
     switch (estado) {

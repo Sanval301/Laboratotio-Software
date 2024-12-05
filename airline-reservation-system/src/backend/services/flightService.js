@@ -162,9 +162,9 @@ const createFlight = async (flightDetails) => {
  * @param {string} CodigoVuelo - Código del vuelo a cancelar.
  * @returns {Object} Resultado de la operación.
  */
-const cancelFlight = async (CodigoVuelo) => {
+const cancelFlight = async (VueloID) => {
   try {
-    const [result] = await db.query("DELETE FROM vuelos WHERE CodigoVuelo = ?", [CodigoVuelo]);
+    const [result] = await db.query("DELETE FROM vuelos WHERE VueloID = ?", [VueloID]);
     if (result.affectedRows === 0) {
       throw new Error("El vuelo no existe o ya ha sido cancelado.");
     }
@@ -428,6 +428,40 @@ const obtenerTarjetasPorUsuario = async (nombreusuario) => {
   }
 };
 
+const editarPerfil = async (userId, updates) => {
+  try {
+    // Generar dinámicamente la consulta SQL para solo los campos enviados
+    const fields = Object.keys(updates).map((key) => `${key} = ?`).join(', ');
+    const values = Object.values(updates);
+
+    if (!fields.length) {
+      throw new Error("No se enviaron campos para actualizar");
+    }
+
+    // Ejecutar la consulta de actualización
+    const [result] = await db.execute(
+      `UPDATE users SET ${fields} WHERE id = ?`,
+      [...values, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      throw new Error("Usuario no encontrado o no se realizaron cambios");
+    }
+
+    // Retornar los nuevos datos
+    const [updatedUser] = await db.execute(
+      `SELECT id, nombre, apellido, email, genero, fechaNacimiento, paisResidencia 
+       FROM users WHERE id = ?`,
+      [userId]
+    );
+
+    return updatedUser[0]; // Retorna el primer registro actualizado
+  } catch (error) {
+    console.error("Error en editarPerfil con SQL:", error);
+    throw error;
+  }
+};
+
 
 module.exports = {
   register,
@@ -450,5 +484,6 @@ module.exports = {
   crearAdministrador,
   actualizarContraseña,
   enviarCorreo,
+  editarPerfil,
   obtenerTarjetasPorUsuario
 };
