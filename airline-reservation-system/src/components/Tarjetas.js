@@ -152,23 +152,23 @@ function Tarjetas() {
   };
   
 
-  const handleEliminarTarjeta = async (id) => {
+  const handleEliminarTarjeta = async (numero) => {
     const token = localStorage.getItem("token");
   
     if (!token) {
       alert("No estás autenticado. Por favor, inicia sesión.");
-      return;
+      return; 
     }
   
     try {
       // Realiza una solicitud DELETE al backend
-      const response = await axios.delete(`http://localhost:5009/deleteTarjetas`,  {
+      const response = await axios.delete(`http://localhost:5009/deleteTarjetas`,{numero},  {
         headers: { Authorization: `Bearer ${token}` },
       });
   
       if (response.status === 200) {
         // Si la eliminación es exitosa, actualiza el estado local
-        setTarjetas(tarjetas.filter((tarjeta) => tarjeta.id !== id));
+        setTarjetas(tarjetas.filter((tarjeta) => tarjeta.numero !== numero));
         alert("Tarjeta eliminada exitosamente.");
       } else {
         alert("No se pudo eliminar la tarjeta. Intenta nuevamente.");
@@ -252,12 +252,13 @@ function Tarjetas() {
                             {tarjeta.titular}
                           </Typography>
                           <IconButton
-                            onClick={() => handleEliminarTarjeta(tarjeta.id)}
+                            onClick={() => handleEliminarTarjeta(tarjeta.numero)}
                             size="small"
                             style={{ color: "white" }}
                           >
                             <DeleteIcon />
                           </IconButton>
+
                         </div>
                         <CardNumber>
                           {tarjeta.numero.replace(/\d{4}(?=.)/g, "$& ")}
