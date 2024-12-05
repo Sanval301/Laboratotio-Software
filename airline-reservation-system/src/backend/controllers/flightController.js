@@ -40,7 +40,7 @@ const register = async (req, res) => {
     ciudad,
     direccionFacturacion,
     email,
-    nombreusuario,
+    nombreUsuario,
     contraseña,
     genero,
     imagenUsuario
@@ -50,7 +50,7 @@ const register = async (req, res) => {
   // Validar datos obligatorios
   const missingFields = [];
 
-if (!nombreusuario) missingFields.push("Nombre de Usuario");
+if (!nombreUsuario) missingFields.push("Nombre de Usuario");
 if (!nombres) missingFields.push("Nombres");
 if (!apellidos) missingFields.push("Apellidos");
 if (!email) missingFields.push("Correo Electrónico");
@@ -87,7 +87,7 @@ if (missingFields.length > 0) {
       ciudad,
       direccionFacturacion,
       email,
-      nombreusuario,
+      nombreUsuario,
       contraseña,
       genero,
       imagenUsuario,
@@ -191,10 +191,10 @@ const cancelFlightController = async (req, res) => {
 
 
 const createCard = async (req, res) => {
-  const { numero, titular, fechaExpiracion, cvv, saldo } = req.body;
+  const { numero, titular, fechaExpiracion, cvv, saldo,nombreUsuario } = req.body;
 
   // Validar datos obligatorios
-  if (!numero || !titular || !fechaExpiracion || !cvv|| !saldo) {
+  if (!numero || !titular || !fechaExpiracion || !cvv|| !saldo|| !nombreUsuario) {
     return res.status(400).json({ error: "Todos los campos son obligatorios" });
   }
 
@@ -219,7 +219,7 @@ const createCard = async (req, res) => {
   }
 
   try {
-    const card = flightService.createCard({ numero, titular, fechaExpiracion, cvv,saldo  });
+    const card = flightService.createCard({ numero, titular, fechaExpiracion, cvv,saldo,nombreUsuario  });
     res.status(201).json({ message: "Tarjeta creada exitosamente", card });
   } catch (error) {
     console.error("Error al crear la tarjeta:", error);

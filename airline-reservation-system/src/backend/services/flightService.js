@@ -24,12 +24,12 @@ const register = async (
   ciudad,
   direccionFacturacion,
   email,
-  nombreusuario,
+  nombreUsuario,
   contraseña,
   genero,
   imagenUsuario
 ) => {
-  console.log("Datos recibidos para registro:", { cedula, nombres, apellidos, email, nombreusuario });
+  console.log("Datos recibidos para registro:", { cedula, nombres, apellidos, email, nombreUsuario });
 
   if (!contraseña) {
     throw new Error("La contraseña es obligatoria.");
@@ -50,18 +50,18 @@ const register = async (
     const [result] = await db.query(
       `INSERT INTO Usuarios (Cedula, Nombres, Apellidos, FechaNacimiento, Pais, Estado, Ciudad, DireccionFacturacion, Email, NombreUsuario, Contraseña, Genero, ImagenUsuario, FechaRegistro) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [cedula, nombres, apellidos, fechaNacimiento, pais, estado, ciudad, direccionFacturacion, email, nombreusuario, hashedPassword, genero, imagenUsuario, fechaRegistro]
+      [cedula, nombres, apellidos, fechaNacimiento, pais, estado, ciudad, direccionFacturacion, email, nombreUsuario, hashedPassword, genero, imagenUsuario, fechaRegistro]
     );
 
     // Generar el token JWT
     const token = jwt.sign(
-      { id: result.insertId, nombreusuario, email,contraseña }, // Datos que incluirás en el payload del token
+      { id: result.insertId, nombreUsuario, email,contraseña }, // Datos que incluirás en el payload del token
       JWT_SECRET, // Clave secreta para firmar el token
       { expiresIn: "1h" } // El token expirará en 1 hora
     );
 
     // Retornar el token junto con otros datos opcionales
-    return { token, nombreusuario, email, id: result.insertId,contraseña };
+    return { token, nombreUsuario, email, id: result.insertId,contraseña };
   } catch (error) {
     console.error("Error al registrar usuario:", error.message);
     throw new Error("Error al registrar el usuario: " + error.message);
@@ -87,7 +87,7 @@ const login = async (email, contraseña) => {
       throw new Error("Contraseña incorrecta");
     }
 
-    const token = jwt.sign({ id: user.UsuarioID, nombreusuario: user.NombreUsuario }, "secreto", { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.UsuarioID, nombreUsuario: user.NombreUsuario }, "secreto", { expiresIn: '1h' });
     return { token, user };
   } catch (error) {
     console.error("Error en inicio de sesión:", error.message);
@@ -106,7 +106,7 @@ const getAllFlights = async () => {
   } catch (err) {
     console.error("Error al obtener vuelos:", err);
     throw new Error("Error al obtener la lista de vuelos.");
-  }
+  } 
 };
 
 /**
@@ -167,14 +167,10 @@ const cancelFlight = async (CodigoVuelo) => {
  * @param {string} token - Token JWT del usuario.
  * @returns {Object} Tarjeta creada.
  */
-const createCard = async ({ numero, titular, fechaExpiracion, cvv, saldo }, token) => {
+const createCard = async ({ numero, titular, fechaExpiracion, cvv, saldo, nombreUsuario }) => {
   try {
-    // Decodificar el token para obtener el nombreusuario
-    const decoded = jwt.verify(token, "secreto"); // Reemplaza "secreto" por tu clave secreta real
-    const nombreusuario = decoded.nombreusuario;
-
-    if (!nombreusuario) {
-      throw new Error("Token inválido o usuario no encontrado.");
+    if (!nombreUsuario) {
+      throw new Error("Usuario no encontrado.");
     }
 
     // Verificar si la tarjeta ya existe
@@ -183,10 +179,10 @@ const createCard = async ({ numero, titular, fechaExpiracion, cvv, saldo }, toke
       throw new Error("La tarjeta ya existe.");
     }
 
-    // Insertar la tarjeta en la base de datos asociada al nombreusuario
+    // Insertar la tarjeta en la base de datos
     const [result] = await db.query(
-      "INSERT INTO tarjetas (numero, titular, fechaExpiracion, cvv, nombreusuario,saldo ) VALUES (?, ?, ?, ?, ?, ?)",
-      [numero, titular, fechaExpiracion, cvv, nombreusuario, saldo]
+      "INSERT INTO tarjetas (numero, titular, fechaExpiracion, cvv, nombreUsuario, saldo) VALUES (?, ?, ?, ?, ?, ?)",
+      [numero, titular, fechaExpiracion, cvv, nombreUsuario, saldo]
     );
 
     return { id: result.insertId, numero, titular, fechaExpiracion, cvv, saldo };

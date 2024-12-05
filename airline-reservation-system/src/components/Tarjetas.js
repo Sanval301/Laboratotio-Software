@@ -97,20 +97,40 @@ function Tarjetas() {
       setErrorFecha("El formato debe ser MM/AA");
       return;
     }
-
+  
     if (
       nuevaTarjeta.numero &&
       nuevaTarjeta.titular &&
       nuevaTarjeta.fechaExpiracion &&
       nuevaTarjeta.cvv &&
       nuevaTarjeta.saldo
-        ) {
+    ) {
       try {
+        // Obtén el token desde el almacenamiento local
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("No se encontró el token");
+          return; // O mostrar un mensaje de error
+        }
+  
+        // Decodifica el token para obtener nombreUsuario
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
+        const nombreUsuario = decodedToken.nombreUsuario;
+        console.log({nombreUsuario})
+
+        if (!decodedToken || !decodedToken.nombreUsuario) {
+          throw new Error("El token no contiene el nombre de usuario");
+        }
+  
+        if (!nombreUsuario) {
+          console.error("El nombre de usuario no está presente en el token");
+          return;
+        }
+  
+        // Añadir nombreUsuario a nuevaTarjeta
+        nuevaTarjeta.nombreUsuario = nombreUsuario;
+  
         // Envía los datos al backend
-        const token = localStorage.getItem("token"); // Obtén el token desde el almacenamiento local
-        console.log(localStorage.getItem("token")); // Verifica que exista el token
-
-
         const response = await axios.post(
           "http://localhost:5009/Tarjetas",
           nuevaTarjeta,
@@ -118,26 +138,47 @@ function Tarjetas() {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
-
-
+  
         // Si el backend responde exitosamente, agrega la tarjeta al estado local
-        setTarjetas([...tarjetas, { ...nuevaTarjeta, id: response.data.id }]); // Usa el ID generado por el backend si aplica
-
+        setTarjetas([...tarjetas, { ...nuevaTarjeta, id: response.data.id }]);
         handleCloseDialog();
       } catch (error) {
         console.error("Error al guardar la tarjeta:", error.response || error.message);
         alert(`Hubo un error al guardar la tarjeta: ${error.response?.data?.message || error.message}`);
       }
-      
     } else {
       alert("Por favor, completa todos los campos.");
     }
   };
+  
 
-  const handleEliminarTarjeta = (id) => {
-    setTarjetas(tarjetas.filter((tarjeta) => tarjeta.id !== id));
+  const handleEliminarTarjeta = async (id) => {
+    const token = localStorage.getItem("token");
+  
+    if (!token) {
+      alert("No estás autenticado. Por favor, inicia sesión.");
+      return;
+    }
+  
+    try {
+      // Realiza una solicitud DELETE al backend
+      const response = await axios.delete(`http://localhost:5009/deleteTarjetas`,  {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (response.status === 200) {
+        // Si la eliminación es exitosa, actualiza el estado local
+        setTarjetas(tarjetas.filter((tarjeta) => tarjeta.id !== id));
+        alert("Tarjeta eliminada exitosamente.");
+      } else {
+        alert("No se pudo eliminar la tarjeta. Intenta nuevamente.");
+      }
+    } catch (error) {
+      console.error("Error al eliminar la tarjeta:", error.response || error.message);
+      alert(`Hubo un error al eliminar la tarjeta: ${error.response?.data?.message || error.message}`);
+    }
   };
-
+  
   const handleCompra = (id) => {
     const monto = parseFloat(compra);
     if (isNaN(monto) || monto <= 0) return;

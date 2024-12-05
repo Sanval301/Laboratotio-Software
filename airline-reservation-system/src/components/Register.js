@@ -99,7 +99,7 @@ function Registro() {
       ciudad: formData.ciudad || "",
       direccionFacturacion: formData.direccionFacturacion || "",
       email: formData.email || "",
-      nombreusuario: formData.nombreusuario || "",
+      nombreusuario: formData.nombreUsuario || "",
       contraseña: formData.contraseña || "",
       genero: formData.genero || "",
       imagenUsuario: formData.imagenUsuario || null,
@@ -282,7 +282,7 @@ function Registro() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Nombre de Usuario"
-                  name="nombreusuario"
+                  name="nombreUsuario"
                   value={formData.nombreusuario}
                   onChange={handleChange}
                   fullWidth

@@ -45,12 +45,27 @@ export default function CancelacionVuelosMejorada() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // Realizar la solicitud a la API para obtener los vuelos desde la base de datos
+    const token = localStorage.getItem("token"); // Supongamos que guardas el token en localStorage
+  
     axios
-      .get("http://localhost:5009/CancelarVuelos")
-      .then((response) => setVuelos(response.data))
-      .catch((error) => console.error("Error al obtener los vuelos:", error));
+      .get("http://localhost:5009/obtenervuelos", {
+        headers: {
+          Authorization: `Bearer ${token}`, // Enviar el token como Bearer
+        },
+      })
+      .then((response) => {
+        if (response.data && Array.isArray(response.data)) {
+          setVuelos(response.data);
+        } else {
+          console.error("La respuesta no es válida:", response.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error al obtener los vuelos:", error);
+        alert("Hubo un problema al cargar los vuelos. Intenta nuevamente.");
+      });
   }, []);
+  
 
   const handleOpenDialog = (vuelo) => {
     setSelectedFlight(vuelo);
