@@ -86,8 +86,24 @@ const login = async (email, contraseña) => {
     if (!isMatch) {
       throw new Error("Contraseña incorrecta");
     }
+    console.log(user)
 
-    const token = jwt.sign({ id: user.UsuarioID, nombreUsuario: user.NombreUsuario }, "secreto", { expiresIn: '1h' });
+    const token = jwt.sign(
+      { 
+        id: user.UsuarioID, 
+        nombreUsuario: user.NombreUsuario,
+        nombres: user.Nombres,  // Cambiado a 'Nombres' de la tabla
+        apellidos: user.Apellidos,  // Cambiado a 'Apellidos' de la tabla
+        email: user.Email,
+        fechaNacimiento: user.FechaNacimiento,
+        genero: user.Genero,
+        pais: user.Pais
+      },
+      "secreto", // Clave secreta para firmar el token
+      { expiresIn: '1h' } // El token expirará en 1 hora
+    );
+    
+    
     return { token, user };
   } catch (error) {
     console.error("Error en inicio de sesión:", error.message);
