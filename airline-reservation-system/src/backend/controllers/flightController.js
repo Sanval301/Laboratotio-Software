@@ -255,7 +255,8 @@ const createCard = async (req, res) => {
 };
 
 const deleteCard = async (req, res) => {
-  const { numero } = req.params;
+  const { numero } = req.body;
+  console.log("Número de tarjeta a eliminar:", numero); 
 
   // Validar el ID
   if (!numero) {

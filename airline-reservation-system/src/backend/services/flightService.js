@@ -195,7 +195,7 @@ const createCard = async ({ numero, titular, fechaExpiracion, cvv, saldo, nombre
 
 const deleteCard = async (numero) => {
   // Eliminar tarjeta por ID
-  const [result] = await db.promise().query("DELETE FROM tarjetas WHERE numero = ?", [numero]);
+  const [result] = await db.query("DELETE FROM tarjetas WHERE numero = ?", [numero]);
 
   // Si no se eliminó ninguna tarjeta, retornar null
   return result.affectedRows > 0;
