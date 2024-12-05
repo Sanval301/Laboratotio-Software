@@ -22,6 +22,7 @@ import MenuLateral from "./MenuLateral";
 import axios from "axios";
 import NavbarCliente from "./NavbarCliente";
 import Footer from "./Footer";
+import { useEffect } from "react"; // Asegúrate de importar useEffect
 
 
 
@@ -61,6 +62,46 @@ const CardInfo = styled(Typography)(({ theme }) => ({
 }));
 
 function Tarjetas() {
+ 
+
+// Dentro del componente Tarjetas:
+useEffect(() => {
+  const fetchTarjetas = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No se encontró el token");
+      return;
+    }
+
+    try {
+      // Decodifica el token para obtener el nombreUsuario
+      const decodedToken = JSON.parse(atob(token.split(".")[1]));
+      const nombreUsuario = decodedToken.nombreUsuario;
+      console.log("Número enviado al backend:", nombreUsuario);
+
+
+      if (!nombreUsuario) {
+        console.error("El token no contiene el nombre de usuario");
+        return;
+      }
+
+      // Realiza la solicitud al backend para obtener las tarjetas
+      const response = await axios.get("http://localhost:5009/getTarjetas", {
+        params: { nombreUsuario }, // Envía el nombreUsuario como parámetro
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Actualiza el estado con las tarjetas obtenidas
+      setTarjetas(response.data.tarjetas || []);
+    } catch (error) {
+      console.error("Error al obtener las tarjetas:", error.response || error.message);
+      alert(`Hubo un error al obtener las tarjetas: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
+  fetchTarjetas();
+}, []); // Solo se ejecuta al montar el componente
+
   const [tarjetas, setTarjetas] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [nuevaTarjeta, setNuevaTarjeta] = useState({

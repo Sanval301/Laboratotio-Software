@@ -275,6 +275,24 @@ const deleteCard = async (req, res) => {
   }
 };
 
+const getTarjetas = async (req, res) => {
+  try {
+    const { nombreUsuario } = req.query;
+    console.log("Número recibido al backend:", nombreUsuario);
+
+
+    if (!nombreUsuario) {
+      return res.status(400).json({ message: "El nombre de usuario es requerido" });
+    }
+
+    const tarjetas = await flightService.getTarjetasPorUsuario(nombreUsuario);
+    res.status(200).json({ tarjetas });
+  } catch (error) {
+    console.error("Error en getTarjetas:", error);
+    res.status(500).json({ message: "Error al obtener las tarjetas" });
+  }
+};
+
 // Compra de tiquetes
 const BuyTicket = async (req, res) => {
   const { nombre, email, vuelo, fechaVuelo, estado,tarjeta,fechacompra } = req.body;
@@ -591,6 +609,7 @@ module.exports = {
   cancelFlightController,
   createCard,
   deleteCard,
+  getTarjetas,
   BuyTicket,
   cancelBuy,
   reserveTicket,

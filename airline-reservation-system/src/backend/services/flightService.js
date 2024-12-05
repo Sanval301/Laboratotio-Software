@@ -201,6 +201,12 @@ const deleteCard = async (numero) => {
   return result.affectedRows > 0;
 };
 
+const getTarjetasPorUsuario = async (nombreUsuario) => {
+  const query = "SELECT * FROM Tarjetas WHERE nombreUsuario = ?";
+  const [results] = await db.query(query, [nombreUsuario]);
+  return results;
+};
+
 
 const BuyTicket = async (nombre, email, vuelo, fechaVuelo, estado,tarjeta,fechacompra) => {
   try {
@@ -415,6 +421,7 @@ module.exports = {
   cancelFlight,
   createCard,
   deleteCard,
+  getTarjetasPorUsuario,
   BuyTicket,
   obtenerCompraPorId,
   cancelarCompra,

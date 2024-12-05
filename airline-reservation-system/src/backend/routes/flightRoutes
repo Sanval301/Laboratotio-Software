@@ -15,8 +15,12 @@ router.post("/login", flightController.login);
 router.get("/obtenervuelos", flightController.getAllFlights); // Obtener vuelos del usuario
 router.get("/Reservar", flightController.getAllFlights); // Obtener vuelos del usuario
 router.post("/crearvuelo",  flightController.createFlight); // Crear un vuelo nuevo
+
+router.get("/getTarjetas",flightController.getTarjetas)
 router.post("/Tarjetas",  flightController.createCard);
 router.delete("/deleteTarjetas",  flightController.deleteCard);
+
+
 router.delete("/CancelarVuelos/:CodigoVuelo",  flightController.cancelFlightController);
 router.post("/ComprarVuelo",  flightController.BuyTicket);
 router.delete('/CancelarCompra/:id',  flightController.cancelBuy);
