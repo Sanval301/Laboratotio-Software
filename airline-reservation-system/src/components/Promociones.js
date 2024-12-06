@@ -14,14 +14,11 @@ import Footer from "./Footer"; // Importa Footer
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-
-
 const StyledCard = styled(Card)(({ theme }) => ({
   position: "relative",
   overflow: "visible",
   backgroundColor: "transparent",
   boxShadow: "none",
-  
 }));
 
 const CardBackground = styled(Box)(({ theme }) => ({
@@ -49,19 +46,19 @@ function Promociones() {
       id: 1,
       destino: "Madrid",
       descuento: "20%",
-      vigencia: "2023-11-01 a 2023-12-31",
+      vigencia: "2025-01-10 a 2025-01-31",
     },
     {
       id: 2,
       destino: "Nueva York",
       descuento: "15%",
-      vigencia: "2023-12-01 a 2024-01-31",
+      vigencia: "2024-12-01 a 2024-12-15",
     },
     {
       id: 3,
-      destino: "Cancún",
+      destino: "Miami",
       descuento: "25%",
-      vigencia: "2023-10-20 a 2024-02-28",
+      vigencia: "2024-12-20 a 2025-01-05",
     },
   ];
 
