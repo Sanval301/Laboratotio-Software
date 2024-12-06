@@ -34,6 +34,7 @@ import Historial from "./components/Historial";
 import Promociones from "./components/Promociones";
 import MenuLateral from "./components/MenuLateral";
 import Reservar from "./components/Reservar";
+import BuscarVuelos from "./components/BuscarVuelos";
 import CheckIn from "./components/CheckIn";
 import SeatSelection from "./components/SeatSelection";
 import ProtectedRoute from "./components/Protected";
@@ -229,6 +230,7 @@ function App() {
           <Route path="/Promociones" element={<Promociones />} />
           <Route path="/Historial" element={<Historial />} />
           <Route path="/Reservar" element={<Reservar />} />
+          <Route path="/BuscarVuelos" element={<BuscarVuelos />} />
           <Route path="/CheckIn" element={<CheckIn />} />
           <Route path="/SeatSelection" element={<SeatSelection />} />
           {/*</Route>*/}

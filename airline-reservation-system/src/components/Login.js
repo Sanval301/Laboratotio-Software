@@ -34,8 +34,7 @@ const Login = () => {
       alert("Inicio de sesión exitoso"); // Notificar éxito
 
       // Redirigir al usuario al NavbarCliente (ajusta la ruta según sea necesario)
-      navigate("/Navbar"); // Redirige a la página "navbarcliente" después del login exitoso
-
+      navigate("/reservar"); // Redirige a la página "navbarcliente" después del login exitoso
     } catch (err) {
       setError(err.response?.data?.error || "Error en el inicio de sesión");
     } finally {
@@ -45,14 +44,14 @@ const Login = () => {
 
   return (
     <Box
-    
       sx={{
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        backgroundImage: 'url("https://images.pexels.com/photos/8493781/pexels-photo-8493781.jpeg")',  // Asegúrate de que esta ruta sea correcta
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
+        backgroundImage:
+          'url("https://images.pexels.com/photos/8493781/pexels-photo-8493781.jpeg")', // Asegúrate de que esta ruta sea correcta
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
       <Navbar />
@@ -64,7 +63,7 @@ const Login = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          m: '5%',
+          m: "5%",
         }}
       >
         <Box
@@ -74,7 +73,7 @@ const Login = () => {
             boxShadow: 3,
             borderRadius: "8px",
             textAlign: "center",
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
           }}
         >
           <Typography variant="h5" gutterBottom>
