@@ -86,8 +86,24 @@ const login = async (email, contraseña) => {
     if (!isMatch) {
       throw new Error("Contraseña incorrecta");
     }
+    console.log(user)
 
-    const token = jwt.sign({ id: user.UsuarioID, nombreUsuario: user.NombreUsuario }, "secreto", { expiresIn: '1h' });
+    const token = jwt.sign(
+      { 
+        id: user.UsuarioID, 
+        nombreUsuario: user.NombreUsuario,
+        nombres: user.Nombres,  // Cambiado a 'Nombres' de la tabla
+        apellidos: user.Apellidos,  // Cambiado a 'Apellidos' de la tabla
+        email: user.Email,
+        fechaNacimiento: user.FechaNacimiento,
+        genero: user.Genero,
+        pais: user.Pais
+      },
+      "secreto", // Clave secreta para firmar el token
+      { expiresIn: '1h' } // El token expirará en 1 hora
+    );
+    
+    
     return { token, user };
   } catch (error) {
     console.error("Error en inicio de sesión:", error.message);
@@ -146,9 +162,9 @@ const createFlight = async (flightDetails) => {
  * @param {string} CodigoVuelo - Código del vuelo a cancelar.
  * @returns {Object} Resultado de la operación.
  */
-const cancelFlight = async (CodigoVuelo) => {
+const cancelFlight = async (VueloID) => {
   try {
-    const [result] = await db.query("DELETE FROM vuelos WHERE CodigoVuelo = ?", [CodigoVuelo]);
+    const [result] = await db.query("DELETE FROM vuelos WHERE VueloID = ?", [VueloID]);
     if (result.affectedRows === 0) {
       throw new Error("El vuelo no existe o ya ha sido cancelado.");
     }
@@ -195,10 +211,16 @@ const createCard = async ({ numero, titular, fechaExpiracion, cvv, saldo, nombre
 
 const deleteCard = async (numero) => {
   // Eliminar tarjeta por ID
-  const [result] = await db.promise().query("DELETE FROM tarjetas WHERE numero = ?", [numero]);
+  const [result] = await db.query("DELETE FROM tarjetas WHERE numero = ?", [numero]);
 
   // Si no se eliminó ninguna tarjeta, retornar null
   return result.affectedRows > 0;
+};
+
+const getTarjetasPorUsuario = async (nombreUsuario) => {
+  const query = "SELECT * FROM Tarjetas WHERE nombreUsuario = ?";
+  const [results] = await db.query(query, [nombreUsuario]);
+  return results;
 };
 
 
@@ -278,37 +300,6 @@ const createNews = async (titulo, informacion, precio_antes, precio_despues) => 
   }
 };
 
-const buscarVuelos = async (origen, destino, fechaVuelo, precioMin, precioMax) => {
-  // Base query
-  let query = 'SELECT * FROM Vuelos WHERE 1=1';
-  const params = [];
-
-  // Filtros dinámicos
-  if (origen) {
-    query += ' AND origen = ?';
-    params.push(origen);
-  }
-  if (destino) {
-    query += ' AND destino = ?';
-    params.push(destino);
-  }
-  if (fechaVuelo) {
-    query += ' AND DATE(fechaVuelo) = ?';
-    params.push(fechaVuelo); // Aseguramos que solo compare la fecha, no la hora
-  }
-  if (precioMin) {
-    query += ' AND precio >= ?';
-    params.push(precioMin);
-  }
-  if (precioMax) {
-    query += ' AND precio <= ?';
-    params.push(precioMax);
-  }
-
-  // Ejecutar consulta
-  const [rows] = await db.query(query, params);
-  return rows;
-};
 
 
 const crearAdministrador = async (nombre, apellido, email, nombreUsuario, contraseñaTemporal, tipoAdmin) => {
@@ -406,6 +397,74 @@ const obtenerTarjetasPorUsuario = async (nombreusuario) => {
   }
 };
 
+const editarPerfil = async (userId, updates) => {
+  try {
+    // Generar dinámicamente la consulta SQL para solo los campos enviados
+    const fields = Object.keys(updates).map((key) => `${key} = ?`).join(', ');
+    const values = Object.values(updates);
+
+    if (!fields.length) {
+      throw new Error("No se enviaron campos para actualizar");
+    }
+
+    // Ejecutar la consulta de actualización
+    const [result] = await db.execute(
+      `UPDATE users SET ${fields} WHERE id = ?`,
+      [...values, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      throw new Error("Usuario no encontrado o no se realizaron cambios");
+    }
+
+    // Retornar los nuevos datos
+    const [updatedUser] = await db.execute(
+      `SELECT id, nombre, apellido, email, genero, fechaNacimiento, paisResidencia 
+       FROM users WHERE id = ?`,
+      [userId]
+    );
+
+    return updatedUser[0]; // Retorna el primer registro actualizado
+  } catch (error) {
+    console.error("Error en editarPerfil con SQL:", error);
+    throw error;
+  }
+};
+
+const buscarVuelos = async ({ origen, destino, fechaIda, fechaVuelta, clase }) => {
+  let query = "SELECT * FROM vuelos WHERE 1=1"; // Consulta base
+  const params = [];
+
+  if (origen) {
+    query += " AND origen LIKE ?";
+    params.push(`%${origen}%`);
+  }
+
+  if (destino) {
+    query += " AND destino LIKE ?";
+    params.push(`%${destino}%`);
+  }
+
+  if (fechaIda) {
+    query += " AND fecha_ida = ?";
+    params.push(fechaIda);
+  }
+
+  if (fechaVuelta) {
+    query += " AND fecha_vuelta = ?";
+    params.push(fechaVuelta);
+  }
+
+  if (clase) {
+    query += " AND clase = ?";
+    params.push(clase);
+  }
+
+  const [rows] = await db.execute(query, params); // Ejecutar la consulta
+  return rows; // Devolver los resultados
+};
+
+
 
 module.exports = {
   register,
@@ -415,6 +474,7 @@ module.exports = {
   cancelFlight,
   createCard,
   deleteCard,
+  getTarjetasPorUsuario,
   BuyTicket,
   obtenerCompraPorId,
   cancelarCompra,
@@ -427,5 +487,7 @@ module.exports = {
   crearAdministrador,
   actualizarContraseña,
   enviarCorreo,
+  editarPerfil,
+  buscarVuelos,
   obtenerTarjetasPorUsuario
 };

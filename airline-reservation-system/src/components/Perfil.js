@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import { jwtDecode } from "jwt-decode"; // Importación correcta
+
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Button,
   TextField,
@@ -14,23 +17,46 @@ import {
 import { CameraAlt } from "@mui/icons-material";
 import MenuLateral from "./MenuLateral";
 import Footer from "./Footer";
-import NavbarCliente from "./NavbarCliente"; // Importar NavbarCliente
-import { Outlet } from "react-router-dom";
-import Navbar from "./NavbarAdmin"
+import NavbarCliente from "./NavbarCliente";
 
 export default function Perfil() {
   const [activeTab, setActiveTab] = useState("General");
   const [isEditing, setIsEditing] = useState(false);
-  const [userData, setUserData] = useState({
-    profileImage: "/placeholder.svg",
-    nombre: "Juan",
-    apellido: "Pérez",
-    email: "juan.perez@example.com",
-    tarjetaFrecuente: "1234-5678-9123-4567",
-    genero: "Masculino",
-    fechaNacimiento: "1990-01-01",
-    paisResidencia: "Colombia",
-  });
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem("token"); // Obtener el token almacenado
+        if (!token) throw new Error("Token no encontrado");
+  
+        const decoded = jwtDecode(token); // Decodificar el token
+        console.log("Datos decodificados del token:", decoded);
+  
+        // Si el token contiene suficiente información, usa los datos locales
+        setUserData({
+          nombre: decoded.nombres || "",  // Debería decodificar 'nombres'
+          apellido: decoded.apellidos || "",  // Debería decodificar 'apellidos'
+          email: decoded.email,
+          genero: decoded.genero || "",
+          fechaNacimiento: decoded.fechaNacimiento || "",
+          paisResidencia: decoded.pais || "",
+        });
+  
+        // Si necesitas más datos, realiza una solicitud al backend
+        const response = await axios.get("http://localhost:5009/getUserProfile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setUserData(response.data);
+      } catch (error) {
+        console.error("Error al obtener los datos del usuario:", error);
+      }
+    };
+  
+    fetchUserData();
+  }, []);
+  
+  
 
   const handleImageUpload = (event) => {
     const file = event.target.files?.[0];
@@ -50,10 +76,30 @@ export default function Perfil() {
     setIsEditing(!isEditing);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = async (e) => {
     const { name, value } = e.target;
     setUserData((prevData) => ({ ...prevData, [name]: value }));
+  
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Token no encontrado");
+  
+      await axios.put(
+        "http://localhost:5009/editarperfil",
+        { [name]: value }, // Solo el campo modificado
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+  
+      console.log(`Campo ${name} actualizado exitosamente en el servidor.`);
+    } catch (error) {
+      console.error(`Error al actualizar el campo ${name}:`, error);
+    }
   };
+  
+
+  if (!userData) {
+    return <Typography>Cargando datos del usuario...</Typography>;
+  }
 
   return (
     <Box
@@ -63,10 +109,8 @@ export default function Perfil() {
         minHeight: "100vh",
       }}
     >
-      {/* NavbarCliente en la parte superior */}
       <NavbarCliente />
 
-      {/* Contenido principal */}
       <Box sx={{ display: "flex", flex: 1 }}>
         <MenuLateral activeTab={activeTab} setActiveTab={setActiveTab} />
         <Box flex={1} p={4} overflow="auto">
@@ -74,125 +118,110 @@ export default function Perfil() {
             Perfil del Usuario
           </Typography>
           <Avatar
-                  src={userData.profileImage}
-                  sx={{ width: 120, height: 120, mr: 4 }}
+            src={userData.profileImage}
+            sx={{ width: 120, height: 120, mr: 4 }}
+          />
+          {isEditing && (
+            <Box ml={2}>
+              <Button
+                variant="contained"
+                component="label"
+                startIcon={<CameraAlt />}
+              >
+                Cambiar Foto
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleImageUpload}
                 />
-                {isEditing && ( 
-                  <Box ml={2}>
-                    <Button
-                      variant="contained"
-                      component="label"
-                      startIcon={<CameraAlt />}
-                    >
-                      Cambiar Foto
-                      <input
-                        type="file"
-                        hidden
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                      />
-                    </Button>
-                  </Box>
-                )}  
-          {/* Renderización dinámica de secciones */}
-          <Outlet />
-
-          {activeTab === "General" && (
-            <Box maxWidth={800} mx="auto" display="flex" alignItems="right" mb={4}>
-            
-              <Box display="flex" alignItems="right" mb={4}>
-                
-              </Box>
-
-              <form>
-                <TextField
-                  fullWidth
-                  label="Nombre"
-                  name="nombre"
-                  value={userData.nombre}
-                  onChange={handleInputChange}
-                  InputProps={{ readOnly: !isEditing }}
-                  margin="normal"
-                />
-                <TextField
-                  fullWidth
-                  label="Apellido"
-                  name="apellido"
-                  value={userData.apellido}
-                  onChange={handleInputChange}
-                  InputProps={{ readOnly: !isEditing }}
-                  margin="normal"
-                />
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  value={userData.email}
-                  onChange={handleInputChange}
-                  InputProps={{ readOnly: !isEditing }}
-                  margin="normal"
-                />
-                <TextField
-                  fullWidth
-                  label="Tarjeta Frecuente"
-                  name="tarjetaFrecuente"
-                  value={userData.tarjetaFrecuente}
-                  onChange={handleInputChange}
-                  InputProps={{ readOnly: !isEditing }}
-                  margin="normal"
-                />
-                <TextField
-                  fullWidth
-                  label="Fecha de Nacimiento"
-                  name="fechaNacimiento"
-                  type="date"
-                  value={userData.fechaNacimiento}
-                  onChange={handleInputChange}
-                  InputProps={{ readOnly: !isEditing }}
-                  InputLabelProps={{ shrink: true }}
-                  margin="normal"
-                />
-                <FormControl fullWidth margin="normal">
-                  <InputLabel>Género</InputLabel>
-                  <Select
-                    name="genero"
-                    value={userData.genero}
-                    onChange={handleInputChange}
-                    disabled={!isEditing}
-                    label="Género"
-                  >
-                    <MenuItem value="Masculino">Masculino</MenuItem>
-                    <MenuItem value="Femenino">Femenino</MenuItem>
-                    <MenuItem value="Otro">Otro</MenuItem>
-                  </Select>
-                </FormControl>
-                <TextField
-                  fullWidth
-                  label="País de Residencia"
-                  name="paisResidencia"
-                  value={userData.paisResidencia}
-                  onChange={handleInputChange}
-                  InputProps={{ readOnly: !isEditing }}
-                  margin="normal"
-                />
-
-                <Divider sx={{ my: 4 }} />
-
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleEditToggle}
-                  sx={{ mt: 2 }}
-                >
-                  {isEditing ? "Guardar Cambios" : "Editar Perfil"}
-                </Button>
-              </form>
+              </Button>
             </Box>
           )}
+
+          <form>
+            <TextField
+              fullWidth
+              label="Nombre"
+              name="nombre"
+              value={userData.nombre}
+              onChange={handleInputChange}
+              InputProps={{ readOnly: !isEditing }}
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Apellido"
+              name="apellido"
+              value={userData.apellido}
+              onChange={handleInputChange}
+              InputProps={{ readOnly: !isEditing }}
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              value={userData.email}
+              onChange={handleInputChange}
+              InputProps={{ readOnly: !isEditing }}
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Tarjeta Frecuente"
+              name="tarjetaFrecuente"
+              value={userData.tarjetaFrecuente}
+              onChange={handleInputChange}
+              InputProps={{ readOnly: !isEditing }}
+              margin="normal"
+            />
+            <TextField
+              fullWidth
+              label="Fecha de Nacimiento"
+              name="fechaNacimiento"
+              type="date"
+              value={userData.fechaNacimiento}
+              onChange={handleInputChange}
+              InputProps={{ readOnly: !isEditing }}
+              InputLabelProps={{ shrink: true }}
+              margin="normal"
+            />
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Género</InputLabel>
+              <Select
+                name="genero"
+                value={userData.genero}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                label="Género"
+              >
+                <MenuItem value="Masculino">Masculino</MenuItem>
+                <MenuItem value="Femenino">Femenino</MenuItem>
+                <MenuItem value="Otro">Otro</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              fullWidth
+              label="País de Residencia"
+              name="paisResidencia"
+              value={userData.paisResidencia}
+              onChange={handleInputChange}
+              InputProps={{ readOnly: !isEditing }}
+              margin="normal"
+            />
+            <Divider sx={{ my: 4 }} />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleEditToggle}
+              sx={{ mt: 2 }}
+            >
+              {isEditing ? "Guardar Cambios" : "Editar Perfil"}
+            </Button>
+          </form>
         </Box>
       </Box>
-
-      {/* Footer fijo al final */}
       <Footer />
     </Box>
   );

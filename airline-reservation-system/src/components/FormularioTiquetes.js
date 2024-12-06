@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, Grid, Snackbar, Alert } from "@mui/material";
+import { TextField, Button, Grid, Snackbar, Alert, Box } from "@mui/material";
 
 const FormularioTiquetes = ({ tipo }) => {
   const [datosViajeros, setDatosViajeros] = useState([]);
@@ -19,7 +19,6 @@ const FormularioTiquetes = ({ tipo }) => {
   const [severity, setSeverity] = useState("success");
 
   const agregarViajero = () => {
-    // Validación: no menores de edad sin acompañantes
     const edad =
       new Date().getFullYear() -
       new Date(nuevoViajero.fechaNacimiento).getFullYear();
@@ -27,15 +26,6 @@ const FormularioTiquetes = ({ tipo }) => {
       mostrarMensaje("Un menor de edad no puede viajar solo.", "error");
       return;
     }
-
-    if (datosViajeros.length >= 5) {
-      mostrarMensaje(
-        "No se pueden agregar más de 5 viajeros por vuelo.",
-        "error"
-      );
-      return;
-    }
-
     setDatosViajeros([...datosViajeros, nuevoViajero]);
     setNuevoViajero({
       documento: "",
@@ -48,7 +38,13 @@ const FormularioTiquetes = ({ tipo }) => {
       contacto: "",
       telefonoContacto: "",
     });
-    mostrarMensaje("Viajero agregado con éxito.", "success");
+    mostrarMensaje("Viajero agregado exitosamente.", "success");
+  };
+
+  const enviarFormulario = (tipo) => {
+    // Aquí puedes agregar la lógica para enviar el formulario a la base de datos
+    console.log("Enviando formulario con tipo:", tipo);
+    mostrarMensaje(`Formulario enviado como ${tipo}`, "success");
   };
 
   const mostrarMensaje = (mensaje, severidad) => {
@@ -60,11 +56,7 @@ const FormularioTiquetes = ({ tipo }) => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
-        <h2>
-          {tipo === "reserva"
-            ? "Formulario de Reserva"
-            : "Formulario de Compra"}
-        </h2>
+        <h2>Formulario de Compra/Reserva</h2>
       </Grid>
       {Object.keys(nuevoViajero).map((campo) => (
         <Grid item xs={12} sm={6} key={campo}>
@@ -84,16 +76,30 @@ const FormularioTiquetes = ({ tipo }) => {
         </Button>
       </Grid>
       <Grid item xs={12}>
-        <Button variant="outlined" color="secondary">
-          {tipo === "reserva" ? "Reservar" : "Comprar"}
-        </Button>
+        <Box sx={{ mt: 2 }}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => enviarFormulario("reserva")}
+            sx={{ mr: 2 }}
+          >
+            Reservar
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => enviarFormulario("compra")}
+          >
+            Comprar
+          </Button>
+        </Box>
       </Grid>
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         onClose={() => setOpenSnackbar(false)}
       >
-        <Alert severity={severity} sx={{ width: "100%" }}>
+        <Alert onClose={() => setOpenSnackbar(false)} severity={severity}>
           {mensaje}
         </Alert>
       </Snackbar>

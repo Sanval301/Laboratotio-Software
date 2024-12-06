@@ -6,7 +6,10 @@ import {
   Typography,
   Card,
   CardContent,
+  CardActions,
+  Box,
 } from "@mui/material";
+import axios from "axios";
 
 const BusquedaTiquetes = () => {
   const [criterios, setCriterios] = useState({
@@ -14,45 +17,32 @@ const BusquedaTiquetes = () => {
     destino: "",
     fechaIda: "",
     fechaVuelta: "",
-    clase: "económica",
   });
   const [resultados, setResultados] = useState([]);
+  const [error, setError] = useState(null);
 
   const manejarCambio = (e) => {
     const { name, value } = e.target;
     setCriterios({ ...criterios, [name]: value });
   };
 
-  const buscarVuelos = () => {
-    // Ejemplo de resultados estáticos (luego se puede conectar con un backend).
-    const vuelosEjemplo = [
-      {
-        id: 1,
-        vuelo: "VU123",
-        origen: "Bogotá",
-        destino: "Medellín",
-        precio: 150,
-        clase: "económica",
-      },
-      {
-        id: 2,
-        vuelo: "VU456",
-        origen: "Bogotá",
-        destino: "Cartagena",
-        precio: 200,
-        clase: "económica",
-      },
-    ];
+  const buscarVuelos = async () => {
+    try {
+      setError(null);
+      const response = await axios.get("http://localhost:5009/buscarVuelos", {
+        params: criterios,
+      });
 
-    // Filtro básico según criterios
-    const resultadosFiltrados = vuelosEjemplo.filter(
-      (vuelo) =>
-        vuelo.origen.toLowerCase().includes(criterios.origen.toLowerCase()) &&
-        vuelo.destino.toLowerCase().includes(criterios.destino.toLowerCase()) &&
-        vuelo.clase === criterios.clase
-    );
-
-    setResultados(resultadosFiltrados);
+      if (response.data && response.data.length > 0) {
+        setResultados(response.data);
+      } else {
+        setResultados([]);
+        setError("No se encontraron vuelos con los criterios especificados.");
+      }
+    } catch (error) {
+      console.error("Error al buscar vuelos:", error);
+      setError("Hubo un problema al realizar la búsqueda. Inténtalo nuevamente.");
+    }
   };
 
   return (
@@ -102,42 +92,52 @@ const BusquedaTiquetes = () => {
           />
         </Grid>
         <Grid item xs={12}>
-          <TextField
-            fullWidth
-            select
-            label="Clase"
-            name="clase"
-            value={criterios.clase}
-            onChange={manejarCambio}
-            SelectProps={{ native: true }}
-          >
-            <option value="económica">Económica</option>
-            <option value="primera clase">Primera Clase</option>
-          </TextField>
-        </Grid>
-        <Grid item xs={12}>
           <Button variant="contained" color="primary" onClick={buscarVuelos}>
             Buscar Vuelos
           </Button>
         </Grid>
       </Grid>
+
+      {error && (
+        <Typography color="error" sx={{ mt: 2 }}>
+          {error}
+        </Typography>
+      )}
+
       <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
         Resultados
       </Typography>
       <Grid container spacing={2}>
-        {resultados.map((vuelo) => (
-          <Grid item xs={12} sm={6} md={4} key={vuelo.id}>
-            <Card>
+        {resultados.map((vuelo, index) => (
+          <Grid item xs={12} sm={6} md={4} key={index}>
+            <Card sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
               <CardContent>
-                <Typography variant="h6">Vuelo: {vuelo.vuelo}</Typography>
-                <Typography>Origen: {vuelo.origen}</Typography>
-                <Typography>Destino: {vuelo.destino}</Typography>
-                <Typography>Precio: ${vuelo.precio}</Typography>
-                <Typography>Clase: {vuelo.clase}</Typography>
-                <Button variant="outlined" color="primary" sx={{ mt: 1 }}>
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                  Vuelo de {vuelo.Origen} a {vuelo.Destino}
+                </Typography>
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body2">
+                    <strong>Fecha del Vuelo:</strong> {new Date(vuelo.FechaVuelo).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Hora de Salida:</strong> {vuelo.HoraSalida}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Hora de Llegada:</strong> {vuelo.HoraLlegadaLocal}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Duración:</strong> {vuelo.DuracionVuelo}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Costo por Persona:</strong> ${vuelo.CostoPorPersona}
+                  </Typography>
+                </Box>
+              </CardContent>
+              <CardActions sx={{ mt: "auto", justifyContent: "center" }}>
+                <Button variant="outlined" color="primary">
                   Reservar / Comprar
                 </Button>
-              </CardContent>
+              </CardActions>
             </Card>
           </Grid>
         ))}

@@ -210,10 +210,10 @@ const createFlight = async (req, res) => {
 
 const cancelFlightController = async (req, res) => {
   try {
-    const { CodigoVuelo } = req.params; // Suponiendo que el código de vuelo viene en los parámetros de la URL
-    
+    const { VueloID } = req.params; // Suponiendo que el código de vuelo viene en los parámetros de la URL
+    console.log("datos recibidos:",VueloID)
     // Llama al servicio de cancelación de vuelo
-    const result = await flightService.cancelFlight(CodigoVuelo);
+    const result = await flightService.cancelFlight(VueloID);
 
     // Enviar respuesta exitosa
     res.status(200).json({
@@ -272,7 +272,8 @@ const createCard = async (req, res) => {
 };
 
 const deleteCard = async (req, res) => {
-  const { numero } = req.params;
+  const { numero } = req.body;
+  console.log("Número de tarjeta a eliminar:", numero); 
 
   // Validar el ID
   if (!numero) {
@@ -288,6 +289,24 @@ const deleteCard = async (req, res) => {
   } catch (error) {
     console.error("Error al eliminar la tarjeta:", error);
     res.status(500).json({ error: "Error del servidor" });
+  }
+};
+
+const getTarjetas = async (req, res) => {
+  try {
+    const { nombreUsuario } = req.query;
+    console.log("Número recibido al backend:", nombreUsuario);
+
+
+    if (!nombreUsuario) {
+      return res.status(400).json({ message: "El nombre de usuario es requerido" });
+    }
+
+    const tarjetas = await flightService.getTarjetasPorUsuario(nombreUsuario);
+    res.status(200).json({ tarjetas });
+  } catch (error) {
+    console.error("Error en getTarjetas:", error);
+    res.status(500).json({ message: "Error al obtener las tarjetas" });
   }
 };
 
@@ -599,6 +618,50 @@ const obtenerTarjetas = async (req, res) => {
   }
 };
 
+const editarPerfil = async (req, res) => {
+  try {
+    const { userId } = req.user; // Obtener el ID del usuario desde el token decodificado
+    const updates = req.body; // Datos enviados en la solicitud (parciales o completos)
+
+    // Validar que haya datos para actualizar
+    if (!Object.keys(updates).length) {
+      return res.status(400).json({ message: "No se enviaron datos para actualizar." });
+    }
+
+    // Llamar al servicio para actualizar el perfil
+    const updatedUser = await flightService.editarPerfil(userId, updates);
+
+    res.status(200).json({ 
+      message: "Perfil actualizado correctamente", 
+      user: updatedUser 
+    });
+  } catch (error) {
+    console.error("Error al actualizar el perfil:", error);
+    res.status(500).json({ message: "Error al actualizar el perfil", error });
+  }
+};
+
+const buscarVuelosController = async (req, res) => {
+  const { origen, destino, fechaIda, fechaVuelta, clase } = req.query;
+
+  try {
+    // Llamar al servicio para obtener los vuelos filtrados
+    const vuelos = await flightService.buscarVuelos({
+      origen,
+      destino,
+      fechaIda,
+      fechaVuelta,
+      clase,
+    });
+
+    res.status(200).json(vuelos);
+  } catch (error) {
+    console.error("Error al buscar vuelos:", error);
+    res.status(500).json({ message: "Error al buscar vuelos" });
+  }
+};
+
+
 module.exports = {
   login,
   register,
@@ -607,6 +670,7 @@ module.exports = {
   cancelFlightController,
   createCard,
   deleteCard,
+  getTarjetas,
   BuyTicket,
   cancelBuy,
   reserveTicket,
@@ -616,6 +680,8 @@ module.exports = {
   createAdmin,
   changePassword,
   enviarCorreo,
+  editarPerfil,
+  buscarVuelosController,
   obtenerTarjetas
 
 };
