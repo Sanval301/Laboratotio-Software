@@ -1,119 +1,140 @@
-// Historial.js
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
-  Grid,
-  Card,
-  CardContent,
-  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Button,
+  Snackbar,
+  Alert,
+  Paper,
 } from "@mui/material";
-import { styled, keyframes } from "@mui/material/styles";
-import MenuLateral from "./MenuLateral";
-import FlightIcon from "@mui/icons-material/Flight";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Footer from "./Footer";
 import NavbarCliente from "./NavbarCliente";
-const floatAnimation = keyframes`
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-`;
-
-const StyledCard = styled(Card)(({ theme }) => ({
-  position: "relative",
-  overflow: "visible",
-  backgroundColor: "transparent",
-  boxShadow: "none",
-}));
-
-const CardBackground = styled(Box)(({ theme }) => ({
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundImage: "linear-gradient(135deg, #FFD194 0%, #D1913C 100%)",
-  borderRadius: theme.shape.borderRadius,
-  transform: "skew(-5deg)",
-  boxShadow: "0 10px 20px rgba(0, 0, 0, 0.2)",
-}));
-
-const CardInfo = styled(Typography)(({ theme }) => ({
-  fontSize: "1rem",
-  color: theme.palette.common.white,
-  opacity: 0.9,
-  position: "relative",
-  zIndex: 1,
-}));
+import Footer from "./Footer";
+import MenuLateral from "./MenuLateral";
 
 function Historial() {
-  const vuelosHistorial = [
-    { id: 1, fecha: "2023-08-20", destino: "Londres", vuelo: "AA101" },
-    { id: 2, fecha: "2023-09-15", destino: "Tokio", vuelo: "JL203" },
-    { id: 3, fecha: "2023-10-05", destino: "París", vuelo: "AF456" },
-  ];
+  const [historial, setHistorial] = useState([
+    {
+      id: 1,
+      vuelo: "VU123",
+      tipo: "Compra",
+      estado: "Confirmado",
+      fecha: "2024-11-01",
+    },
+    {
+      id: 2,
+      vuelo: "VU456",
+      tipo: "Reserva",
+      estado: "Pendiente",
+      fecha: "2024-11-02",
+    },
+  ]);
+  const [mensaje, setMensaje] = useState("");
+  const [severity, setSeverity] = useState("success");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
-  return(
+  const cancelar = (id) => {
+    const item = historial.find((item) => item.id === id);
+
+    if (item.tipo === "Compra") {
+      const horasRestantes = Math.abs(new Date(item.fecha) - new Date()) / 36e5;
+      if (horasRestantes < 1) {
+        mostrarMensaje(
+          "No se puede cancelar compras a menos de 1 hora del vuelo.",
+          "error"
+        );
+        return;
+      }
+    } else if (item.tipo === "Reserva") {
+      const horasReservadas =
+        Math.abs(new Date() - new Date(item.fecha)) / 36e5;
+      if (horasReservadas > 24) {
+        mostrarMensaje("La reserva ya expiró y no se puede cancelar.", "error");
+        return;
+      }
+    }
+
+    setHistorial(historial.filter((item) => item.id !== id));
+    mostrarMensaje("Cancelación exitosa.", "success");
+  };
+
+  const mostrarMensaje = (mensaje, severidad) => {
+    setMensaje(mensaje);
+    setSeverity(severidad);
+    setOpenSnackbar(true);
+  };
+
+  return (
     <Box display="flex" flexDirection="column" height="100vh">
-  <NavbarCliente />
-  
-  <Box display="flex" flex={1} overflow="auto">
-    {/* Menú lateral */}
-    <MenuLateral />
-    
-    {/* Contenedor de las tarjetas */}
-    <Box sx={{ flex: 1, p: 4 }}>
-      <Typography
-        variant="h4"
-        gutterBottom
-        sx={{ fontWeight: "bold", color: "#333", textAlign: "center", mb: 4 }}
-      >
-        Historial de Vuelos
-      </Typography>
+      <NavbarCliente />
+      <Box display="flex" flex={1} overflow="auto">
+        {/* Menú lateral */}
+        <MenuLateral />
 
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "flex-start",
-          gap: "16px",
-        }}
-      >
-        {vuelosHistorial.map((vuelo) => (
-          <StyledCard
-            key={vuelo.id}
-            sx={{ width: "calc(33.33% - 16px)", minHeight: 200 }}
+        {/* Contenido principal */}
+        <Box sx={{ flex: 1, p: 4 }}>
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{
+              fontWeight: "bold",
+              color: "#333",
+              textAlign: "center",
+              mb: 4,
+            }}
           >
-            <CardBackground />
-            <CardContent sx={{ position: "relative", zIndex: 1 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  mb: 2,
-                }}
-              >
-                <FlightIcon fontSize="large" sx={{ color: "white" }} />
-                <IconButton size="small" sx={{ color: "white" }}>
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-              <CardInfo variant="body2">Fecha: {vuelo.fecha}</CardInfo>
-              <CardInfo variant="body2">Destino: {vuelo.destino}</CardInfo>
-              <CardInfo variant="body2">Vuelo: {vuelo.vuelo}</CardInfo>
-            </CardContent>
-          </StyledCard>
-        ))}
+            Historial de Vuelos
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Vuelo</TableCell>
+                  <TableCell>Tipo</TableCell>
+                  <TableCell>Estado</TableCell>
+                  <TableCell>Fecha</TableCell>
+                  <TableCell>Acciones</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {historial.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.vuelo}</TableCell>
+                    <TableCell>{item.tipo}</TableCell>
+                    <TableCell>{item.estado}</TableCell>
+                    <TableCell>{item.fecha}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => cancelar(item.id)}
+                      >
+                        Cancelar
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={4000}
+            onClose={() => setOpenSnackbar(false)}
+          >
+            <Alert severity={severity} sx={{ width: "100%" }}>
+              {mensaje}
+            </Alert>
+          </Snackbar>
+        </Box>
       </Box>
+      <Footer />
     </Box>
-  </Box>
-  
-  <Footer />
-</Box>
-
-
   );
 }
 
