@@ -446,7 +446,7 @@ const buscarVuelos = async ({ origen, destino, fechaIda, fechaVuelta, clase }) =
   }
 
   if (fechaIda) {
-    query += " AND fecha_ida = ?";
+    query += " AND fechaVuelo = ?";
     params.push(fechaIda);
   }
 
@@ -466,79 +466,6 @@ const buscarVuelos = async ({ origen, destino, fechaIda, fechaVuelta, clase }) =
 
 
 
-
-
-const crearReservaCompra = async (tipo, reserva, viajeros) => {
-  const connection = await db.getConnection(); // Obtener conexión
-  try {
-    await connection.beginTransaction();
-
-    // Insertar en la tabla de reservas
-    const [resultadoReserva] = await connection.query(
-      "INSERT INTO reservas (nombre, email, vuelo, fechaVuelo, tarjeta, estado, fechaCompra) VALUES (?, ?, ?, ?, ?, ?, NOW())",
-      [
-        reserva.nombre,
-        reserva.email,
-        reserva.vuelo,
-        reserva.fechaVuelo,
-        reserva.tarjeta,
-        tipo === "reserva" ? "activa" : "comprada",
-      ]
-    );
-
-    const reservaId = resultadoReserva.insertId;
-
-    // Insertar pasajeros con asignación de asiento aleatoria
-    for (const viajero of viajeros) {
-      const asientoAsignado = asignarAsiento(reserva.tipoVuelo, viajeros.length);
-      await connection.query(
-        "INSERT INTO pasajeros (ReservaID, TipoDocumento, NumeroDocumento, Nombre, Apellido, FechaNacimiento, Genero, Telefono, Email, NombreContactoEmergencia, TelefonoContactoEmergencia, NumeroAsiento, ClaseViaje, EstadoCheckIn) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-          reservaId,
-          viajero.TipoDocumento,
-          viajero.NumeroDocumento,
-          viajero.Nombre,
-          viajero.Apellido,
-          viajero.FechaNacimiento,
-          viajero.Genero,
-          viajero.Telefono,
-          viajero.Email,
-          viajero.NombreContactoEmergencia,
-          viajero.TelefonoContactoEmergencia,
-          asientoAsignado.numero,
-          asientoAsignado.clase,
-          "Pendiente",
-        ]
-      );
-    }
-
-    await connection.commit();
-    return { reservaId, pasajeros: viajeros };
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
-};
-
-// Función para asignar asiento aleatoriamente
-const asignarAsiento = (tipoVuelo, cantidadPasajeros) => {
-  const esNacional = tipoVuelo === "nacional";
-  const capacidad = esNacional ? 150 : 250;
-
-  // Primera clase y clase económica
-  const primeraClase = esNacional ? 25 : 50;
-  const asientoDisponible = Math.floor(Math.random() * capacidad) + 1;
-
-  const clase =
-    asientoDisponible <= primeraClase ? "Primera" : "Economica";
-
-  return {
-    numero: asientoDisponible.toString(),
-    clase,
-  };
-};
 
 const updateFlight = async (vueloID, vueloData) => {
   // Desestructurar los datos del vuelo
@@ -587,7 +514,51 @@ const updateFlight = async (vueloID, vueloData) => {
   }
 };
 
+const addReservation = async ({ nombre, email, vuelo, fechaVuelo, expiracion }) => {
+  const fechaReserva = new Date(); // Fecha actual
+  const query = `
+    INSERT INTO reservas (nombre, email, vuelo, fechaVuelo, expiracion, fechaReserva) 
+    VALUES (?, ?, ?, ?, ?, ?);
+  `;
 
+  try {
+    const [result] = await db.execute(query, [
+      nombre,
+      email,
+      vuelo,
+      fechaVuelo,
+      expiracion,
+      fechaReserva,
+    ]);
+    return result;
+  } catch (error) {
+    console.error('Error al agregar la reserva:', error.message);
+    throw new Error('Error al guardar la reserva en la base de datos.');
+  }
+};
+
+const addcompra = async ({ nombre, email, vuelo, fechaVuelo, expiracion }) => {
+  const fechaReserva = new Date(); // Fecha actual
+  const query = `
+    INSERT INTO compras (nombre, email, vuelo, fechaVuelo, tarjeta, estado , fechacompra) 
+    VALUES (?, ?, ?, ?, ?, ?);
+  `;
+
+  try {
+    const [result] = await db.execute(query, [
+      nombre,
+      email,
+      vuelo,
+      fechaVuelo,
+      expiracion,
+      fechaReserva,
+    ]);
+    return result;
+  } catch (error) {
+    console.error('Error al agregar la reserva:', error.message);
+    throw new Error('Error al guardar la reserva en la base de datos.');
+  }
+};
 
 
 
@@ -614,7 +585,8 @@ module.exports = {
   enviarCorreo,
   editarPerfil,
   buscarVuelos,
-  crearReservaCompra,
   updateFlight,
+  addReservation,
+  addcompra,
   obtenerTarjetasPorUsuario
 };

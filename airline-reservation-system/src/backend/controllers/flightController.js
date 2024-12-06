@@ -663,25 +663,6 @@ const buscarVuelosController = async (req, res) => {
 
 
 
-const gestionarReservaCompra = async (req, res) => {
-  const { tipo, viajeros, reserva } = req.body; // `tipo` puede ser "reserva" o "compra"
-  try {
-    if (!viajeros || viajeros.length === 0 || !reserva) {
-      return res.status(400).json({ error: "Datos incompletos." });
-    }
-
-    const resultado = await flightService.crearReservaCompra(tipo, reserva, viajeros);
-
-    return res.status(200).json({
-      message: `${tipo === "reserva" ? "Reserva" : "Compra"} realizada exitosamente.`,
-      datos: resultado,
-    });
-  } catch (error) {
-    console.error("Error en gestionarReservaCompra:", error);
-    return res.status(500).json({ error: "Error al procesar la solicitud." });
-  }
-};
-
 const updateFlight = async (req, res) => {
   
   const vueloID = req.params.vueloID;
@@ -700,6 +681,66 @@ const updateFlight = async (req, res) => {
     res.status(500).json({ message: "Error al actualizar el vuelo" });
   }
 };
+const createReservation = 
+  async (req, res) => {
+    const { nombre, email, vuelo, fechaVuelo, expiracion } = req.body;
+    console.log("datosback",req.body)
+
+    // Validar datos obligatorios
+    if (!nombre || !email || !vuelo || !fechaVuelo || !expiracion) {
+      return res.status(400).json({ message: 'Todos los campos son obligatorios.' });
+    }
+
+    try {
+      // Guardar reserva en la base de datos
+      const result = await flightService.addReservation({
+        nombre,
+        email,
+        vuelo,
+        fechaVuelo,
+        expiracion,
+      });
+
+      return res.status(201).json({
+        message: 'Reserva creada exitosamente.',
+        reservaId: result.insertId,
+      });
+    } catch (error) {
+      console.error('Error al crear la reserva:', error.message);
+      return res.status(500).json({ message: 'Error al crear la reserva.' });
+    }
+  };
+
+  const createcompra = 
+  async (req, res) => {
+    const { nombre, email, vuelo, fechaVuelo, expiracion } = req.body;
+    console.log("datosback",req.body)
+
+    // Validar datos obligatorios
+    if (!nombre || !email || !vuelo || !fechaVuelo || !expiracion) {
+      return res.status(400).json({ message: 'Todos los campos son obligatorios.' });
+    }
+
+    try {
+      // Guardar reserva en la base de datos
+      const result = await flightService.addcompra({
+        nombre,
+        email,
+        vuelo,
+        fechaVuelo,
+        expiracion,
+      });
+
+      return res.status(201).json({
+        message: 'Reserva creada exitosamente.',
+        reservaId: result.insertId,
+      });
+    } catch (error) {
+      console.error('Error al crear la reserva:', error.message);
+      return res.status(500).json({ message: 'Error al crear la reserva.' });
+    }
+  };
+
 
 
 module.exports = {
@@ -722,8 +763,9 @@ module.exports = {
   enviarCorreo,
   editarPerfil,
   buscarVuelosController,
-  gestionarReservaCompra,
   updateFlight,
+  createReservation,
+  createcompra,
   obtenerTarjetas
 
 };
