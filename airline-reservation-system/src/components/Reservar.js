@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Container, Tabs, Tab, Box, Typography } from "@mui/material";
 import FormularioTiquetes from "./FormularioTiquetes";
 import CarritoCompras from "./CarritoCompras";
-import HistorialCR from "./HistorialCR";
 import BusquedaTiquetes from "./BusquedaTiquetes";
 import NavbarCliente from "./NavbarCliente"; // Asegúrate de que la ruta sea correcta
 import Footer from "./Footer"; // Asegúrate de que la ruta sea correcta
@@ -44,17 +43,13 @@ const CompraReserva = () => {
               <Tab label="Buscar Tiquetes" />
               <Tab label="Reservar/Comprar" />
               <Tab label="Carrito de Compras" />
-              <Tab label="Historial" />
             </Tabs>
           </Box>
           {tabIndex === 0 && (
             <BusquedaTiquetes VueloSeleccionado={manejarVueloSeleccionado} />
           )}
-          {tabIndex === 1 && (
-            <FormularioTiquetes vuelo={vueloSeleccionado} />
-          )}
+          {tabIndex === 1 && <FormularioTiquetes vuelo={vueloSeleccionado} />}
           {tabIndex === 2 && <CarritoCompras />}
-          {tabIndex === 3 && <HistorialCR />}
         </Container>
       </Box>
       <Footer />
