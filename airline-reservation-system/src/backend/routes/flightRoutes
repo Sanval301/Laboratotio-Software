@@ -22,6 +22,9 @@ router.delete("/deleteTarjetas",  flightController.deleteCard);
 
 router.put("/editarperfil",  flightController.editarPerfil);//falta  
 
+router.get("/buscarVuelos", flightController.buscarVuelosController);
+
+
 
 router.delete("/CancelarVuelos/:VueloID",  flightController.cancelFlightController);
 router.post("/ComprarVuelo",  flightController.BuyTicket);

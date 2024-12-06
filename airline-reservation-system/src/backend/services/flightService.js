@@ -300,37 +300,6 @@ const createNews = async (titulo, informacion, precio_antes, precio_despues) => 
   }
 };
 
-const buscarVuelos = async (origen, destino, fechaVuelo, precioMin, precioMax) => {
-  // Base query
-  let query = 'SELECT * FROM Vuelos WHERE 1=1';
-  const params = [];
-
-  // Filtros dinámicos
-  if (origen) {
-    query += ' AND origen = ?';
-    params.push(origen);
-  }
-  if (destino) {
-    query += ' AND destino = ?';
-    params.push(destino);
-  }
-  if (fechaVuelo) {
-    query += ' AND DATE(fechaVuelo) = ?';
-    params.push(fechaVuelo); // Aseguramos que solo compare la fecha, no la hora
-  }
-  if (precioMin) {
-    query += ' AND precio >= ?';
-    params.push(precioMin);
-  }
-  if (precioMax) {
-    query += ' AND precio <= ?';
-    params.push(precioMax);
-  }
-
-  // Ejecutar consulta
-  const [rows] = await db.query(query, params);
-  return rows;
-};
 
 
 const crearAdministrador = async (nombre, apellido, email, nombreUsuario, contraseñaTemporal, tipoAdmin) => {
@@ -462,6 +431,40 @@ const editarPerfil = async (userId, updates) => {
   }
 };
 
+const buscarVuelos = async ({ origen, destino, fechaIda, fechaVuelta, clase }) => {
+  let query = "SELECT * FROM vuelos WHERE 1=1"; // Consulta base
+  const params = [];
+
+  if (origen) {
+    query += " AND origen LIKE ?";
+    params.push(`%${origen}%`);
+  }
+
+  if (destino) {
+    query += " AND destino LIKE ?";
+    params.push(`%${destino}%`);
+  }
+
+  if (fechaIda) {
+    query += " AND fecha_ida = ?";
+    params.push(fechaIda);
+  }
+
+  if (fechaVuelta) {
+    query += " AND fecha_vuelta = ?";
+    params.push(fechaVuelta);
+  }
+
+  if (clase) {
+    query += " AND clase = ?";
+    params.push(clase);
+  }
+
+  const [rows] = await db.execute(query, params); // Ejecutar la consulta
+  return rows; // Devolver los resultados
+};
+
+
 
 module.exports = {
   register,
@@ -485,5 +488,6 @@ module.exports = {
   actualizarContraseña,
   enviarCorreo,
   editarPerfil,
+  buscarVuelos,
   obtenerTarjetasPorUsuario
 };
