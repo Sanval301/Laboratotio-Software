@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Grid, Snackbar, Alert, Box } from "@mui/material";
+import axios from "axios";
 
 const FormularioTiquetes = ({ tipo }) => {
   const [datosViajeros, setDatosViajeros] = useState([]);
@@ -19,6 +20,10 @@ const FormularioTiquetes = ({ tipo }) => {
   const [severity, setSeverity] = useState("success");
 
   const agregarViajero = () => {
+    if (datosViajeros.length >= 5) {
+      mostrarMensaje("Solo puedes agregar un máximo de 5 viajeros.", "error");
+      return;
+    }
     const edad =
       new Date().getFullYear() -
       new Date(nuevoViajero.fechaNacimiento).getFullYear();
@@ -41,10 +46,37 @@ const FormularioTiquetes = ({ tipo }) => {
     mostrarMensaje("Viajero agregado exitosamente.", "success");
   };
 
-  const enviarFormulario = (tipo) => {
-    // Aquí puedes agregar la lógica para enviar el formulario a la base de datos
-    console.log("Enviando formulario con tipo:", tipo);
-    mostrarMensaje(`Formulario enviado como ${tipo}`, "success");
+  const enviarFormulario = async (tipoAccion) => {
+    if (datosViajeros.length === 0) {
+      mostrarMensaje("Debes agregar al menos un viajero.", "error");
+      return;
+    }
+
+    try {
+      const payload = {
+        tipo: tipoAccion, // "reserva" o "compra"
+        viajeros: datosViajeros,
+      };
+      console.log("fronted:",payload)
+      // Llamada al backend
+      const response = await axios.post(
+        "http://localhost:5009/gestionTiquetes",
+        payload
+      );
+
+      if (response.status === 200) {
+        mostrarMensaje(
+          `Formulario enviado como ${tipoAccion} exitosamente.`,
+          "success"
+        );
+        setDatosViajeros([]); // Limpiar el estado de los viajeros
+      } else {
+        mostrarMensaje("Ocurrió un error al enviar el formulario.", "error");
+      }
+    } catch (error) {
+      console.error("Error al enviar el formulario:", error);
+      mostrarMensaje("Ocurrió un error al procesar la solicitud.", "error");
+    }
   };
 
   const mostrarMensaje = (mensaje, severidad) => {

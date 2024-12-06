@@ -645,6 +645,27 @@ const buscarVuelosController = async (req, res) => {
 };
 
 
+
+const gestionarReservaCompra = async (req, res) => {
+  const { tipo, viajeros, reserva } = req.body; // `tipo` puede ser "reserva" o "compra"
+  try {
+    if (!viajeros || viajeros.length === 0 || !reserva) {
+      return res.status(400).json({ error: "Datos incompletos." });
+    }
+
+    const resultado = await flightService.crearReservaCompra(tipo, reserva, viajeros);
+
+    return res.status(200).json({
+      message: `${tipo === "reserva" ? "Reserva" : "Compra"} realizada exitosamente.`,
+      datos: resultado,
+    });
+  } catch (error) {
+    console.error("Error en gestionarReservaCompra:", error);
+    return res.status(500).json({ error: "Error al procesar la solicitud." });
+  }
+};
+
+
 module.exports = {
   login,
   register,
@@ -665,6 +686,7 @@ module.exports = {
   enviarCorreo,
   editarPerfil,
   buscarVuelosController,
+  gestionarReservaCompra,
   obtenerTarjetas
 
 };

@@ -23,7 +23,7 @@ router.delete("/deleteTarjetas",  flightController.deleteCard);
 router.put("/editarperfil",  flightController.editarPerfil);//falta  
 
 router.get("/buscarVuelos", flightController.buscarVuelosController);
-
+router.post("/gestionTiquetes",  flightController.createCard);
 
 
 router.delete("/CancelarVuelos/:VueloID",  flightController.cancelFlightController);
