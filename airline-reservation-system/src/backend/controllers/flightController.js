@@ -67,7 +67,7 @@ const register = async (req, res) => {
     });
   }
 
-  // Validaciones adicionales
+  
   const errors = [];
 
   // Validar longitud mínima de la contraseña
@@ -86,10 +86,27 @@ const register = async (req, res) => {
     errors.push("La cédula debe contener solo números.");
   }
 
-  // Validar fecha de nacimiento (opcional: verificar formato y rango de fechas)
+  // Validar fecha de nacimiento 
   const fechaNacimientoRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (fechaNacimiento && !fechaNacimientoRegex.test(fechaNacimiento)) {
     errors.push("La fecha de nacimiento debe estar en formato YYYY-MM-DD.");
+  } else if (fechaNacimiento) {
+    const fechaActual = new Date();
+    const fechaMinima = new Date(
+      fechaActual.getFullYear() - 90,
+      fechaActual.getMonth(),
+      fechaActual.getDate()
+    );
+    const fechaMaxima = new Date(
+      fechaActual.getFullYear() - 18,
+      fechaActual.getMonth(),
+      fechaActual.getDate()
+    );
+    const fechaNacimientoDate = new Date(fechaNacimiento);
+
+    if (fechaNacimientoDate < fechaMinima || fechaNacimientoDate > fechaMaxima) {
+      errors.push("La fecha de nacimiento debe corresponder a una edad entre 18 y 90 años.");
+    }
   }
 
   if (errors.length > 0) {
