@@ -624,6 +624,27 @@ const editarPerfil = async (req, res) => {
   }
 };
 
+const buscarVuelosController = async (req, res) => {
+  const { origen, destino, fechaIda, fechaVuelta, clase } = req.query;
+
+  try {
+    // Llamar al servicio para obtener los vuelos filtrados
+    const vuelos = await flightService.buscarVuelos({
+      origen,
+      destino,
+      fechaIda,
+      fechaVuelta,
+      clase,
+    });
+
+    res.status(200).json(vuelos);
+  } catch (error) {
+    console.error("Error al buscar vuelos:", error);
+    res.status(500).json({ message: "Error al buscar vuelos" });
+  }
+};
+
+
 module.exports = {
   login,
   register,
@@ -643,6 +664,7 @@ module.exports = {
   changePassword,
   enviarCorreo,
   editarPerfil,
+  buscarVuelosController,
   obtenerTarjetas
 
 };
