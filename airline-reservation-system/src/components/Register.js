@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";  // Importamos el hook useNavigate
+import { useNavigate } from "react-router-dom"; // Importamos el hook useNavigate
 import {
   Button,
   TextField,
@@ -87,7 +87,7 @@ function Registro() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     const dataToSend = {
       ...formData,
       cedula: formData.cedula || null,
@@ -104,38 +104,32 @@ function Registro() {
       genero: formData.genero || "",
       imagenUsuario: formData.imagenUsuario || null,
     };
-  
+
     console.log("Datos a enviar:", dataToSend);
-  
+
     try {
       // Enviar los datos al backend para el registro
-      await axios.post(
-        "http://localhost:5009/enviarc",
-        {
-          email: dataToSend.email, // Email decodificado del token
-          contraseña: dataToSend.contraseña, // Nombre de usuario del token
-        },
-      
-      );
-      
-      
-      const response = await axios.post("http://localhost:5009/register", dataToSend, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+      await axios.post("http://localhost:5009/enviarc", {
+        email: dataToSend.email, // Email decodificado del token
+        contraseña: dataToSend.contraseña, // Nombre de usuario del token
       });
-  
-      
-        // Guardar el token en localStorage
-        localStorage.setItem("token", response.data.token);
-  
-      
-        
-  
-        alert("Usuario registrado y correo enviado con éxito.");
-        navigate("/login");
-        setError("");
-      
+
+      const response = await axios.post(
+        "http://localhost:5009/register",
+        dataToSend,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Guardar el token en localStorage
+      localStorage.setItem("token", response.data.token);
+
+      alert("Usuario registrado y correo enviado con éxito.");
+      navigate("/BuscarVuelos");
+      setError("");
     } catch (err) {
       setError(err.response?.data?.message || "Error en el registro");
       console.error("Error en el registro:", err.message);
@@ -143,9 +137,6 @@ function Registro() {
       setIsLoading(false);
     }
   };
-  
-  
-  
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -156,11 +147,20 @@ function Registro() {
           <StyledAvatar>
             <AccountCircle />
           </StyledAvatar>
-          <Typography component="h1" variant="h5" sx={{ fontWeight: "bold", mb: 3 }}>
+          <Typography
+            component="h1"
+            variant="h5"
+            sx={{ fontWeight: "bold", mb: 3 }}
+          >
             Registro de Cliente
           </Typography>
 
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <Grid container spacing={2}>
               {/* Información Personal */}
               <Grid item xs={12} sm={6}>
@@ -282,7 +282,7 @@ function Registro() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Nombre de Usuario"
-                  name="nombreUsuario"
+                  name="nombreusuario"
                   value={formData.nombreusuario}
                   onChange={handleChange}
                   fullWidth
@@ -354,7 +354,12 @@ function Registro() {
             </Grid>
 
             {error && (
-              <Typography color="error" variant="body2" gutterBottom sx={{ mt: 2 }}>
+              <Typography
+                color="error"
+                variant="body2"
+                gutterBottom
+                sx={{ mt: 2 }}
+              >
                 {error}
               </Typography>
             )}

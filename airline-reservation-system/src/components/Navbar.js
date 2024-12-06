@@ -23,18 +23,15 @@ const NavbarVisitante = () => {
               }}
             />
           </Link>
-        <Link to="/" style={{ textDecoration: "none", color: "white" }}>
-          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            AirTicket
-          </Typography>
-        </Link>
-        {/* Título */}
+          <Link to="/" style={{ textDecoration: "none", color: "white" }}>
+            <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+              AirTicket
+            </Typography>
+          </Link>
+          {/* Título */}
         </Box>
         {/* Opciones básicas */}
         <Box sx={{ display: "flex", gap: 2 }}>
-          <Button color="inherit" component={Link} to="/" sx={{ mx: 1 }}>
-            Buscar Vuelos
-          </Button>
           <Button color="inherit" component={Link} to="/login" sx={{ mx: 1 }}>
             Iniciar Sesión
           </Button>
