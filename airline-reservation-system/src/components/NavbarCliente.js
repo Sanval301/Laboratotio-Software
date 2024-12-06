@@ -31,7 +31,7 @@ const NavbarCliente = () => {
             />
           </Link>
           <Link
-            to="/AdminVuelos"
+            to="/BuscarVuelos"
             style={{ textDecoration: "none", color: "white" }}
           >
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
@@ -42,7 +42,7 @@ const NavbarCliente = () => {
 
         {/* Opciones del cliente */}
         <Box sx={{ display: "flex", gap: 2 }}>
-          <Button color="inherit" component={Link} to="/">
+          <Button color="inherit" component={Link} to="/BuscarVuelos">
             Buscar Vuelos
           </Button>
           <Button color="inherit" component={Link} to="/reservar">

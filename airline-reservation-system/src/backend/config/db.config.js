@@ -5,7 +5,7 @@ const db = mysql
   .createPool({
     host: "127.0.0.1", // Cambiar por la dirección de tu servidor MySQL si no es local
     user: "root", // Tu usuario de MySQL
-    password: "Santiaguito1", // Tu contraseña de MySQL
+    password: "1234", // Tu contraseña de MySQL
     database: "aeroticket", // Nombre de tu base de datos
   })
   .promise();
