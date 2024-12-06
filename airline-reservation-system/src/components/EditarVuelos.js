@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect} from "react";
+import axios from "axios"; // Importa axios
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 import {
   Container,
   Typography,
@@ -29,47 +31,25 @@ import {
 import NavbarAdmin from "./NavbarAdmin"; // Asegúrate de que la ruta sea correcta
 import Footer from "./Footer"; // Asegúrate de que la ruta sea correcta
 export default function EditarVuelos() {
-  const [vuelos, setVuelos] = useState([
-    {
-      VueloID: 1,
-      CodigoVuelo: "AV123",
-      Origen: "Bogota",
-      Destino: "Cartagena",
-      FechaVuelo: "2024-12-01",
-      HoraSalida: "08:30",
-      Pasajeros: 150,
-      CostoPorPersona: 300000,
-      Estado: "Activo",
-    },
-    {
-      VueloID: 2,
-      CodigoVuelo: "AV456",
-      Origen: "Medellin",
-      Destino: "Miami",
-      FechaVuelo: "2024-12-05",
-      HoraSalida: "10:00",
-      Pasajeros: 200,
-      CostoPorPersona: 500000,
-      Estado: "Activo",
-    },
-    {
-      VueloID: 3,
-      CodigoVuelo: "AV789",
-      Origen: "Cali",
-      Destino: "Madrid",
-      FechaVuelo: "2024-12-10",
-      HoraSalida: "16:45",
-      Pasajeros: 250,
-      CostoPorPersona: 900000,
-      Estado: "Activo",
-    },
-  ]);
-
+  const [vuelos, setVuelos] = useState([]);
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const navigate = useNavigate(); // Inicializa useNavigate
 
+  // Cargar vuelos desde la API al montar el componente
+  useEffect(() => {
+    const fetchVuelos = async () => {
+      try {
+        const response = await axios.get("http://localhost:5009/obtenervuelos"); // Ajusta la URL si es necesario
+        setVuelos(response.data); // Asume que la API devuelve los vuelos en el campo 'data'
+      } catch (error) {
+        console.error("Error al obtener los vuelos", error);
+      }
+    };
+    fetchVuelos();
+  }, []);
   const locations = [
     "Pereira",
     "Bogota",
@@ -93,14 +73,16 @@ export default function EditarVuelos() {
     setOpenDialog(false);
   };
 
-  const handleEditFlight = () => {
-    setVuelos((prev) =>
-      prev.map((vuelo) =>
-        vuelo.VueloID === selectedFlight.VueloID ? selectedFlight : vuelo
-      )
-    );
-    setSnackbarOpen(true);
-    handleCloseDialog();
+  const handleEditFlight = async () => {
+    try {
+      console.log("fronted",selectedFlight.VueloID)
+      await axios.put(`http://localhost:5009/editarvuelos/${selectedFlight.VueloID}`, selectedFlight); // Actualiza el vuelo
+      setSnackbarOpen(true);
+      handleCloseDialog();
+      navigate("/editarvuelos"); // Redirige a /editarvuelos después de guardar
+    } catch (error) {
+      console.error("Error al actualizar el vuelo", error);
+    }
   };
 
   const handleInputChange = (field, value) => {
@@ -279,6 +261,7 @@ export default function EditarVuelos() {
                   color="primary"
                 >
                   Guardar Cambios
+                  
                 </Button>
               </DialogActions>
             </Dialog>

@@ -682,6 +682,25 @@ const gestionarReservaCompra = async (req, res) => {
   }
 };
 
+const updateFlight = async (req, res) => {
+  
+  const vueloID = req.params.vueloID;
+  const vueloData = req.body; // Los datos del vuelo se pasan en el cuerpo de la solicitud
+  console.log("back:",vueloData)
+
+  try {
+    const result = await flightService.updateFlight(vueloID, vueloData);
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: "Vuelo actualizado exitosamente" });
+    } else {
+      res.status(404).json({ message: "Vuelo no encontrado" });
+    }
+  } catch (error) {
+    console.error("Error al actualizar el vuelo", error);
+    res.status(500).json({ message: "Error al actualizar el vuelo" });
+  }
+};
+
 
 module.exports = {
   login,
@@ -704,6 +723,7 @@ module.exports = {
   editarPerfil,
   buscarVuelosController,
   gestionarReservaCompra,
+  updateFlight,
   obtenerTarjetas
 
 };

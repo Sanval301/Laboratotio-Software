@@ -15,6 +15,7 @@ router.post("/login", flightController.login);
 router.get("/obtenervuelos", flightController.getAllFlights); // Obtener vuelos del usuario
 router.get("/Reservar", flightController.getAllFlights); // Obtener vuelos del usuario
 router.post("/crearvuelo",  flightController.createFlight); // Crear un vuelo nuevo
+router.put("/editarvuelos/:VueloId",  flightController.updateFlight);//falta  
 
 router.get("/getTarjetas",flightController.getTarjetas)
 router.post("/Tarjetas",  flightController.createCard);

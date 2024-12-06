@@ -540,6 +540,52 @@ const asignarAsiento = (tipoVuelo, cantidadPasajeros) => {
   };
 };
 
+const updateFlight = async (vueloID, vueloData) => {
+  // Desestructurar los datos del vuelo
+  console.log("servicio:",vueloData)
+  
+  const fechaVuelo = new Date(vueloData.FechaVuelo);
+  // Validar los datos y asignar 'null' si es 'undefined'
+  
+  const query = `
+    UPDATE vuelos
+    SET
+      CodigoVuelo = ?,
+      FechaVuelo = ?,
+      HoraSalida = ?,
+      Origen = ?,
+      Destino = ?,
+      DuracionVuelo = ?,
+      HoraLlegadaLocal = ?,
+      CostoPorPersona = ?,
+      EsInternacional = ?,
+      Estado = ?,
+      CreadoPor = ?
+    WHERE VueloID = ?;
+  `;
+
+  const values = [
+    vueloData.CodigoVuelo,
+    fechaVuelo,
+    vueloData.HoraSalida,
+    vueloData.Origen,
+    vueloData.Destino,
+    vueloData.DuracionVuelo,
+    vueloData.HoraLlegadaLocal,
+    vueloData.CostoPorPersona,
+    vueloData.EsInternacional,
+    vueloData.Estado,
+    vueloData.CreadoPor,
+    vueloData.VueloID
+  ];
+  console.log(values)
+  try {
+    const [result] = await db.execute(query, values);
+    return result;
+  } catch (error) {
+    throw new Error("Error al actualizar el vuelo: " + error.message);
+  }
+};
 
 
 
@@ -569,5 +615,6 @@ module.exports = {
   editarPerfil,
   buscarVuelos,
   crearReservaCompra,
+  updateFlight,
   obtenerTarjetasPorUsuario
 };
