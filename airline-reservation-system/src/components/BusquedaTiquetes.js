@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import axios from "axios";
 
-const BusquedaTiquetes = () => {
+const BusquedaTiquetes = ({ VueloSeleccionado }) => {
   const [criterios, setCriterios] = useState({
     origen: "",
     destino: "",
@@ -134,7 +134,11 @@ const BusquedaTiquetes = () => {
                 </Box>
               </CardContent>
               <CardActions sx={{ mt: "auto", justifyContent: "center" }}>
-                <Button variant="outlined" color="primary">
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => VueloSeleccionado(vuelo)}
+                >
                   Reservar / Comprar
                 </Button>
               </CardActions>

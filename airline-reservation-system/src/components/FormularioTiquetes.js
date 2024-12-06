@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { TextField, Button, Grid, Snackbar, Alert, Box } from "@mui/material";
 import axios from "axios";
 
-const FormularioTiquetes = ({ tipo }) => {
+const FormularioTiquetes = ({ vuelo }) => {
+  console.log(vuelo)
   const [datosViajeros, setDatosViajeros] = useState([]);
   const [nuevoViajero, setNuevoViajero] = useState({
     documento: "",
@@ -55,10 +56,10 @@ const FormularioTiquetes = ({ tipo }) => {
     try {
       const payload = {
         tipo: tipoAccion, // "reserva" o "compra"
+        vuelo: vuelo, // Incluye los datos del vuelo seleccionado
         viajeros: datosViajeros,
       };
-      console.log("fronted:",payload)
-      // Llamada al backend
+
       const response = await axios.post(
         "http://localhost:5009/gestionTiquetes",
         payload
@@ -69,7 +70,7 @@ const FormularioTiquetes = ({ tipo }) => {
           `Formulario enviado como ${tipoAccion} exitosamente.`,
           "success"
         );
-        setDatosViajeros([]); // Limpiar el estado de los viajeros
+        setDatosViajeros([]);
       } else {
         mostrarMensaje("Ocurrió un error al enviar el formulario.", "error");
       }
@@ -87,9 +88,15 @@ const FormularioTiquetes = ({ tipo }) => {
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
-        <h2>Formulario de Compra/Reserva</h2>
-      </Grid>
+      {vuelo && (
+        <Grid item xs={12}>
+          <h3>Detalles del Vuelo Seleccionado</h3>
+          <p>Origen: {vuelo.Origen}</p>
+          <p>Destino: {vuelo.Destino}</p>
+          <p>Fecha: {vuelo.FechaVuelo}</p>
+          <p>Precio: ${vuelo.CostoPorPersona}</p>
+        </Grid>
+      )}
       {Object.keys(nuevoViajero).map((campo) => (
         <Grid item xs={12} sm={6} key={campo}>
           <TextField

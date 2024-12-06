@@ -1,11 +1,3 @@
-/** id(automarized) 
- * Name, email, 
- * tabla tiquetes compras y reservas
- * 
- * 
- * Cambiar seccion de comprar reservar 
-*/
-
 import React, { useState } from "react";
 import { Container, Tabs, Tab, Box, Typography } from "@mui/material";
 import FormularioTiquetes from "./FormularioTiquetes";
@@ -17,9 +9,16 @@ import Footer from "./Footer"; // Asegúrate de que la ruta sea correcta
 
 const CompraReserva = () => {
   const [tabIndex, setTabIndex] = useState(0);
+  const [vueloSeleccionado, setVueloSeleccionado] = useState(null);
 
   const handleChange = (event, newValue) => {
     setTabIndex(newValue);
+  };
+
+  // Función para manejar el vuelo seleccionado
+  const manejarVueloSeleccionado = (vuelo) => {
+    setVueloSeleccionado(vuelo);
+    setTabIndex(1); // Cambia a la pestaña "Reservar/Comprar"
   };
 
   return (
@@ -48,8 +47,12 @@ const CompraReserva = () => {
               <Tab label="Historial" />
             </Tabs>
           </Box>
-          {tabIndex === 0 && <BusquedaTiquetes />}
-          {tabIndex === 1 && <FormularioTiquetes />}
+          {tabIndex === 0 && (
+            <BusquedaTiquetes VueloSeleccionado={manejarVueloSeleccionado} />
+          )}
+          {tabIndex === 1 && (
+            <FormularioTiquetes vuelo={vueloSeleccionado} />
+          )}
           {tabIndex === 2 && <CarritoCompras />}
           {tabIndex === 3 && <HistorialCR />}
         </Container>
