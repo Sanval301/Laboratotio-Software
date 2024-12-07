@@ -54,7 +54,7 @@ function Registro() {
     ciudad: "",
     direccionFacturacion: "",
     email: "",
-    nombreusuario: "",
+    nombreUsuario: "",
     contraseña: "",
     genero: "",
     imagenUsuario: null,
@@ -128,7 +128,7 @@ function Registro() {
       localStorage.setItem("token", response.data.token);
 
       alert("Usuario registrado y correo enviado con éxito.");
-      navigate("/BuscarVuelos");
+      navigate("/login");
       setError("");
     } catch (err) {
       setError(err.response?.data?.message || "Error en el registro");
@@ -282,8 +282,8 @@ function Registro() {
               <Grid item xs={12} sm={6}>
                 <TextField
                   label="Nombre de Usuario"
-                  name="nombreusuario"
-                  value={formData.nombreusuario}
+                  name="nombreUsuario"
+                  value={formData.nombreUsuario}
                   onChange={handleChange}
                   fullWidth
                   required
