@@ -30,7 +30,7 @@
     "react-scripts": "5.0.1",
     "sequelize": "^6.37.5",
     "web-vitals": "^2.1.4",
-    "homepage": "https://Sanval301.github.io/airline-reservation-system/"
+    
   },
   "scripts": {
     "start": "node server.js",
