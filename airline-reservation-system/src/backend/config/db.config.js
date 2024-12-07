@@ -1,14 +1,19 @@
 const mysql = require("mysql2");
 
-// Configuración de la conexión a la base de datos
-const db = mysql
-  .createPool({
-    host: "127.0.0.1", // Cambiar por la dirección de tu servidor MySQL si no es local
-    user: "root", // Tu usuario de MySQL
-    password: "Santiaguito1", // Tu contraseña de MySQL
-    database: "aeroticket", // Nombre de tu base de datos
-  })
-  .promise();
+export const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+
+
+export const DB_HOST = process.env.DB_HOST || "localhost";
+
+export const DB_PORT = process.env.DB_PORT || 5444;
+
+export const DB_DATABASE = process.env.DB_DATABASE || "postgres";
+
+export const DB_USER = process.env.DB_USER || "postgres";
+
+export const DB_PASSWORD = process.env.DB_PASSWORD || "mysecretpassword"; I
+
+export const PORT = process.env.PORT || 3000;
 
 // Verificar conexión (opcional)
 db.query("SELECT 1")
